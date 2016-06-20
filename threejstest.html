@@ -15,28 +15,25 @@
 
 	section {
 		margin: auto;
-		height: 610px;
+		height: 606px;
 	}
 
 	#cylinder {
-		max-width: 410px;
-		max-height: 610px;
-		border: solid #e0e0e0 5px;
+		max-width: 406px;
+		max-height: 606px;
+		border: solid #e0e0e0 3px;
+		border-radius: 1px;
 		float: left;
 	}
 
 	#svg {
-		max-width: 410px;
-		max-height: 610px;
-		border: solid #e0e0e0 5px;
+		max-width: 406px;
+		max-height: 606px;
+		border: solid #e0e0e0 3px;
+		border-radius: 1px;
 		position: relative;
-		left: 415px;
+		left: 410px;
 	}
-
-	#general {
-
-	}
-
 	</style>
 </head>
 <body>
@@ -46,9 +43,12 @@
 	</section>
 	<script src="//d3js.org/d3.v3.min.js"></script>
 	<script src="//cdnjs.cloudflare.com/ajax/libs/three.js/r78/three.min.js"></script>
+	<script type="text/javascript" src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
 	<script>
 
-	// useful variables
+	/*
+	 * useful variables declaration
+	 */
 
 	var WIDTH = 400,
 	HEIGHT = 600;
@@ -64,7 +64,10 @@
 	var color_split = color_scheme[0].split(",");
 
 
-	// three.js setup
+	/*
+   * three.js setup
+	 * appends scene to div
+	 */
 
 	var scene = new THREE.Scene();
 	var camera = new THREE.PerspectiveCamera( 75, WIDTH/HEIGHT, 0.1, 1000 );
@@ -75,7 +78,9 @@
 	var container = document.getElementById('cylinder');
 	container.appendChild( renderer.domElement );
 
-	// camera setup
+	/*
+	 * camera setup with lookat
+	 */
 
 	scene.add(camera);
 	camera.rotation.z = Math.PI/4;
@@ -84,7 +89,9 @@
 	camera.up = new THREE.Vector3(0, 0, 1);
 	camera.lookAt(new THREE.Vector3(0, 0, 5));
 
-	// add slice (6 lines)
+	/*
+	 * draws the slice plane using 6 lines
+	 */
 
 	var sliceWidth = .25;
 	var sliceGroup = new THREE.Group();
@@ -110,7 +117,6 @@
 	line12g.vertices.push(new THREE.Vector3(-5,(sliceWidth/2),-0.25), new THREE.Vector3(5,(sliceWidth/2),-0.25));
 
 	// CREATE LINES
-
 	var line1 = new THREE.Line(line1g, lineMat);
 	var line5 = new THREE.Line(line5g, lineMat);
 	var line9 = new THREE.Line(line9g, lineMat);
@@ -127,6 +133,47 @@
 	sliceGroup.add(line12);
 	scene.add(sliceGroup);
 
+	/*
+	 * function to rotate the cylinder with mouse drag on click
+	 */
+
+	 var isDragging = false;
+	 var previousMousePosition = 0;
+	 $(renderer.domElement).on('mousedown', function(e) {
+		 d3.select('#cylinder').style('cursor', 'ew-resize');
+		 isDragging = true;
+	 })
+	 .on('mousemove', function(e) {
+		 //console.log(e);
+		 var deltaMove = e.offsetX - previousMousePosition;
+
+
+		 if(isDragging) {
+
+			 var deltaRotationQuaternion = new THREE.Quaternion()
+			 .setFromEuler(new THREE.Euler(
+				 0,
+				 0,
+				 (deltaMove * 1) * Math.PI/180,
+				 'XYZ'
+			 ));
+
+			 particleSystem.quaternion.multiplyQuaternions(deltaRotationQuaternion, particleSystem.quaternion);
+		 }
+
+		 previousMousePosition = e.offsetX;
+	 });
+	 /* */
+
+	 $(document).on('mouseup', function(e) {
+		 isDragging = false;
+		 d3.select('#cylinder').style('cursor', 'default');
+	 });
+
+	 // mouse rotation function ends here
+
+
+
 	// render scene
 
 	var particleSystem;
@@ -140,7 +187,7 @@
 		if(particleSystem) {
 
 			currentRotation = (currentRotation + myClock.getDelta() /2) % (2*Math.PI);
-			particleSystem.rotation.z = currentRotation;
+			// particleSystem.rotation.z = currentRotation;
 
 
 			sliced = [];
@@ -228,7 +275,7 @@
 
 			// add it to the scene
 			scene.add(particleSystem);
-			particleSystem.rotation.z = currentRotation;
+			// particleSystem.rotation.z = currentRotation;
 
 
 			// render again after particles created
