@@ -210,6 +210,12 @@
 
 		if (keyboard.pressed("up")) {
 			if (camera.position.z <= 12.5) camera.position.z += 0.03;
+<<<<<<< HEAD
+=======
+			camera.updateProjectionMatrix();
+
+			camera.lookAt(new THREE.Vector3(0, 0, 6));
+>>>>>>> master
 		}
 
 		if (keyboard.pressed("down")) {
@@ -224,6 +230,23 @@
 			if (camera.position.y <= 3) camera.position.y += 0.03;
 		}
 
+<<<<<<< HEAD
+=======
+		if (keyboard.pressed("left")) {
+			if (camera.position.y >= -3) camera.position.y -= 0.03;
+			camera.updateProjectionMatrix();
+
+			camera.lookAt(new THREE.Vector3(0, 0, 6));
+		}
+
+		if (keyboard.pressed("right")) {
+			if (camera.position.y <= 3) camera.position.y += 0.03;
+			camera.updateProjectionMatrix();
+
+			camera.lookAt(new THREE.Vector3(0, 0, 6));
+		}
+
+>>>>>>> master
 	}
 
 
@@ -231,8 +254,12 @@
 		requestAnimationFrame( render );
 
 		keyboardListener();
+<<<<<<< HEAD
 		camera.updateProjectionMatrix();
 		camera.lookAt(new THREE.Vector3(0, 0, 6));
+=======
+
+>>>>>>> master
 
 		renderer.render( scene, camera );
 	}
