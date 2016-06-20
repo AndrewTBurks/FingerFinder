@@ -42,6 +42,7 @@
 	</section>
 	<script src="//d3js.org/d3.v3.min.js"></script>
 	<script src="//cdnjs.cloudflare.com/ajax/libs/three.js/r78/three.min.js"></script>
+	<script src="js/THREEx.KeyboardState.js"></script>
 	<script type="text/javascript" src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
 	<script>
 
@@ -54,6 +55,7 @@
 	var folderPath = "clean.44/";
 	var numFiles = 121;
 	var data = [];
+	var keyboard = new THREEx.KeyboardState();
 
 	// number of blocks in the slice
 	var sliceResolution = 49;
@@ -96,11 +98,10 @@
 	 */
 
 	scene.add(camera);
-	camera.rotation.z = Math.PI/4;
-	camera.position.z = 7;
+	camera.position.z = 10;
 	camera.position.x = 15;
 	camera.up = new THREE.Vector3(0, 0, 1);
-	camera.lookAt(new THREE.Vector3(0, 0, 5));
+	camera.lookAt(new THREE.Vector3(-2, 0, 5));
 
 	/*
 	 * draws the slice plane using 6 lines
@@ -181,7 +182,7 @@
 
 	 $(document).on('mouseup', function(e) {
 		 isDragging = false;
-		 // refresh the slice after the user is done dragging 
+		 // refresh the slice after the user is done dragging
 		 refreshSlice();
 		 d3.select('#cylinder').style('cursor', 'default');
 	 });
@@ -207,10 +208,14 @@
 	function render() {
 		requestAnimationFrame( render );
 
-		if(particleSystem) {
+		if (keyboard.pressed("up")) {
+			if (camera.position.z <= 13.3) camera.position.z += 0.03;
+			camera.updateProjectionMatrix();
+		}
 
-			// particleSystem.rotation.z = currentRotation;
-			
+		if (keyboard.pressed("down")) {
+			if (camera.position.z >= 6.5) camera.position.z -= 0.03;
+			camera.updateProjectionMatrix();
 		}
 
 		renderer.render( scene, camera );
@@ -347,7 +352,7 @@
 					  	//.style("fill", "orange");
 				}
 			}
-			
+
 
 		}
 
