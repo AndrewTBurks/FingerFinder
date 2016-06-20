@@ -88,7 +88,8 @@
 	var scene = new THREE.Scene();
 	var camera = new THREE.PerspectiveCamera( 75, WIDTH/HEIGHT, 0.1, 1000 );
 
-	var renderer = new THREE.WebGLRenderer();
+	var renderer = new THREE.WebGLRenderer({antialias: true});
+
 	renderer.setClearColor(new THREE.Color("#181818"));
 	renderer.setSize(WIDTH, HEIGHT);
 	var container = document.getElementById('cylinder');
@@ -205,12 +206,10 @@
 	var particleSystem;
 	var currentRotation = 0;
 
-
-	function render() {
-		requestAnimationFrame( render );
+	function keyboardListener() {
 
 		if (keyboard.pressed("up")) {
-			if (camera.position.z <= 13.3) camera.position.z += 0.03;
+			if (camera.position.z <= 12.5) camera.position.z += 0.03;
 			camera.updateProjectionMatrix();
 
 			camera.lookAt(new THREE.Vector3(0, 0, 6));
@@ -222,6 +221,29 @@
 
 			camera.lookAt(new THREE.Vector3(0, 0, 6));
 		}
+
+		if (keyboard.pressed("left")) {
+			if (camera.position.y >= -3) camera.position.y -= 0.03;
+			camera.updateProjectionMatrix();
+
+			camera.lookAt(new THREE.Vector3(0, 0, 6));
+		}
+
+		if (keyboard.pressed("right")) {
+			if (camera.position.y <= 3) camera.position.y += 0.03;
+			camera.updateProjectionMatrix();
+
+			camera.lookAt(new THREE.Vector3(0, 0, 6));
+		}
+
+	}
+
+
+	function render() {
+		requestAnimationFrame( render );
+
+		keyboardListener();
+
 
 		renderer.render( scene, camera );
 	}
@@ -256,9 +278,9 @@
 		if(particles) particles.dispose();
 
 
-		
 
-		
+
+
 
 		var particleCount = data.length, // 40th step
 		particles = new THREE.Geometry();
@@ -271,7 +293,7 @@
 			var pX = data[p].Points0,
 			pY = data[p].Points1,
 			pZ = data[p].concentration < (mean + stddev/3) ? -40 : data[p].Points2,
-			//pZ = data[p].Points2,
+			// pZ = data[p].Points2,
 			particle = new THREE.Vector3(pX, pY, pZ);
 
 			// add it to the geometry
@@ -337,7 +359,7 @@
 			var minConcSlice = d3.min(sliceAccumulated, function(e) { return d3.max(e, function(e){ return e.conc;}); });
 
 
-			colorSlice.domain([minConcSlice, maxConcSlice]);
+			colorSlice.domain([0, maxConcSlice]);
 
 
 			d3.selectAll(".slicePixel").remove();
@@ -352,7 +374,7 @@
 					  	.attr("height", gridWidth)
 					  	.attr("x", (sliceAccumulated[i][j].x*gridWidth))
 					  	.attr("y", (sliceAccumulated[i][j].y*gridWidth))
-					  	.style("fill", d3.rgb("#" + colorSlice(sliceAccumulated[i][j].conc)));
+					  	.style("fill", d3.rgb("#" + color(sliceAccumulated[i][j].conc/3)));
 					  	//.style("fill", "orange");
 				}
 			}
