@@ -210,31 +210,20 @@
 
 		if (keyboard.pressed("up")) {
 			if (camera.position.z <= 12.5) camera.position.z += 0.03;
-			camera.updateProjectionMatrix();
-
-			camera.lookAt(new THREE.Vector3(0, 0, 6));
 		}
 
 		if (keyboard.pressed("down")) {
 			if (camera.position.z >= 5) camera.position.z -= 0.03;
-			camera.updateProjectionMatrix();
-
-			camera.lookAt(new THREE.Vector3(0, 0, 6));
 		}
 
 		if (keyboard.pressed("left")) {
 			if (camera.position.y >= -3) camera.position.y -= 0.03;
-			camera.updateProjectionMatrix();
-
-			camera.lookAt(new THREE.Vector3(0, 0, 6));
 		}
 
 		if (keyboard.pressed("right")) {
 			if (camera.position.y <= 3) camera.position.y += 0.03;
-			camera.updateProjectionMatrix();
-
-			camera.lookAt(new THREE.Vector3(0, 0, 6));
 		}
+
 
 	}
 
@@ -243,7 +232,8 @@
 		requestAnimationFrame( render );
 
 		keyboardListener();
-
+		camera.updateProjectionMatrix();
+		camera.lookAt(new THREE.Vector3(0, 0, 6));
 
 		renderer.render( scene, camera );
 	}
