@@ -43,6 +43,7 @@
 	<script src="//d3js.org/d3.v3.min.js"></script>
 	<script src="//cdnjs.cloudflare.com/ajax/libs/three.js/r78/three.min.js"></script>
 	<script src="js/THREEx.KeyboardState.js"></script>
+	<script src="js/TrackballControls.js"></script>
 	<script type="text/javascript" src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
 	<script>
 
@@ -108,6 +109,16 @@
 	camera.position.x = 15;
 	camera.up = new THREE.Vector3(0, 0, 1);
 	camera.lookAt(new THREE.Vector3(0, 0, 6));
+
+	var controls = new THREE.TrackballControls(camera, renderer.domElement);
+	controls.target.set(0, 0, 6);
+	controls.zoomSpeed = 0.15;
+
+	controls.noRotate = true;
+	controls.noZoom = false;
+	controls.noPan = true;
+	controls.minDistance = 1;
+	controls.maxDistance = 20;
 
 	/*
 	 * draws the slice plane using 6 lines
@@ -251,6 +262,7 @@
 		requestAnimationFrame( render );
 
 		keyboardListener();
+		controls.update();
 
 		renderer.render( scene, camera );
 	}
@@ -258,6 +270,7 @@
 	function onWindowResize(){
 		camera.updateProjectionMatrix();
 		renderer.setSize(500,500);
+		controls.handleResize();
 	}
 
 
