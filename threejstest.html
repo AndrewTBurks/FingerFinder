@@ -1,7 +1,7 @@
 <html>
 <head>
 	<meta charset="utf-8">
-	<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Lato">
+	<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Lato:300">
 	<title>Particle Visualization</title>
 	<style>
 	* {
@@ -15,50 +15,85 @@
 		background-color: #1C2329;
 	}
 
-	/*h1 {
-		color: #373737;
-		font-family: 'Muli', sans-serif;
-		font-size: 36px;
-		font-weight: normal;
-	}*/
 
 	h1 {
-		color: #ffffff;
+		color: #e0e0e0;
 		font-family: 'Lato', sans-serif;
-		font-size: 48px;
-		font-weight: 100;
-		line-height: 48px;
+		font-size: 42px;
+		font-weight: 300;
+		padding-bottom: 0;
+		margin-bottom: 0;
 		text-transform: uppercase;
+		text-align: center;
 	}
 
-	section {
-		margin: auto;
-		height: 606px;
+	p.subtitle {
+		color: #e0e0e0;
+		font-family: 'Lato', sans-serif;
+		text-align: center;
+		font-weight: 300;
+		font-size: 16px;
+		/*line-height: 40px;*/
+		margin-top: 0;
+		padding-top: 0;
+		padding-bottom: 30px;
+	}
+
+	#wrapper {
+		text-align: center;
+		vertical-align: top;
+		position: relative;
+		/*height: 606px;*/
+		/*width: 80%;*/
 	}
 
 	#cylinder {
-		max-width: 406px;
-		max-height: 606px;
+		max-width: 500px;
+		max-height: 1000px;
 		border: solid #e0e0e0 3px;
 		border-radius: 1px;
-		float: left;
+		display: inline-block;
+		vertical-align: top;
+		/*margin: inherit;*/
+		/*float: left;*/
+
 	}
 
-	#svg {
-		max-width: 406px;
+	#slice {
+		max-width: 500px;
 		max-height: 606px;
 		border: solid #e0e0e0 3px;
 		border-radius: 1px;
+		/*margin: inherit;*/
 		position: relative;
-		left: 10px;
+		display: inline-block;
+		vertical-align: top;
+		/*float: left;*/
+		left: 16px;
+	}
+
+	#slice2{
+		width: 392px;
+		height: 392px;
+		border: solid #e0e0e0 3px;
+		border-radius: 1px;
+		display: inline-block;
+		position: absolute;
+		top: 414px;
+		/*vertical-align: bottom;*/
+		right: 386px;
+		left: 866px;
 	}
 	</style>
 </head>
 <body>
 	<h1>Particular Ensembles</h1>
-	<section>
+	<p class="subtitle">Scientific Visualization Contest 2016</p>
+	<div id="wrapper">
 		<div id="cylinder"></div>
-	</section>
+		<div id="slice"></div>
+		<div id="slice2"></div>
+	</div>
 	<script src="//d3js.org/d3.v3.min.js"></script>
 	<script src="//cdnjs.cloudflare.com/ajax/libs/three.js/r78/three.min.js"></script>
 	<script src="js/THREEx.KeyboardState.js"></script>
@@ -70,8 +105,9 @@
 	 * useful variables declaration
 	 */
 
-	var WIDTH = 400,
-	HEIGHT = 600;
+	var WIDTH = 450,
+	HEIGHT = 800;
+	var WIDTH_SLICE = 386;
 	var folderPath = "clean.44/";
 	var numFiles = 121;
 	var data = [];
@@ -124,7 +160,7 @@
 	 */
 
 	scene.add(camera);
-	camera.position.z = 10;
+	camera.position.z = 9;
 	camera.position.x = 15;
 	camera.up = new THREE.Vector3(0, 0, 1);
 	camera.lookAt(new THREE.Vector3(0, 0, 6));
@@ -182,6 +218,7 @@
 	sliceGroup.add(line11);
 	sliceGroup.add(line12);
 	scene.add(sliceGroup);
+	sliceGroup.position.setZ(1);
 
 	/*
 	 * function to rotate the cylinder with mouse drag on click
@@ -230,10 +267,10 @@
 	 // set up slice vis
 	 // set up slice vis
 
-	var svg = d3.select("section").append("svg")
-		.attr("id", "svg")
-		.attr("width", WIDTH)
-		.attr("height", WIDTH);
+	var svg = d3.select("#slice").append("svg")
+		// .attr("class", "svg")
+		.attr("width", WIDTH_SLICE)
+		.attr("height", WIDTH_SLICE);
 
 
 
@@ -354,6 +391,8 @@
 
 			// add it to the scene
 			scene.add(particleSystem);
+			particleSystem.position.setZ(1);
+
 
 
 			// render again after particles created
@@ -443,7 +482,7 @@
 		  d3.selectAll(".slicePixel").remove();
 		  d3.selectAll(".sliceLine").remove();
 
-		  var gridWidth = d3.min([WIDTH, HEIGHT])/(sliceResolution+1);
+		  var gridWidth = d3.min([WIDTH_SLICE, WIDTH_SLICE])/(sliceResolution+1);
 
 		  var velLength = d3.scale.linear()
 		    .range([0, gridWidth*4]);
