@@ -39,15 +39,48 @@
 		padding-bottom: 30px;
 	}
 
-	#wrapper {
+	p.view {
+		color: #e0e0e0;
+		font-family: 'Lato', sans-serif;
 		/*text-align: center;*/
-		/*display: inline-block;*/
-		/*margin: auto;*/
-		/*vertical-align: top;*/
-		/*position: relative;*/
-		/*height: 606px;*/
-		/*width: 80%;*/
+		font-weight: normal;
+		font-size: 16px;
+		/*line-height: 40px;*/
+		margin: 0;
+		padding: 0;
+	}
+
+	p.view2 {
+		color: #e0e0e0;
+		font-family: 'Lato', sans-serif;
+		/*text-align: center;*/
+		font-weight: normal;
+		font-size: 16px;
+		/*line-height: 40px;*/
+		margin: 0;
+		padding: 0;
+		padding-top: 14px;
+	}
+
+
+	#wrapper {
 		overflow: hidden;
+	}
+
+	#slice_wrapper {
+		max-width: 500px;
+		display: inline-block;
+		vertical-align: top;
+		left: 34px;
+		position: relative;
+	}
+
+	#cylinder_wrapper {
+		max-width: 500px;
+		display: inline-block;
+		vertical-align: top;
+		/*left: 34px;*/
+		position: relative;
 	}
 
 	#cylinder {
@@ -58,31 +91,18 @@
 		display: inline-block;
 		vertical-align: top;
 		margin: auto;
-		/*margin: inherit;*/
-		/*float: left;*/
-
 	}
 
-	#slice_wrapper {
-		max-width: 500px;
-		display: inline-block;
-		vertical-align: top;
-		left: 34px;
-		position: relative;
 
-	}
 
 	#slice {
 		max-width: 500px;
 		max-height: 606px;
 		border: solid #e0e0e0 3px;
 		border-radius: 1px;
-		/*margin: inherit;*/
 		position: relative;
 		display: inline-block;
 		vertical-align: top;
-		/*float: left;*/
-		/*left: 34px;*/
 	}
 
 	#slice2{
@@ -92,12 +112,8 @@
 		border-radius: 1px;
 		display: inline-block;
 		position: relative;
-		/*left: 34px;*/
-		top: 34px;
-		/*top: 414px;*/
-		/*vertical-align: bottom;*/
-		/*right: 380px;*/
-		/*left: 866px;*/
+		/*top: 34px;*/
+
 	}
 
 	.sliceLine {
@@ -117,10 +133,16 @@
 	<h1>Particular Ensembles</h1>
 	<p class="subtitle">Scientific Visualization Contest 2016</p>
 	<div id="wrapper">
-		<div id="cylinder"></div>
+		<div id="cylinder_wrapper">
+			<p class="view">3D Cylinder View</p>
+			<div id="cylinder"></div>
+		</div>
 		<div id="slice_wrapper">
+			<p class="view">2D Slice View</p>
 			<div id="slice"></div>
-			<div id="slice2"></div>
+				<p class="view2">2D Vector Field View</p>
+			<div id="slice2">
+			</div>
 		</div>
 	</div>
 	<script src="//d3js.org/d3.v3.min.js"></script>
