@@ -65,7 +65,7 @@
 	for(var i = 0; i < sliceResolution+1; i++) {
 		sliceAccumulated.push(new Array(sliceResolution+1));
 		for(var j = 0; j < sliceResolution+1; j++) {
-			sliceAccumulated[i][j] = {x: i, y: j, conc: 0 };
+			sliceAccumulated[i][j] = {x: i, y: j, conc: 0 , vel: new THREE.Vector3(0,0,0)};
 		}
 	}
 
@@ -153,6 +153,8 @@
 	 * function to rotate the cylinder with mouse drag on click
 	 */
 
+	 var myClock = new THREE.Clock();
+
 	 var isDragging = false;
 	 var previousMousePosition = 0;
 	 $(renderer.domElement).on('mousedown', function(e) {
@@ -204,7 +206,6 @@
 	// render scene
 
 	var particleSystem;
-	var currentRotation = 0;
 
 	function keyboardListener() {
 
@@ -221,18 +222,20 @@
 		}
 
 		if (keyboard.pressed("left")) {
-			if (camera.position.y >= -3) camera.position.y -= 0.03;
+			camera.position = camera.position.applyAxisAngle(new THREE.Vector3(0,0,1), -Math.PI * 0.3/180);
 			pressed = true;
 		}
 
 		if (keyboard.pressed("right")) {
-			if (camera.position.y <= 3) camera.position.y += 0.03;
+			camera.position = camera.position.applyAxisAngle(new THREE.Vector3(0,0,1), Math.PI * 0.3/180);
 			pressed = true;
 		}
 
+
+
 		if (pressed) {
 			camera.updateProjectionMatrix();
-			camera.lookAt(new THREE.Vector3(0, 0, 6));			
+			camera.lookAt(new THREE.Vector3(0, 0, 6));
 		}
 
 
@@ -244,7 +247,6 @@
 		requestAnimationFrame( render );
 
 		keyboardListener();
-
 
 		renderer.render( scene, camera );
 	}
@@ -309,20 +311,17 @@
 
 			for(var p = 0; p < particleCount; p++) {
 				particleSystem.geometry.colors[p] = new THREE.Color("#" + color(Number(data[p].concentration)));
-				//particleSystem.geometry.colors[p].setHSL(color(data[p].concentration), 1, 0.5);
-
 			}
 
 			particleSystem.geometry.colorsNeedUpdate = true;
 
-			particleSystem.sortParticles = true;
 
 			// add it to the scene
 			scene.add(particleSystem);
-			// particleSystem.rotation.z = currentRotation;
 
 
 			// render again after particles created
+			refreshSlice();
 			render();
 
 			//setTimeout(function(){return drawParticles((fileNum+1)%numFiles); }, 5000);
@@ -337,21 +336,51 @@
 				loc.applyAxisAngle(new THREE.Vector3(0,0,1), currRotation + (0*Math.PI/2));
 				if(loc.y > (sliceGroup.position.y - (sliceWidth/2)) && loc.y < (sliceGroup.position.y + (sliceWidth/2)))
 				{
-					sliced.push({num: i, position: loc, concentration: data[i].concentration});
+					var vel = new THREE.Vector3(data[i].velocity0, data[i].velocity1, data[i].velocity2);
+					vel.applyAxisAngle(new THREE.Vector3(0,0,1), currRotation + (0*Math.PI/2));
+					sliced.push({num: i, position: loc, velocity: vel, concentration: data[i].concentration});
 				}
 			}
 
 			for(var i = 0; i < sliceResolution + 1; i++) {
 				for(var j = 0; j < sliceResolution + 1; j++) {
 					sliceAccumulated[i][j].conc = 0;
+					sliceAccumulated[i][j].vel = new THREE.Vector3(0,0,0);
 				}
 			}
 
+			// highlight the points which are within the slice
+			// draw all points as their normal colors first (gets rid of old hignlighted points)
+			var particleCount = data.length;
+
+			for(var p = 0; p < particleCount; p++) {
+				particleSystem.geometry.colors[p] = new THREE.Color("#" + color(Number(data[p].concentration)));
+			}
+
+			// makes all sliced points white
 			for(var i = 0; i < sliced.length; i++) {
+
+					particleSystem.geometry.colors[sliced[i].num].r += .2;
+					particleSystem.geometry.colors[sliced[i].num].g += .2;
+					particleSystem.geometry.colors[sliced[i].num].b += .2;
+
+					/*
+					var oldHSL = particleSystem.geometry.colors[sliced[i].num].getHSL();
+					particleSystem.geometry.colors[sliced[i].num].setHSL(oldHSL.h, oldHSL.s, oldHSL.l+.3);
+					*/
+			}
+			particleSystem.geometry.colorsNeedUpdate = true;
+
+
+			for(var i = 0; i < sliced.length; i++) {
+
 				var thisX = Math.floor((sliced[i].position.x + 5)*(sliceResolution/10)), // (-5, 5) -> [0, sliceResolution)
 					thisZ = Math.floor(sliced[i].position.z * (sliceResolution/10));	  // [0, 10] -> [0, sliceResolution)
 
 				sliceAccumulated[thisX][sliceResolution - thisZ].conc += sliced[i].concentration;
+				sliceAccumulated[thisX][sliceResolution - thisZ].vel.x += data[sliced[i].num].velocity0;
+				sliceAccumulated[thisX][sliceResolution - thisZ].vel.y += data[sliced[i].num].velocity1;
+				sliceAccumulated[thisX][sliceResolution - thisZ].vel.z += data[sliced[i].num].velocity2;
 			}
 
 			// create/color rectangles of slice
@@ -359,6 +388,11 @@
 			var maxConcSlice = d3.max(sliceAccumulated, function(e) { return d3.max(e, function(e){ return e.conc;}); });
 			var minConcSlice = d3.min(sliceAccumulated, function(e) { return d3.max(e, function(e){ return e.conc;}); });
 
+			var maxVel = d3.max(sliceAccumulated, function(e) {
+				return d3.max(e, function(e) {
+					return e.vel.length();
+				});
+			});
 
 			colorSlice.domain([0, maxConcSlice]);
 
@@ -405,7 +439,10 @@
 					concentration: Number(d.concentration),
 					Points0: Number(d.Points0),
 					Points1: Number(d.Points1),
-					Points2: Number(d.Points2)
+					Points2: Number(d.Points2),
+					velocity0: Number(d.velocity0),
+					velocity1: Number(d.velocity1),
+					velocity2: Number(d.velocity2)
 
 				};
 
