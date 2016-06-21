@@ -166,16 +166,16 @@
 	var keyboard = new THREEx.KeyboardState();
 
 	// number of blocks in the slice
-	var sliceResolution = 49;
+	var sliceResolution = 50;
 	var sliced = [];
 	var sliceAccumulated = [];
 
 	// 0 for Normal, 1 for desaturate, 2 for highlight
 	var sliceColorMode = 1;
 
-	for(var i = 0; i < sliceResolution+1; i++) {
-		sliceAccumulated.push(new Array(sliceResolution+1));
-		for(var j = 0; j < sliceResolution+1; j++) {
+	for(var i = 0; i < sliceResolution; i++) {
+		sliceAccumulated.push(new Array(sliceResolution));
+		for(var j = 0; j < sliceResolution; j++) {
 			sliceAccumulated[i][j] = {x: i, y: j, conc: 0 , vel: new THREE.Vector3(0,0,0)};
 		}
 	}
@@ -400,6 +400,18 @@
 	var colorSlice = d3.scale.quantile()
 		.range(color_split);
 
+	// FOR DRAWING SLICES:
+	// [-5,5] -> [0, sliceResolution)
+	var xScale = d3.scale.quantize()
+		.domain([-5, 5])
+		.range(Array.apply(null, {length: sliceResolution}).map(Number.call, Number));
+
+	// [0,10] -> [0, sliceResolution)
+	var yScale = d3.scale.quantize()
+		.domain([0,10])
+		.range(Array.apply(null, {length: sliceResolution}).map(Number.call, Number));
+
+
 	var particles,
 	pMaterial = new THREE.PointsMaterial({
 		size: .2,
@@ -479,8 +491,8 @@
 		    }
 		  }
 
-		  for(var i = 0; i < sliceResolution + 1; i++) {
-		    for(var j = 0; j < sliceResolution + 1; j++) {
+		  for(var i = 0; i < sliceResolution; i++) {
+		    for(var j = 0; j < sliceResolution; j++) {
 		      sliceAccumulated[i][j].conc = 0;
 		      sliceAccumulated[i][j].vel = new THREE.Vector3(0,0,0);
 		    }
@@ -519,13 +531,13 @@
 
 		  for(var i = 0; i < sliced.length; i++) {
 
-		    var thisX = Math.floor((sliced[i].position.x + 5)*(sliceResolution/10)), // (-5, 5) -> [0, sliceResolution)
-		      thisZ = Math.floor(sliced[i].position.z * (sliceResolution/10));	  // [0, 10] -> [0, sliceResolution)
+		    var thisX = xScale(sliced[i].position.x),
+		      	thisZ = yScale(sliced[i].position.z);
 
-		    sliceAccumulated[thisX][sliceResolution - thisZ].conc += sliced[i].concentration;
-		    sliceAccumulated[thisX][sliceResolution - thisZ].vel.x += data[sliced[i].num].velocity0;
-		    sliceAccumulated[thisX][sliceResolution - thisZ].vel.y += data[sliced[i].num].velocity1;
-		    sliceAccumulated[thisX][sliceResolution - thisZ].vel.z += data[sliced[i].num].velocity2;
+		    sliceAccumulated[thisX][sliceResolution - thisZ - 1].conc += sliced[i].concentration;
+		    sliceAccumulated[thisX][sliceResolution - thisZ - 1].vel.x += data[sliced[i].num].velocity0;
+		    sliceAccumulated[thisX][sliceResolution - thisZ - 1].vel.y += data[sliced[i].num].velocity1;
+		    sliceAccumulated[thisX][sliceResolution - thisZ - 1].vel.z += data[sliced[i].num].velocity2;
 		  }
 
 		  // create/color rectangles of slice
@@ -544,7 +556,7 @@
 		  d3.selectAll(".slicePixel").remove();
 		  d3.selectAll(".sliceLine").remove();
 
-		  var gridWidth = d3.min([WIDTH_SLICE, WIDTH_SLICE])/(sliceResolution+1);
+		  var gridWidth = d3.min([WIDTH_SLICE, WIDTH_SLICE])/(sliceResolution);
 
 		  var velLength = d3.scale.linear()
 		    .range([1, gridWidth*15]);
@@ -557,8 +569,8 @@
 
 
 		  // add colored values for concentration
-		  for(var i = 0; i < sliceResolution + 1; i++) {
-		    for(var j = 0; j < sliceResolution + 1; j++) {
+		  for(var i = 0; i < sliceResolution; i++) {
+		    for(var j = 0; j < sliceResolution; j++) {
 		      svg.append("rect")
 		          .attr("class", "slicePixel")
 		          .attr("width", gridWidth)
@@ -580,8 +592,8 @@
 		    }
 		  }
 		  // draw lines for velocity
-		  for(var i = 0; i < sliceResolution + 1; i++) {
-		    for(var j = 0; j < sliceResolution + 1; j++) {
+		  for(var i = 0; i < sliceResolution; i++) {
+		    for(var j = 0; j < sliceResolution; j++) {
 
 					var vecX = sliceAccumulated[i][j].vel.x < 0 ?
 								-velLength(+sliceAccumulated[i][j].vel.x) :
