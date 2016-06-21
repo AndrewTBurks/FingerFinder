@@ -2,6 +2,7 @@
 <head>
 	<meta charset="utf-8">
 	<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Lato:300">
+	<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Lato">
 	<title>Particle Visualization</title>
 	<style>
 	* {
@@ -201,7 +202,7 @@
 
 	var renderer = new THREE.WebGLRenderer({antialias: true});
 
-	renderer.setClearColor(new THREE.Color("#181818"));
+	renderer.setClearColor(new THREE.Color("#222222"));
 	renderer.setSize(WIDTH, HEIGHT);
 	var container = document.getElementById('cylinder');
 	container.appendChild( renderer.domElement );
@@ -331,7 +332,7 @@
 	svg2.append("rect")
 		.attr("width", "100%")
 		.attr("height", "100%")
-		.style("fill", "black");
+		.style("fill", "#444444");
 
 
 
@@ -574,7 +575,7 @@
 		          .attr("x", (sliceAccumulated[i][j].x*gridWidth))
 		          .attr("y", (sliceAccumulated[i][j].y*gridWidth))
 		          .style("fill", d3.rgb("#" + color(sliceAccumulated[i][j].conc/3)))
-		          .style("fill-opacity", 0.2);
+		          .style("fill-opacity", 0.4);
 
 		    }
 		  }
