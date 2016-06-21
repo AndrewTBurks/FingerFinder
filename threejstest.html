@@ -46,7 +46,8 @@
 		/*vertical-align: top;*/
 		/*position: relative;*/
 		/*height: 606px;*/
-		width: 80%;
+		/*width: 80%;*/
+		overflow: auto;
 	}
 
 	#cylinder {
@@ -275,6 +276,16 @@
 		.attr("width", WIDTH_SLICE)
 		.attr("height", WIDTH_SLICE);
 
+	var svg2 = d3.select("#slice2").append("svg")
+		// .attr("class", "svg")
+		.attr("width", WIDTH_SLICE)
+		.attr("height", WIDTH_SLICE);
+
+	svg2.append("rect")
+		.attr("width", "100%")
+		.attr("height", "100%")
+		.style("fill", "black");
+
 
 
 	// render scene
@@ -488,10 +499,10 @@
 		  var gridWidth = d3.min([WIDTH_SLICE, WIDTH_SLICE])/(sliceResolution+1);
 
 		  var velLength = d3.scale.linear()
-		    .range([0, gridWidth*4]);
+		    .range([2, gridWidth*15]);
 
 		  var velWidth = d3.scale.linear()
-		    .range([0.5, 4]);
+		    .range([1, 3]);
 
 		  velLength.domain([0, maxVel]);
 		  velWidth.domain([0, maxVel]);
@@ -531,7 +542,7 @@
 							yEnd = yCenter + vecY/2;
 
 
-		      svg.append("line")
+		      svg2.append("line")
 		          .attr("class", "sliceLine")
 		          .attr("x1", xStart)
 		          .attr("x2", xEnd)
