@@ -99,9 +99,21 @@
 		/*right: 380px;*/
 		/*left: 866px;*/
 	}
+
+	.sliceLine {
+		marker-end: url(#markerArrow);
+	}
+
 	</style>
 </head>
 <body>
+	<defs>
+		<marker id="markerArrow" markerWidth="13" markerHeight="13" refX="2" refY="6"
+           orient="auto">
+        <path d="M2,2 L2,11 L10,6 L2,2" style="fill: #000000;" />
+    </marker>
+	</defs>
+
 	<h1>Particular Ensembles</h1>
 	<p class="subtitle">Scientific Visualization Contest 2016</p>
 	<div id="wrapper">
@@ -395,7 +407,7 @@
 			// position values, -250 -> 250
 			var pX = data[p].Points0,
 			pY = data[p].Points1,
-			pZ = data[p].concentration < (mean + stddev/3) ? -40 : data[p].Points2,
+			pZ = data[p].concentration < (mean + stddev/8) ? -40 : data[p].Points2,
 			// pZ = data[p].Points2,
 			particle = new THREE.Vector3(pX, pY, pZ);
 
@@ -512,10 +524,10 @@
 		  var gridWidth = d3.min([WIDTH_SLICE, WIDTH_SLICE])/(sliceResolution+1);
 
 		  var velLength = d3.scale.linear()
-		    .range([2, gridWidth*15]);
+		    .range([1, gridWidth*15]);
 
 		  var velWidth = d3.scale.linear()
-		    .range([1, 3]);
+		    .range([0.5, 2]);
 
 		  velLength.domain([0, maxVel]);
 		  velWidth.domain([0, maxVel]);
@@ -531,7 +543,17 @@
 		          .attr("x", (sliceAccumulated[i][j].x*gridWidth))
 		          .attr("y", (sliceAccumulated[i][j].y*gridWidth))
 		          .style("fill", d3.rgb("#" + color(sliceAccumulated[i][j].conc/3)));
-		          //.style("fill", "orange");
+
+
+					svg2.append("rect")
+		          .attr("class", "slicePixel")
+		          .attr("width", gridWidth)
+		          .attr("height", gridWidth)
+		          .attr("x", (sliceAccumulated[i][j].x*gridWidth))
+		          .attr("y", (sliceAccumulated[i][j].y*gridWidth))
+		          .style("fill", d3.rgb("#" + color(sliceAccumulated[i][j].conc/3)))
+		          .style("fill-opacity", 0.2);
+
 		    }
 		  }
 		  // draw lines for velocity
@@ -554,16 +576,23 @@
 							yStart = yCenter - vecY/2,
 							yEnd = yCenter + vecY/2;
 
-
+						/*
 		      svg2.append("line")
 		          .attr("class", "sliceLine")
 		          .attr("x1", xStart)
 		          .attr("x2", xEnd)
 		          .attr("y1", yStart)
 		          .attr("y2", yEnd)
-		          .style("stroke", "white")
+		          .style("stroke", d3.rgb("#" + color(sliceAccumulated[i][j].conc/3)))
 		          .style("stroke-width", velWidth(sliceAccumulated[i][j].vel.length()));
-		          //.style("fill", "orange");
+							*/
+					svg2.append("path")
+		          .attr("class", "sliceLine")
+		          .attr("d", "M " + xStart + " " + yStart +
+								" L " + xEnd + " " + yEnd + " Z")
+							.attr("marker-end", "url(#markerArrow")
+		          .style("stroke", d3.rgb("#" + color(sliceAccumulated[i][j].conc/3)))
+		          .style("stroke-width", velWidth(sliceAccumulated[i][j].vel.length()));
 		    }
 		  }
 
