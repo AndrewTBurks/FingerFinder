@@ -10,9 +10,25 @@ var folderPath = "clean.44/";
 var data = [];
 var dataLength;
 
+var clusters = [];
+
 var maxDistance = .15;
+var minClusterConc;
+
+var mean, stddev, maxConc;
 
 readFileNumCSV(23, 24);
+
+function createClusters() {
+  var done = false;
+
+  clusters.push(new Array());
+
+  var ind = getIndexOfConc(maxConc);
+  clusters[0].push(ind);
+
+
+}
 
 function findAdjPoints() {
   var thisPoint = new THREE.Vector3();
@@ -20,7 +36,7 @@ function findAdjPoints() {
 
   var pointDistance = 0;
 
-  for(var i = 0; i < 10000; i++) {
+  for(var i = 0; i < 1000; i++) {
     thisPoint.x = data[i].Points0;
     thisPoint.y = data[i].Points1;
     thisPoint.z = data[i].Points2;
@@ -38,6 +54,8 @@ function findAdjPoints() {
   }
 
   console.log("Max Neighbors", d3.max(data, function(e) { return e.adjPoints.length; }));
+
+  createClusters();
 }
 
 function readFileNumCSV(n, end) {
@@ -50,7 +68,8 @@ function readFileNumCSV(n, end) {
       Points0: Number(d.Points0),
       Points1: Number(d.Points1),
       Points2: Number(d.Points2),
-      adjPoints: []
+      adjPoints: [],
+      inCluster: -1
     };
 
     data.push(el);
@@ -62,12 +81,23 @@ function readFileNumCSV(n, end) {
     return el.concentration;
   });
 
+  mean = d3.mean(data, function (e) { return e.concentration; });
+  stddev = d3.deviation(data, function (e) { return e.concentration; });
+
   dataLength = data.length;
+  minClusterConc = mean;
 
   findAdjPoints();
-
 });
 
 }
+
+function getIndexOfConc(val) {
+  for(var i = 0; i < dataLength; i++) {
+    if(data[i].concentration === val) return i;
+  }
+  return -1;
+}
+
 </script>
 </body>
