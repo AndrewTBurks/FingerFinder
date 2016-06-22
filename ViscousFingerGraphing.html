@@ -10,7 +10,7 @@ var folderPath = "clean.44/";
 var data = [];
 var dataLength;
 
-var maxDistance = .2;
+var maxDistance = .15;
 
 readFileNumCSV(23, 24);
 
@@ -20,7 +20,7 @@ function findAdjPoints() {
 
   var pointDistance = 0;
 
-  for(var i = 0; i < 100; i++) {
+  for(var i = 0; i < 10000; i++) {
     thisPoint.x = data[i].Points0;
     thisPoint.y = data[i].Points1;
     thisPoint.z = data[i].Points2;
