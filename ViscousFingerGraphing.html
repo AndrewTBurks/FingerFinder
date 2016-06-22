@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<meta charset='utf-8'>
+<script src='http://d3js.org/d3.v3.min.js'></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/three.js/r78/three.min.js"></script>
+<body>
+<script>
+
+var folderPath = "clean.44/";
+
+var data = [];
+var dataLength;
+
+var maxDistance = .2;
+
+readFileNumCSV(23, 24);
+
+function findAdjPoints() {
+  var thisPoint = new THREE.Vector3();
+  var otherPoint = new THREE.Vector3();
+
+  var pointDistance = 0;
+
+  for(var i = 0; i < 100; i++) {
+    thisPoint.x = data[i].Points0;
+    thisPoint.y = data[i].Points1;
+    thisPoint.z = data[i].Points2;
+    for(var j = 0; j < dataLength; j++) {
+      otherPoint.x = data[j].Points0;
+      otherPoint.y = data[j].Points1;
+      otherPoint.z = data[j].Points2;
+
+      pointDistance = thisPoint.distanceTo(otherPoint);
+
+      if((pointDistance < maxDistance) && (i !== j)) {
+        data[i].adjPoints.push(j);
+      }
+    }
+  }
+
+  console.log("Max Neighbors", d3.max(data, function(e) { return e.adjPoints.length; }));
+}
+
+function readFileNumCSV(n, end) {
+
+  d3.csv(folderPath + ('000' + n).substr(-3) + ".csv")
+  .row(function(d) {
+
+    var el = {
+      concentration: Number(d.concentration),
+      Points0: Number(d.Points0),
+      Points1: Number(d.Points1),
+      Points2: Number(d.Points2),
+      adjPoints: []
+    };
+
+    data.push(el);
+  })
+  .get(function(error, rows) {
+  console.log(n, "read (CSV).");
+
+  maxConc = d3.max(data, function(el) {
+    return el.concentration;
+  });
+
+  dataLength = data.length;
+
+  findAdjPoints();
+
+});
+
+}
+</script>
+</body>
