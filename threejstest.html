@@ -28,6 +28,24 @@
 		/*text-align: center;*/
 	}
 
+	.legendText {
+		color: #e0e0e0;
+		font-family: 'Lato', sans-serif;
+	}
+
+	#canvas {
+	  width: 456px;
+	  height: 25px;
+	  border: solid 3px #e0e0e0;
+	  /*display: block;*/
+	  /*margin: 0 0 10px 0;*/
+		position: relative;
+		/*top: 16px;*/
+		display: inline-block;
+		vertical-align: bottom;
+	}
+
+
 	p.subtitle {
 		color: #e0e0e0;
 		font-family: 'Lato', sans-serif;
@@ -63,6 +81,27 @@
 		padding-top: 14px;
 	}
 
+	.colorLegend1 {
+		color: #e0e0e0;
+		font-family: 'Lato', sans-serif;
+		margin: 0;
+		padding: 0;
+		display: inline-block;
+		float: left;
+		padding-top: 1px;
+	}
+
+	.colorLegend2 {
+		color: #e0e0e0;
+		font-family: 'Lato', sans-serif;
+		margin: 0;
+		padding: 0;
+		display: inline-block;
+		float: right;
+		padding-top: 1px;
+	}
+
+
 
 	#wrapper {
 		overflow: hidden;
@@ -84,6 +123,13 @@
 		position: relative;
 	}
 
+	#legend {
+		max-width: 456px;
+		/*display: inline-block;*/
+		/*vertical-align: bottom;
+		position: relative;*/
+	}
+
 	#cylinder {
 		max-width: 500px;
 		max-height: 1000px;
@@ -93,8 +139,6 @@
 		vertical-align: top;
 		margin: auto;
 	}
-
-
 
 	#slice {
 		max-width: 500px;
@@ -137,6 +181,11 @@
 		<div id="cylinder_wrapper">
 			<p class="view">3D Cylinder View</p>
 			<div id="cylinder"></div>
+			<div id="legend">
+				<p class="view" style="padding-top:23px;">Concentration Range</p>
+				<p class="colorLegend1" id="scaleMin"></p>
+				<p class="colorLegend2" id="scaleMax"></p>
+			</div>
 		</div>
 		<div id="slice_wrapper">
 			<p class="view">2D Slice View</p>
@@ -158,7 +207,7 @@
 	 */
 
 	var WIDTH = 450,
-	HEIGHT = 800;
+	HEIGHT = 710;
 	var WIDTH_SLICE = 380;
 	var folderPath = "clean.44/";
 	var numFiles = 121;
@@ -288,6 +337,30 @@
 	/*
 	 * Create line to show the front of the slice (right of the 2d picture)
 	 */
+
+	 /*
+	  * create a color legend using canvas
+		*/
+
+		var canvas = d3.select("#legend").append("canvas")
+			.attr("id", "canvas")
+			.attr("width", 450)
+			.attr("height", 1);
+			// .attr("x", 100)
+			// .attr("y", 1000);
+
+		var context = canvas.node().getContext("2d");
+		var image = context.createImageData(450, 1);
+
+		for (var i=0, j=-1, c; i<450; ++i) {
+			c = color_split[Math.floor(i/450 * color_split.length)];
+			image.data[++j] = +("0x" + c.slice(0, 2));
+	    image.data[++j] = +("0x" + c.slice(2, 4));
+	    image.data[++j] = +("0x" + c.slice(4, 6));
+	    image.data[++j] = 255;
+		}
+
+		context.putImageData(image, 0, 0);
 
 
 
@@ -756,6 +829,11 @@
 			maxConc = d3.max(data, function(el) {
 				return el.concentration;
 			});
+
+			window.onload = function() {
+				document.getElementById("scaleMin").innerHTML = mean.toFixed(2);
+				document.getElementById("scaleMax").innerHTML = maxConc.toFixed(2);
+			}
 
 			color.domain([mean, maxConc]);
 
