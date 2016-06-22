@@ -606,10 +606,10 @@
 		  var gridWidth = d3.min([WIDTH_SLICE, WIDTH_SLICE])/(sliceResolution);
 
 		  var velLength = d3.scale.linear()
-		    .range([1, gridWidth*15]);
+		    .range([0.5, gridWidth*15]);
 
 		  var velWidth = d3.scale.linear()
-		    .range([0.5, 2]);
+		    .range([0.5, 3]);
 
 		  velLength.domain([0, maxVel]);
 		  velWidth.domain([0, maxVel]);
@@ -634,7 +634,7 @@
 		          .attr("x", (sliceAccumulated[i][j].x*gridWidth))
 		          .attr("y", (sliceAccumulated[i][j].y*gridWidth))
 		          .style("fill", d3.rgb("#" + color(sliceAccumulated[i][j].conc/3)))
-		          .style("fill-opacity", 0.4);
+		          .style("fill-opacity", 0.3);
 
 		    }
 		  }
@@ -653,34 +653,37 @@
 					var xCenter = (sliceAccumulated[i][j].x * gridWidth) + (gridWidth/2),
 							yCenter = (sliceAccumulated[i][j].y * gridWidth) + (gridWidth/2);
 
-				  var xStart = xCenter - vecX/2,
-							xEnd = xCenter + vecX/2,
-							yStart = yCenter - vecY/2,
-							yEnd = yCenter + vecY/2;
+				  var xStart = xCenter,
+							xEnd = xCenter + vecX,
+							yStart = yCenter,
+							yEnd = yCenter + vecY;
 
-						/*
-		      svg2.append("line")
-		          .attr("class", "sliceLine")
-		          .attr("x1", xStart)
-		          .attr("x2", xEnd)
-		          .attr("y1", yStart)
-		          .attr("y2", yEnd)
-		          .style("stroke", d3.rgb("#" + color(sliceAccumulated[i][j].conc/3)))
-		          .style("stroke-width", velWidth(sliceAccumulated[i][j].vel.length()));
-							*/
+					var slope = (yEnd-yStart)/(xEnd-xStart);
+
+					var slopeInv = -1*(1/slope);
+
+					var dXSlopeInv = 1,
+							dYSlopeInv = dXSlopeInv * slopeInv,
+							dHSlopeInv = Math.sqrt(Math.pow(dXSlopeInv,2) + Math.pow(dYSlopeInv,2));
+
+					var ratio = velWidth(sliceAccumulated[i][j].vel.length()) / dHSlopeInv,
+							dXEndLine = ratio * dXSlopeInv;
+							dYEndLine = ratio * dYSlopeInv;
+
 					svg2.append("path")
 		          .attr("class", "sliceLine")
-		          .attr("d", "M " + xStart + " " + yStart +
+		          .attr("d", "M " + (xStart-dXEndLine) + " " + (yStart-dYEndLine) +
+								" L " + (xStart+dXEndLine) + " " + (yStart+dYEndLine) +
 								" L " + xEnd + " " + yEnd + " Z")
-							.attr("marker-end", "url(#arrow)")
 							.attr('stroke-linecap', 'round')
-		          .style("stroke", d3.rgb("#" + color(sliceAccumulated[i][j].conc/3)))
+		          .style("fill", d3.rgb("#" + color(sliceAccumulated[i][j].conc/3)))
 		          .style("stroke-width", velWidth(sliceAccumulated[i][j].vel.length()));
 		    }
 		  }
 			sliceArrow1.remove();
 			sliceArrow1 = svg.append("path")
 				.attr("class", "arrow")
+				.attr("stroke-linecap", "round")
 				.attr("d", "M " + (WIDTH_SLICE-15) + " " + (WIDTH_SLICE-10) +
 						" l " + 8 + " " + 0 +
 						" m " + 2 + " " + 0 +
@@ -695,6 +698,7 @@
 			sliceArrow2.remove();
 			sliceArrow2 = svg2.append("path")
 				.attr("class", "arrow")
+				.attr("stroke-linecap", "round")
 				.attr("d", "M " + (WIDTH_SLICE-15) + " " + (WIDTH_SLICE-10) +
 						" l " + 8 + " " + 0 +
 						" m " + 2 + " " + 0 +
