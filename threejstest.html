@@ -1,171 +1,10 @@
 <html>
 <head>
 	<meta charset="utf-8">
-	<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Lato:300">
+	<!-- <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Lato:300"> -->
 	<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Lato">
+	<link rel="stylesheet" type="text/css" href="style/style.css">
 	<title>Particle Visualization</title>
-	<style>
-	* {
-		-webkit-box-sizing: border-box;
-		-moz-box-sizing: border-box;
-		box-sizing: border-box;
-		-webkit-font-smoothing: antialiased;
-	}
-
-	body {
-		background-color: #1C2329;
-	}
-
-
-	h1 {
-		color: #e0e0e0;
-		font-family: 'Lato', sans-serif;
-		font-size: 42px;
-		font-weight: 300;
-		padding-bottom: 0;
-		margin-bottom: 0;
-		text-transform: uppercase;
-		/*text-align: center;*/
-	}
-
-	.legendText {
-		color: #e0e0e0;
-		font-family: 'Lato', sans-serif;
-	}
-
-	#canvas {
-	  width: 456px;
-	  height: 25px;
-	  border: solid 3px #e0e0e0;
-	  /*display: block;*/
-	  /*margin: 0 0 10px 0;*/
-		position: relative;
-		/*top: 16px;*/
-		display: inline-block;
-		vertical-align: bottom;
-	}
-
-
-	p.subtitle {
-		color: #e0e0e0;
-		font-family: 'Lato', sans-serif;
-		/*text-align: center;*/
-		font-weight: 300;
-		font-size: 16px;
-		/*line-height: 40px;*/
-		margin-top: 0;
-		padding-top: 0;
-		padding-bottom: 30px;
-	}
-
-	p.view {
-		color: #e0e0e0;
-		font-family: 'Lato', sans-serif;
-		/*text-align: center;*/
-		font-weight: normal;
-		font-size: 16px;
-		/*line-height: 40px;*/
-		margin: 0;
-		padding: 0;
-	}
-
-	p.view2 {
-		color: #e0e0e0;
-		font-family: 'Lato', sans-serif;
-		/*text-align: center;*/
-		font-weight: normal;
-		font-size: 16px;
-		/*line-height: 40px;*/
-		margin: 0;
-		padding: 0;
-		padding-top: 14px;
-	}
-
-	.colorLegend1 {
-		color: #e0e0e0;
-		font-family: 'Lato', sans-serif;
-		margin: 0;
-		padding: 0;
-		display: inline-block;
-		float: left;
-		padding-top: 1px;
-	}
-
-	.colorLegend2 {
-		color: #e0e0e0;
-		font-family: 'Lato', sans-serif;
-		margin: 0;
-		padding: 0;
-		display: inline-block;
-		float: right;
-		padding-top: 1px;
-	}
-
-
-
-	#wrapper {
-		overflow: hidden;
-	}
-
-	#slice_wrapper {
-		max-width: 500px;
-		display: inline-block;
-		vertical-align: top;
-		left: 34px;
-		position: relative;
-	}
-
-	#cylinder_wrapper {
-		max-width: 500px;
-		display: inline-block;
-		vertical-align: top;
-		/*left: 34px;*/
-		position: relative;
-	}
-
-	#legend {
-		max-width: 456px;
-		/*display: inline-block;*/
-		/*vertical-align: bottom;
-		position: relative;*/
-	}
-
-	#cylinder {
-		max-width: 500px;
-		max-height: 1000px;
-		border: solid #e0e0e0 3px;
-		border-radius: 1px;
-		display: inline-block;
-		vertical-align: top;
-		margin: auto;
-	}
-
-	#slice {
-		max-width: 500px;
-		max-height: 606px;
-		border: solid #e0e0e0 3px;
-		border-radius: 1px;
-		position: relative;
-		display: inline-block;
-		vertical-align: top;
-	}
-
-	#slice2{
-		max-width: 500px;
-		max-height: 606px;
-		border: solid #e0e0e0 3px;
-		border-radius: 1px;
-		display: inline-block;
-		position: relative;
-		/*top: 34px;*/
-
-	}
-
-	.sliceLine {
-		marker-end: url(#markerArrow);
-	}
-
-	</style>
 </head>
 <body>
 	<defs>
@@ -182,7 +21,7 @@
 			<p class="view">3D Cylinder View</p>
 			<div id="cylinder"></div>
 			<div id="legend">
-				<p class="view" style="padding-top:23px;">Concentration Range</p>
+				<p class="view" style="padding-top:25px;">Concentration Range</p>
 				<p class="colorLegend1" id="scaleMin"></p>
 				<p class="colorLegend2" id="scaleMax"></p>
 			</div>
