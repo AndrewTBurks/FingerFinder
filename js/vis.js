@@ -8,7 +8,7 @@
 
 // constants for width and height of the scene
 var WIDTH = 450,
-HEIGHT = 650;
+HEIGHT = 632;
 var WIDTH_SLICE = 380;
 var folderPath = "clean.44/";
 var numFiles = 121;
@@ -616,7 +616,7 @@ function downloadJSON(data2JSON) {
  * Draw a slider to move the slice position.
  */
 function sliderMove() {
-	var yMin = 0, yMax = 10;
+	var yMin = -5, yMax = 5;
 	var sliderHeight = 50;
 
 	var x = d3.scale.linear()
@@ -626,7 +626,7 @@ function sliderMove() {
 
 	var brush = d3.svg.brush()
   .x(x)
-  .extent([yMin, yMin])
+  .extent([0, 0])
   .on("brush", brushed);
 
 	var svgSlider = d3.select("#sliderDiv").append("svg")
@@ -643,7 +643,7 @@ function sliderMove() {
   // .tickFormat(function(d){return d.toFixed(2)})
   .tickSize(0)
   .tickPadding(10)
-  .tickValues([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]))
+  .tickValues([-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5]))
   .select(".domain")
   .select(function() { return this.parentNode.appendChild(this.cloneNode(true)); })
   .attr("class", "halo");
@@ -682,7 +682,7 @@ function sliderMove() {
 
 		handle.attr("transform", "translate(" + x(value) + ", 0)");
 		handle.select("text").text(value.toFixed(2));
-		sliceGroup.position.setY(value - 5);
+		sliceGroup.position.setY(value);
 	}
 
 }
