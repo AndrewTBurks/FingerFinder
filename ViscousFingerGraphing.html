@@ -19,7 +19,7 @@ var minClusterConc;
 
 var mean, stddev, maxConc;
 
-readFileNumCSV(45, 46);
+readFileNumCSV(23, 24);
 
 // build clusters (fingers) from graph of nodes
 function createClusters() {
@@ -206,7 +206,7 @@ function readFileNumCSV(n, end) {
   stddev = d3.deviation(data, function (e) { return e.concentration; });
 
   dataLength = data.length;
-  minClusterConc = mean;
+  minClusterConc = mean + (stddev/7);
 
   findAdjPoints();
 });
