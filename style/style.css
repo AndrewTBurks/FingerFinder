@@ -106,9 +106,9 @@ p.view2 {
 
 #sliderDiv {
   max-width: 500px;
-  cursor: default;
-  margin-top: 10px;
-  max-height: 50px;
+  /*cursor: default !important;*/
+  padding-top: 20px;
+  position: relative;
 }
 
 #cylinder {
@@ -172,4 +172,8 @@ p.view2 {
   fill: white;
   text-align: center;
   font-size: 12px;
+}
+
+.svgSlider rect.background {
+  cursor: ew-resize !important;
 }

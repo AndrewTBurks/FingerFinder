@@ -599,11 +599,11 @@ function downloadJSON(data2JSON) {
  */
 function sliderMove() {
 	var yMin = 0, yMax = 10;
-	var sliderHeight = 30;
+	var sliderHeight = 50;
 
 	var x = d3.scale.linear()
 	.domain([yMin, yMax])
-	.range([0, WIDTH + 6])
+	.range([0, WIDTH/2])
 	.clamp(true);
 
 	var brush = d3.svg.brush()
@@ -612,7 +612,8 @@ function sliderMove() {
   .on("brush", brushed);
 
 	var svgSlider = d3.select("#sliderDiv").append("svg")
-	.attr("width", WIDTH + 6)
+	.attr("class", "svgSlider")
+	.attr("width", WIDTH/2)
 	.attr("height", sliderHeight);
 
 	svgSlider.append("g")
@@ -623,7 +624,7 @@ function sliderMove() {
   .orient("bottom")
   .tickFormat(d3.format("d"))
   .tickSize(0)
-  .tickPadding(15)
+  // .tickPadding(15)
   .tickValues([yMin, yMax]))
   .select(".domain")
   .select(function() { return this.parentNode.appendChild(this.cloneNode(true)); })
@@ -637,18 +638,18 @@ function sliderMove() {
   .remove();
 
 	slider.select(".background")
-  .attr("height", 20);
+  .attr("height", sliderHeight);
 
 	var handle = slider.append("g")
   .attr("class", "handle")
 
   handle.append("path")
   .attr("transform", "translate(0," + sliderHeight / 2 + ")")
-  .attr("d", "M 0 -8 V 8")
+  .attr("d", "M 0 -5 V 5")
 
   handle.append("text")
   .text(yMin)
-  .attr("transform", "translate(" + -1 + ", " + 25 + ")")
+  .attr("transform", "translate(" + -1 + ", " + (sliderHeight / 2 - 10) + ")")
 
 	slider
   .call(brush.event);
