@@ -19,7 +19,7 @@ var minClusterConc;
 
 var mean, stddev, maxConc;
 
-readFileNumCSV(45, 46);
+readFileNumCSV(23, 24);
 
 // build clusters (fingers) from graph of nodes
 function createClusters() {
@@ -80,7 +80,7 @@ function createClusters() {
                 data[ind].inCluster = i;
                 cluster.push(ind);
 
-                console.log("Added", ind, "to Cluster", i);
+                //console.log("Added", ind, "to Cluster", i);
               } // END if(!nodeAdded
               else {
                 // node was found in multiple clusters
@@ -108,7 +108,7 @@ function createClusters() {
         data[ind].inCluster = newClusterInd;
         clusters[newClusterInd].push(ind);
 
-        console.log("Added", ind, "to NEW Cluster", newClusterInd);
+        //console.log("Added", ind, "to NEW Cluster", newClusterInd);
       } // END if(!nodeAdded ...
 
     } // END else ...
@@ -150,11 +150,16 @@ function findAdjPoints() {
   var otherPoint = new THREE.Vector3();
 
   var pointDistance = 0;
+  var consoleDisplayThreshold = 5000;
 
   for(var i = 0; i < dataLength; i++) {
     thisPoint.x = data[i].Points0;
     thisPoint.y = data[i].Points1;
     thisPoint.z = data[i].Points2;
+    if(i >= consoleDisplayThreshold) {
+      console.log("Adj Found for:", consoleDisplayThreshold);
+      consoleDisplayThreshold += 5000;
+    }
     for(var j = 0; j < dataLength; j++) {
       otherPoint.x = data[j].Points0;
       otherPoint.y = data[j].Points1;
@@ -201,7 +206,7 @@ function readFileNumCSV(n, end) {
   stddev = d3.deviation(data, function (e) { return e.concentration; });
 
   dataLength = data.length;
-  minClusterConc = mean + (stddev/8);
+  minClusterConc = mean + (stddev/7);
 
   findAdjPoints();
 });
@@ -249,6 +254,13 @@ function canAddPointToCluster(ind) {
     return true;
   }
 
+}
+
+function clearClusters() {
+  clusters = [];
+  for(var i = 0; i < dataLength; i++) {
+    data[i].inCluster = -1;
+  }
 }
 
 function downloadJSON(object) {
