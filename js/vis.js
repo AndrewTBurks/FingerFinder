@@ -1,12 +1,14 @@
 /**
 * @file <p>Visualization of particular ensembles to identify viscous fingers.</p>
+* <p>Scientific Visualization Contest 2016</p>
+* <p>EVL - University of Illinois at Chicago
 * @author Andrew Burks
 * @author Cassiano Sugiyama
 */
 
 // constants for width and height of the scene
 var WIDTH = 450,
-HEIGHT = 710;
+HEIGHT = 650;
 var WIDTH_SLICE = 380;
 var folderPath = "clean.44/";
 var numFiles = 121;
@@ -73,6 +75,7 @@ mouseDragRotate();
 drawSlice();
 createColorLegend();
 mouseWheelZoom();
+sliderMove();
 
 /**
 * Draws the cylinder slice using three.js lines.
@@ -591,6 +594,79 @@ function downloadJSON(data2JSON) {
 	csvWin.document.write(json);
 }
 
+/**
+ * Draw a slider to move the slice position.
+ */
+function sliderMove() {
+	var yMin = 0, yMax = 10;
+	var sliderHeight = 30;
+
+	var x = d3.scale.linear()
+	.domain([yMin, yMax])
+	.range([0, WIDTH + 6])
+	.clamp(true);
+
+	var brush = d3.svg.brush()
+  .x(x)
+  .extent([yMin, yMin])
+  .on("brush", brushed);
+
+	var svgSlider = d3.select("#sliderDiv").append("svg")
+	.attr("width", WIDTH + 6)
+	.attr("height", sliderHeight);
+
+	svgSlider.append("g")
+  .attr("class", "x axis")
+  .attr("transform", "translate(0, " + sliderHeight / 2 + ")")
+  .call(d3.svg.axis()
+  .scale(x)
+  .orient("bottom")
+  .tickFormat(d3.format("d"))
+  .tickSize(0)
+  .tickPadding(15)
+  .tickValues([yMin, yMax]))
+  .select(".domain")
+  .select(function() { return this.parentNode.appendChild(this.cloneNode(true)); })
+  .attr("class", "halo");
+
+	var slider = svgSlider.append("g")
+  .attr("class", "slider")
+  .call(brush);
+
+	slider.selectAll(".extent,.resize")
+  .remove();
+
+	slider.select(".background")
+  .attr("height", 20);
+
+	var handle = slider.append("g")
+  .attr("class", "handle")
+
+  handle.append("path")
+  .attr("transform", "translate(0," + sliderHeight / 2 + ")")
+  .attr("d", "M 0 -8 V 8")
+
+  handle.append("text")
+  .text(yMin)
+  .attr("transform", "translate(" + -1 + ", " + 25 + ")")
+
+	slider
+  .call(brush.event);
+
+	function brushed() {
+		var value = brush.extent()[0];
+
+		if (d3.event.sourceEvent) { // not a programmatic event
+			value = x.invert(d3.mouse(this)[0]);
+			brush.extent([value, value]);
+		}
+
+		handle.attr("transform", "translate(" + x(value) + ", 0)");
+		handle.select("text").text(value);
+	}
+
+}
+
 // mouse and keyboard control funtions
 
 /**
@@ -620,12 +696,9 @@ function mouseDragRotate (){
 	.on('mousemove', function(e) {
 		//console.log(e);
 		var deltaMove = e.offsetX - previousMousePosition;
-
-
 		if(isDragging) {
 			particleSystem.rotation.z += (deltaMove * 1) * Math.PI/180;
 		}
-
 		previousMousePosition = e.offsetX;
 	});
 	/* */

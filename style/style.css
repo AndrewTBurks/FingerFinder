@@ -104,6 +104,13 @@ p.view2 {
   max-width: 456px;
 }
 
+#sliderDiv {
+  max-width: 500px;
+  cursor: default;
+  margin-top: 10px;
+  max-height: 50px;
+}
+
 #cylinder {
   max-width: 500px;
   max-height: 1000px;
@@ -136,4 +143,33 @@ p.view2 {
 
 .sliceLine {
   marker-end: url(#markerArrow);
+}
+
+.axis {
+  fill: #999;
+}
+
+.axis .domain {
+  fill: none;
+
+}
+
+.axis .halo {
+  fill: none;
+  stroke: gray;
+  stroke-width: 4px;
+  stroke-linecap: round;
+}
+
+.slider .handle path {
+  stroke: white;
+  stroke-width: 4px;
+  stroke-linecap: round;
+  pointer-events: none;
+}
+
+.slider .handle text {
+  fill: white;
+  text-align: center;
+  font-size: 12px;
 }

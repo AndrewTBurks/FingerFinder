@@ -28,13 +28,15 @@
         <article>
             <pre class="prettyprint source linenums"><code>/**
 * @file &lt;p>Visualization of particular ensembles to identify viscous fingers.&lt;/p>
+* &lt;p>Scientific Visualization Contest 2016&lt;/p>
+* &lt;p>EVL - University of Illinois at Chicago
 * @author Andrew Burks
 * @author Cassiano Sugiyama
 */
 
 // constants for width and height of the scene
 var WIDTH = 450,
-HEIGHT = 710;
+HEIGHT = 650;
 var WIDTH_SLICE = 380;
 var folderPath = "clean.44/";
 var numFiles = 121;
@@ -101,6 +103,7 @@ mouseDragRotate();
 drawSlice();
 createColorLegend();
 mouseWheelZoom();
+sliderMove();
 
 /**
 * Draws the cylinder slice using three.js lines.
@@ -185,51 +188,6 @@ function createColorLegend() {
 	context.putImageData(image, 0, 0);
 }
 
-/**
- * Zoom in and out the scene using mouse wheel. This uses the TrackballControls.js file.
- */
-function mouseWheelZoom() {
-	controls.target.set(0, 0, 6);
-	controls.zoomSpeed = 0.15;
-	controls.noRotate = true;
-	controls.noZoom = false;
-	controls.noPan = true;
-	controls.minDistance = 5.5;
-	controls.maxDistance = 20;
-}
-
-/**
-* Rotates the cylinder when mouse is clicked and dragged.
-*/
-function mouseDragRotate (){
-	var myClock = new THREE.Clock();
-	var isDragging = false;
-	var previousMousePosition = 0;
-	$(renderer.domElement).on('mousedown', function(e) {
-		d3.select('#cylinder').style('cursor', 'ew-resize');
-		isDragging = true;
-	})
-	.on('mousemove', function(e) {
-		//console.log(e);
-		var deltaMove = e.offsetX - previousMousePosition;
-
-
-		if(isDragging) {
-			particleSystem.rotation.z += (deltaMove * 1) * Math.PI/180;
-		}
-
-		previousMousePosition = e.offsetX;
-	});
-	/* */
-
-	$(document).on('mouseup', function(e) {
-		isDragging = false;
-		// refresh the slice after the user is done dragging
-		refreshSlice();
-		d3.select('#cylinder').style('cursor', 'default');
-	});
-}
-
 // set up slice vis
 // set up slice vis
 
@@ -279,33 +237,6 @@ var sliceArrow2 = svg2.append("path")
 // render scene
 
 var particleSystem;
-
-/**
-* Processes keyboad commands to move the camera up and down or rotate the scene.
-*/
-function keyboardListener() {
-	var pressed = false;
-	if (keyboard.pressed("up")) {
-		if (camera.position.z &lt;= 12.5) camera.position.z += 0.03;
-		pressed = true;
-	}
-	if (keyboard.pressed("down")) {
-		if (camera.position.z >= 5) camera.position.z -= 0.03;
-		pressed = true;
-	}
-	if (keyboard.pressed("left")) {
-		camera.position = camera.position.applyAxisAngle(new THREE.Vector3(0,0,1), -Math.PI * 0.3/180);
-		pressed = true;
-	}
-	if (keyboard.pressed("right")) {
-		camera.position = camera.position.applyAxisAngle(new THREE.Vector3(0,0,1), Math.PI * 0.3/180);
-		pressed = true;
-	}
-	if (pressed) {
-		camera.updateProjectionMatrix();
-		camera.lookAt(new THREE.Vector3(0, 0, 6));
-	}
-}
 
 /**
 * Renders the three.js scene.
@@ -672,7 +603,6 @@ function readFileNumCSV(n, end) {
 }
 
 function readFileNumJSON(n) {
-
 	d3.csv(folderPath + ('000' + n).substr(-3) + ".json", function(error, json) {
 		data = json;
 		console.log(n, "read (JSON).");
@@ -691,6 +621,150 @@ function downloadJSON(data2JSON) {
 	csvWin.document.write('&lt;meta name="content-disposition" content="attachment;  filename=test.csv">  ');
 	csvWin.document.write(json);
 }
+
+/**
+ * Draw a slider to move the slice position.
+ */
+function sliderMove() {
+	var yMin = 0, yMax = 10;
+	var sliderHeight = 30;
+
+	var x = d3.scale.linear()
+	.domain([yMin, yMax])
+	.range([0, WIDTH + 6])
+	.clamp(true);
+
+	var brush = d3.svg.brush()
+  .x(x)
+  .extent([yMin, yMin])
+  .on("brush", brushed);
+
+	var svgSlider = d3.select("#sliderDiv").append("svg")
+	.attr("width", WIDTH + 6)
+	.attr("height", sliderHeight);
+
+	svgSlider.append("g")
+  .attr("class", "x axis")
+  .attr("transform", "translate(0, " + sliderHeight / 2 + ")")
+  .call(d3.svg.axis()
+  .scale(x)
+  .orient("bottom")
+  .tickFormat(d3.format("d"))
+  .tickSize(0)
+  .tickPadding(15)
+  .tickValues([yMin, yMax]))
+  .select(".domain")
+  .select(function() { return this.parentNode.appendChild(this.cloneNode(true)); })
+  .attr("class", "halo");
+
+	var slider = svgSlider.append("g")
+  .attr("class", "slider")
+  .call(brush);
+
+	slider.selectAll(".extent,.resize")
+  .remove();
+
+	slider.select(".background")
+  .attr("height", 20);
+
+	var handle = slider.append("g")
+  .attr("class", "handle")
+
+  handle.append("path")
+  .attr("transform", "translate(0," + sliderHeight / 2 + ")")
+  .attr("d", "M 0 -8 V 8")
+
+  handle.append("text")
+  .text(yMin)
+  .attr("transform", "translate(" + -1 + ", " + 25 + ")")
+
+	slider
+  .call(brush.event);
+
+	function brushed() {
+		var value = brush.extent()[0];
+
+		if (d3.event.sourceEvent) { // not a programmatic event
+			value = x.invert(d3.mouse(this)[0]);
+			brush.extent([value, value]);
+		}
+
+		handle.attr("transform", "translate(" + x(value) + ", 0)");
+		handle.select("text").text(value);
+	}
+
+}
+
+// mouse and keyboard control funtions
+
+/**
+ * Zoom in and out the scene using mouse wheel. This uses the TrackballControls.js file.
+ */
+function mouseWheelZoom() {
+	controls.target.set(0, 0, 6);
+	controls.zoomSpeed = 0.15;
+	controls.noRotate = true;
+	controls.noZoom = false;
+	controls.noPan = true;
+	controls.minDistance = 5.5;
+	controls.maxDistance = 20;
+}
+
+/**
+* Rotates the cylinder when mouse is clicked and dragged.
+*/
+function mouseDragRotate (){
+	var myClock = new THREE.Clock();
+	var isDragging = false;
+	var previousMousePosition = 0;
+	$(renderer.domElement).on('mousedown', function(e) {
+		d3.select('#cylinder').style('cursor', 'ew-resize');
+		isDragging = true;
+	})
+	.on('mousemove', function(e) {
+		//console.log(e);
+		var deltaMove = e.offsetX - previousMousePosition;
+		if(isDragging) {
+			particleSystem.rotation.z += (deltaMove * 1) * Math.PI/180;
+		}
+		previousMousePosition = e.offsetX;
+	});
+	/* */
+
+	$(document).on('mouseup', function(e) {
+		isDragging = false;
+		// refresh the slice after the user is done dragging
+		refreshSlice();
+		d3.select('#cylinder').style('cursor', 'default');
+	});
+}
+
+/**
+* Processes keyboad commands to move the camera up and down or rotate the scene.
+*/
+function keyboardListener() {
+	var pressed = false;
+	if (keyboard.pressed("up")) {
+		if (camera.position.z &lt;= 12.5) camera.position.z += 0.03;
+		pressed = true;
+	}
+	if (keyboard.pressed("down")) {
+		if (camera.position.z >= 5) camera.position.z -= 0.03;
+		pressed = true;
+	}
+	if (keyboard.pressed("left")) {
+		camera.position = camera.position.applyAxisAngle(new THREE.Vector3(0,0,1), -Math.PI * 0.3/180);
+		pressed = true;
+	}
+	if (keyboard.pressed("right")) {
+		camera.position = camera.position.applyAxisAngle(new THREE.Vector3(0,0,1), Math.PI * 0.3/180);
+		pressed = true;
+	}
+	if (pressed) {
+		camera.updateProjectionMatrix();
+		camera.lookAt(new THREE.Vector3(0, 0, 6));
+	}
+}
 </code></pre>
         </article>
     </section>
@@ -701,13 +775,13 @@ function downloadJSON(data2JSON) {
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#colorScheme">colorScheme</a></li><li><a href="global.html#createColorLegend">createColorLegend</a></li><li><a href="global.html#drawParticles">drawParticles</a></li><li><a href="global.html#drawSlice">drawSlice</a></li><li><a href="global.html#filePick">filePick</a></li><li><a href="global.html#keyboardListener">keyboardListener</a></li><li><a href="global.html#mouseDragRotate">mouseDragRotate</a></li><li><a href="global.html#mouseWheelZoom">mouseWheelZoom</a></li><li><a href="global.html#onWindowResize">onWindowResize</a></li><li><a href="global.html#readFileNumCSV">readFileNumCSV</a></li><li><a href="global.html#refreshSlice">refreshSlice</a></li><li><a href="global.html#render">render</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#colorScheme">colorScheme</a></li><li><a href="global.html#createColorLegend">createColorLegend</a></li><li><a href="global.html#drawParticles">drawParticles</a></li><li><a href="global.html#drawSlice">drawSlice</a></li><li><a href="global.html#filePick">filePick</a></li><li><a href="global.html#keyboardListener">keyboardListener</a></li><li><a href="global.html#mouseDragRotate">mouseDragRotate</a></li><li><a href="global.html#mouseWheelZoom">mouseWheelZoom</a></li><li><a href="global.html#onWindowResize">onWindowResize</a></li><li><a href="global.html#readFileNumCSV">readFileNumCSV</a></li><li><a href="global.html#refreshSlice">refreshSlice</a></li><li><a href="global.html#render">render</a></li><li><a href="global.html#sliderMove">sliderMove</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a> on Thu Jun 23 2016 13:49:15 GMT-0500 (CDT)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a> on Thu Jun 23 2016 15:19:16 GMT-0500 (CDT)
 </footer>
 
 <script> prettyPrint(); </script>
