@@ -156,20 +156,20 @@ p.view2 {
 
 .axis .halo {
   fill: none;
-  stroke: gray;
+  stroke: #a0a0a0;
   stroke-width: 4px;
   stroke-linecap: round;
 }
 
 .slider .handle path {
-  stroke: white;
+  stroke: #e0e0e0;
   stroke-width: 4px;
   stroke-linecap: round;
   pointer-events: none;
 }
 
 .slider .handle text {
-  fill: white;
+  fill: #e0e0e0;
   text-align: center;
   font-size: 12px;
 }
