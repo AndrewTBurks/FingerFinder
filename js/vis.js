@@ -621,7 +621,7 @@ function sliderMove() {
 
 	var x = d3.scale.linear()
 	.domain([yMin, yMax])
-	.range([0, WIDTH/2])
+	.range([WIDTH * .1, WIDTH * .9])
 	.clamp(true);
 
 	var brush = d3.svg.brush()
@@ -631,7 +631,7 @@ function sliderMove() {
 
 	var svgSlider = d3.select("#sliderDiv").append("svg")
 	.attr("class", "svgSlider")
-	.attr("width", WIDTH/2)
+	.attr("width", WIDTH)
 	.attr("height", sliderHeight);
 
 	svgSlider.append("g")
@@ -640,10 +640,10 @@ function sliderMove() {
   .call(d3.svg.axis()
   .scale(x)
   .orient("bottom")
-  .tickFormat(d3.format("d"))
+  // .tickFormat(function(d){return d.toFixed(2)})
   .tickSize(0)
-  // .tickPadding(15)
-  .tickValues([yMin, yMax]))
+  .tickPadding(10)
+  .tickValues([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]))
   .select(".domain")
   .select(function() { return this.parentNode.appendChild(this.cloneNode(true)); })
   .attr("class", "halo");
@@ -662,12 +662,12 @@ function sliderMove() {
   .attr("class", "handle")
 
   handle.append("path")
-  .attr("transform", "translate(0," + sliderHeight / 2 + ")")
+  .attr("transform", "translate(0, " + sliderHeight / 2 + ")")
   .attr("d", "M 0 -5 V 5")
 
   handle.append("text")
   .text(yMin)
-  .attr("transform", "translate(" + -1 + ", " + (sliderHeight / 2 - 10) + ")")
+  .attr("transform", "translate(0, " + (sliderHeight / 2 - 10) + ")")
 
 	slider
   .call(brush.event);
@@ -681,7 +681,8 @@ function sliderMove() {
 		}
 
 		handle.attr("transform", "translate(" + x(value) + ", 0)");
-		handle.select("text").text(value);
+		handle.select("text").text(value.toFixed(2));
+		sliceGroup.position.setY(value - 5);
 	}
 
 }
