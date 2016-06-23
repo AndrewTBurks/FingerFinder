@@ -19,7 +19,7 @@ var minClusterConc;
 
 var mean, stddev, maxConc;
 
-readFileNumCSV(23, 24);
+readFileNumCSV(45, 46);
 
 // build clusters (fingers) from graph of nodes
 function createClusters() {
@@ -116,6 +116,7 @@ function createClusters() {
   } // END while(!done ...
 
   console.log("Done Grouping Points");
+  filterSortClusters(50);
 }
 
 function joinClusters(indA, indB) {
