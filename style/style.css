@@ -85,7 +85,7 @@ p.view2 {
   overflow: hidden;
 }
 
-#slice_wrapper {
+#sliceWrapper {
   max-width: 500px;
   display: inline-block;
   vertical-align: top;
@@ -93,7 +93,7 @@ p.view2 {
   position: relative;
 }
 
-#cylinder_wrapper {
+#cylinderWrapper {
   max-width: 500px;
   display: inline-block;
   vertical-align: top;
@@ -124,7 +124,7 @@ p.view2 {
   vertical-align: top;
 }
 
-#slice2{
+#slice2 {
   max-width: 500px;
   max-height: 606px;
   border: solid #e0e0e0 3px;
