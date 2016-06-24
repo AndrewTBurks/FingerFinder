@@ -11,7 +11,7 @@ var data = [];
 var dataLength;
 
 var clusters = [];      // all clusters found
-var keptClusters = [];  // clusters over sizeThreshold
+var keptClusters = new Array(121);  // clusters over sizeThreshold
 
 var maxDistance = .15;
 var topThickness = .5;
@@ -19,7 +19,11 @@ var minClusterConc;
 
 var mean, stddev, maxConc;
 
-readFileNumCSV(23, 24);
+var current = 0;
+var end = 10;
+
+
+readFileNumCSV(current);
 
 // build clusters (fingers) from graph of nodes
 function createClusters() {
@@ -29,8 +33,14 @@ function createClusters() {
 
   var ind = findLargestNotInTopOrUsed();
   var cNum = 0;
-  data[ind].inCluster = cNum;
-  clusters[cNum].push(ind);
+
+  if(data[ind]) {
+    data[ind].inCluster = cNum;
+    clusters[cNum].push(ind);
+  }
+  else {
+    done = true;
+  }
 
 
   var cluster;    // current cluster
@@ -130,19 +140,26 @@ function joinClusters(indA, indB) {
   // remove the data of the second cluster
   clusters[indB] = [];
 
-  console.log("Joined Clusters", indA, "and", indB);
+  // console.log("Joined Clusters", indA, "and", indB);
 }
 
 function filterSortClusters(sizeThreshold) {
-  keptClusters = [];
+  keptClusters[current] = [];
   for(var i = 0; i < clusters.length; i++) {
     if(clusters[i].length >= sizeThreshold) {
-      keptClusters.push(clusters[i]);
+      keptClusters[current].push(clusters[i]);
     }
   }
-  keptClusters.sort(function(a,b) {
+  keptClusters[current].sort(function(a,b) {
     return b.length - a.length;
   });
+  console.log("Done Getting Kept Clusters:", current);
+
+  if(current <= end){
+    current++;
+    readFileNumCSV(current);
+  }
+
 }
 
 function findAdjPoints() {
@@ -161,6 +178,7 @@ function findAdjPoints() {
       consoleDisplayThreshold += 5000;
     }
     for(var j = 0; j < dataLength; j++) {
+
       otherPoint.x = data[j].Points0;
       otherPoint.y = data[j].Points1;
       otherPoint.z = data[j].Points2;
@@ -179,7 +197,9 @@ function findAdjPoints() {
   createClusters();
 }
 
-function readFileNumCSV(n, end) {
+function readFileNumCSV(n) {
+  data = [];
+  clusters = [];
 
   d3.csv(folderPath + ('000' + n).substr(-3) + ".csv")
   .row(function(d) {
@@ -241,13 +261,13 @@ function canAddPointToCluster(ind) {
   // Looks messy but I wanted to make it check the fewest amount of cases
   // instead of doing in 1 return statement.
 
-  if(data[ind].inCluster !== -1) {
+  if(data[current][ind].inCluster !== -1) {
     return false;
   }
-  else if(data[ind].Points2 >= (10-topThickness)) {
+  else if(data[current][ind].Points2 >= (10-topThickness)) {
       return false;
   }
-  else if(data[ind].concentration <= minClusterConc) {
+  else if(data[current][ind].concentration <= minClusterConc) {
       return false;
   }
   else {
