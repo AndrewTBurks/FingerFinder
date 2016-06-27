@@ -536,7 +536,12 @@ function createFingersGraph() {
 	var width = myDiv.width,
 			height = myDiv.height;
 
-			
+	var xSpacing = width/(endFile-startFile);
+	var ySpacing = height/d3.max(fingersOverTime, function (el) {
+		d3.max(el, function(el2) {
+			return el2.id;
+		})
+	});
 }
 
 // file reading
