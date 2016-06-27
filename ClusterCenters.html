@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<meta charset='utf-8'>
+<script src='http://d3js.org/d3.v3.min.js'></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/three.js/r78/three.min.js"></script>
+<body>
+<script>
+
+var folderPath = "clean.44/";
+
+var data = [];
+var dataLength;
+
+var clusters = new Array(121);  // clusters of each timestep
+var clusterCenters = new Array(121); // data for clusters in each timestep
+
+
+// number of points in cluster, x,y,z center of cluster
+// clusterCenters[timestep][clusterNum] = {size: 0, cx: 0, cy: 0, cz: 0};
+
+
+var mean, stddev, maxConc;
+
+var current = 23;
+var end = 44;
+
+
+readFileNumCSV(current);
+
+
+function findCenterOfConc(n) {
+  var numClusters = clusters[n].length;
+  clusterCenters[n] = new Array(numClusters);
+
+  var clusterSize;
+  var xTot, yTot, zTot, concTot;
+  var thisConc;
+
+  for(var i = 0; i < numClusters; i++) {
+    // for each cluster in file n
+    clusterSize = clusters[n][i].length;
+
+    // get center of conc
+    xTot = 0;
+    yTot = 0;
+    zTot = 0;
+    concTot = 0;
+
+    for(var j = 0; j < clusterSize; j++) {
+      // for each point in cluster i
+
+      // add x, y, z weighted by conc of point
+      thisConc = data[clusters[n][i][j]].concentration;
+
+      xTot += data[clusters[n][i][j]].Points0 * thisConc;
+      yTot += data[clusters[n][i][j]].Points1 * thisConc;
+      zTot += data[clusters[n][i][j]].Points2 * thisConc;
+      concTot += thisConc;
+
+    }
+    clusterCenters[n][i] = {size: clusterSize, cx: xTot/concTot, cy: yTot/concTot, cz: zTot/concTot, concTotal: concTot};
+  }
+}
+
+function readFileNumCSV(n) {
+  data = [];
+
+  d3.csv(folderPath + ('000' + n).substr(-3) + ".csv")
+    .row(function(d) {
+
+      var el = {
+        concentration: Number(d.concentration),
+        Points0: Number(d.Points0),
+        Points1: Number(d.Points1),
+        Points2: Number(d.Points2),
+        adjPoints: [],
+        inCluster: -1
+      };
+
+      data.push(el);
+    })
+    .get(function(error, rows) {
+    console.log(n, "read (CSV).");
+
+    dataLength = data.length;
+
+    d3.json(folderPath + ('000' + n).substr(-3) + "Clusters.json",
+      function(err, json) {
+        clusters[n] = json;
+
+        findCenterOfConc(n);
+      });
+
+    });
+
+
+}
+
+
+function downloadJSON(object) {
+    var json = JSON.stringify(object)
+
+	var csvWin = window.open("","","");
+	csvWin.document.write('<meta name="content-type" content="text/csv">');
+	csvWin.document.write('<meta name="content-disposition" content="attachment;  filename=test.csv">  ');
+	csvWin.document.write(json);
+}
+
+</script>
+</body>
