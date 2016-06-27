@@ -13,9 +13,10 @@ var dataLength;
 var clusters = new Array(121).fill([]);  // clusters of each timestep
 var clusterCenters = new Array(121).fill([]); // data for clusters in each timestep
 
+var distanceTolerance = 1;
 
 // number of points in cluster, x,y,z center of cluster
-// clusterCenters[timestep][clusterNum] = {size: 0, cx: 0, cy: 0, cz: 0, concTotal: 0, prevCluster: 0};
+// clusterCenters[timestep][clusterNum] = {size: 0, cx: 0, cy: 0, cz: 0, concTotal: 0, clusterID: 0};
 
 
 var mean, stddev, maxConc;
@@ -27,11 +28,14 @@ var end = 45;
 readFileNumCSV(start);
 
 function clusterTimeline() {
-  var closestCluster;
+  var prevCluster;
   var closestDistance;
 
   var thisPoint;
   var otherPoint;
+  var thisDistance;
+
+  var maxIDUsed = clusterCenters[start].length; // one ID for each cluster in start
 
   for(var i = start+1; i <= end; i++) {
     // for each timestep aside from the start
@@ -43,16 +47,40 @@ function clusterTimeline() {
                                     clusterCenters[i][j].cy,
                                     clusterCenters[i][j].cz);
 
+      closestCluster = -1;
+      closestDistance = 20;
       // find the closest cluster in the previous timestep
       for(var k = 0; k < clusterCenters[i-1].length; k++)
       {
         // for each cluster in the previous timestep
+        otherPoint = new THREE.Vector3(clusterCenters[i-1][k].cx,
+                                      clusterCenters[i-1][k].cy,
+                                      clusterCenters[i-1][k].cz);
 
+        thisDistance = thisPoint.distanceTo(otherPoint);
+        // if the distance between clusters is
+        if(thisDistance < closestDistance) {
+          // if this is the new closest cluster
+          closestCluster = clusterCenters[i-1][k].clusterID;
+          closestDistance = thisDistance;
+        }
+
+      } // END for(var k = 0; ...
+
+      if(closestCluster === -1 || closestDistance > distanceTolerance) {
+        // if no close previous cluster was found
+        clusterCenters[i][j].clusterID = ++maxIDUsed;
+      }
+      else {
+        clusterCenters[i][j].clusterID = closestCluster;
       }
 
-    }
-  }
-}
+    } // END for(var j = 0...
+
+  } // END for(var i = 0...
+
+    console.log(maxIDUsed);
+} // END clusterTimeline() { ...
 
 function findCenterOfConc(n) {
   var numClusters = clusters[n].length;
@@ -84,7 +112,7 @@ function findCenterOfConc(n) {
       concTot += thisConc;
 
     }
-    clusterCenters[n][i] = {size: clusterSize, cx: xTot/concTot, cy: yTot/concTot, cz: zTot/concTot, concTotal: concTot, prevCluster: i};
+    clusterCenters[n][i] = {size: clusterSize, cx: xTot/concTot, cy: yTot/concTot, cz: zTot/concTot, concTotal: concTot, clusterID: i};
   }
 
   console.log("Centers Found:", n);
@@ -93,7 +121,7 @@ function findCenterOfConc(n) {
     readFileNumCSV(n+1);
   }
   else {
-
+    clusterTimeline();
   }
 }
 

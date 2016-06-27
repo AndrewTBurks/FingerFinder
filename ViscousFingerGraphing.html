@@ -19,8 +19,8 @@ var minClusterConc;
 
 var mean, stddev, maxConc;
 
-var current = 0;
-var end = 10;
+var current = 36;
+var end = 44;
 
 
 readFileNumCSV(current);
@@ -155,7 +155,7 @@ function filterSortClusters(sizeThreshold) {
   });
   console.log("Done Getting Kept Clusters:", current);
 
-  if(current <= end){
+  if(current < end){
     current++;
     readFileNumCSV(current);
   }
