@@ -548,7 +548,81 @@ function drawParticles(fileNum) {
 	//readFileNumCSV(23, 24);
 	//readFileNumJSON(0);
 
+	d3.json(folderPath + "allClusterCenters.json", function(err, json) {
+		fingersOverTime = json;
+		drawFingerGraph(startFile, endFile);
 
+	});
+
+function drawFingerGraph(start, end) {
+	var myDiv = d3.select("#fingerGraph");
+	// no idea how to size this stuff
+	var width = 494;
+	var height = 818;
+
+	var mySVG = myDiv.append("svg")
+		.attr("width", width)
+		.attr("height", height);
+
+	var numClusters = d3.max(fingersOverTime, function(el) {
+		return d3.max(el, function(el2) {
+			return el2.clusterID;
+		})
+	});
+
+	var xSpacing = (width/(end - start + 1));
+	var ySpacing = height/(numClusters + 1);
+
+	var maxFingerConc = d3.max(fingersOverTime, function(el) {
+		return d3.max(el, function(el2) {
+			return el2.concTotal;
+		})
+	});
+
+	var minFingerConc = d3.min(fingersOverTime, function(el) {
+		return d3.max(el, function(el2) {
+			return el2.concTotal;
+		})
+	});
+
+	var sizeScale = d3.scale.linear()
+		.domain([minFingerConc, maxFingerConc])
+		.range([2, 10]);
+
+	// draw background
+	mySVG.append("rect")
+		.attr("width", "100%")
+		.attr("height", "100%")
+		.style("fill", "#AAAAAA");
+
+
+		// draw horizontal lines
+
+	for(var i = 1; i <= numClusters; i++){
+		mySVG.append("line")
+			.attr("x1", 0)
+			.attr("x2", width)
+			.attr("y1", ySpacing*i)
+			.attr("y2", ySpacing*i)
+			.style("stroke", "black");
+	}
+
+	console.log(xSpacing);
+
+	for(var i = start; i <= end; i++){
+		for(var j = 0; j < fingersOverTime[i].length; j++) {
+			mySVG.append("circle")
+				.attr("class", "fingerPoint")
+				//.attr("cx", (xSpacing + (xSpacing*i)))
+				.attr("cy", (height - (ySpacing + (ySpacing*fingersOverTime[i][j].clusterID))))
+				.attr("cx", xSpacing * (i-start))
+				//.attr("cy", height/2)
+				.attr("r", 5)
+				.style("fill", "black");
+		}
+	}
+
+}
 
 	var mean, stddev, maxConc;
 
