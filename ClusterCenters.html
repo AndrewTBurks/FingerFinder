@@ -14,6 +14,7 @@ var clusters = new Array(121).fill([]);  // clusters of each timestep
 var clusterCenters = new Array(121).fill([]); // data for clusters in each timestep
 
 var distanceTolerance = 1;
+var edgeTolerance = 0;
 
 // number of points in cluster, x,y,z center of cluster
 // clusterCenters[timestep][clusterNum] = {size: 0, cx: 0, cy: 0, cz: 0, concTotal: 0, clusterID: 0};
@@ -32,7 +33,10 @@ function clusterTimeline() {
   var closestDistance;
 
   var thisPoint;
+  var thisCluster;
   var otherPoint;
+  var otherCluster;
+
   var thisDistance;
 
   var maxIDUsed = clusterCenters[start].length; // one ID for each cluster in start
@@ -43,9 +47,15 @@ function clusterTimeline() {
     for(var j = 0; j < clusterCenters[i].length; j++)
     {
       // for each cluster in this timestep
-      thisPoint = new THREE.Vector3(clusterCenters[i][j].cx,
-                                    clusterCenters[i][j].cy,
-                                    clusterCenters[i][j].cz);
+      thisCluster = clusterCenters[i][j];
+
+
+      thisPoint = new THREE.Vector3(thisCluster.cx,
+                                    thisCluster.cy,
+                                    thisCluster.cz);
+
+      // set distanceTolerance based on the max of the extent dimensions/2
+
 
       closestCluster = -1;
       closestDistance = 20;
@@ -53,21 +63,43 @@ function clusterTimeline() {
       for(var k = 0; k < clusterCenters[i-1].length; k++)
       {
         // for each cluster in the previous timestep
-        otherPoint = new THREE.Vector3(clusterCenters[i-1][k].cx,
-                                      clusterCenters[i-1][k].cy,
-                                      clusterCenters[i-1][k].cz);
+        otherCluster = clusterCenters[i-1][k];
+        distanceTolerance = d3.max([otherCluster.xMax-otherCluster.xMin, otherCluster.yMax-otherCluster.ymin, otherCluster.zMax-otherCluster.zMin])/2;
 
+
+        otherPoint = new THREE.Vector3(otherCluster.cx,
+                                      otherCluster.cy,
+                                      otherCluster.cz);
+        // linear distance between points
         thisDistance = thisPoint.distanceTo(otherPoint);
-        // if the distance between clusters is
-        if(thisDistance < closestDistance) {
-          // if this is the new closest cluster
+
+
+        // if the distance between clusters is smaller than the closest so far
+        if((thisDistance < closestDistance) && (thisDistance < distanceTolerance)) {
+          // set as the new closest cluster
           closestCluster = clusterCenters[i-1][k].clusterID;
           closestDistance = thisDistance;
         }
 
+        /*
+        // if in all 3 dimenions the edges of the clusters are close enough...
+        if(rangesWithinThreshold(thisCluster.xMin, thisCluster.xMax, otherCluster.xMin, otherCluster.xMax, edgeTolerance) &&
+            rangesWithinThreshold(thisCluster.yMin, thisCluster.yMax, otherCluster.yMin, otherCluster.yMax, edgeTolerance) &&
+            rangesWithinThreshold(thisCluster.zMin, thisCluster.zMax, otherCluster.zMin, otherCluster.zMax, edgeTolerance))
+        {
+          // this cluster is acceptable
+          if(thisDistance < closestDistance) {
+            // set as new closest cluster
+            closestCluster = clusterCenters[i-1][k].clusterID;
+            closestDistance = thisDistance;
+          }
+        }
+        */
+
       } // END for(var k = 0; ...
 
-      if(closestCluster === -1 || closestDistance > distanceTolerance) {
+      //if(closestCluster === -1 || closestDistance > distanceTolerance) {
+      if(closestCluster === -1) {
         // if no close previous cluster was found
         clusterCenters[i][j].clusterID = ++maxIDUsed;
       }
@@ -88,6 +120,7 @@ function findCenterOfConc(n) {
 
   var clusterSize;
   var xTot, yTot, zTot, concTot;
+  var xMax, xMin, yMax, yMin, zMax, zMin;
   var thisConc;
 
   for(var i = 0; i < numClusters; i++) {
@@ -100,19 +133,50 @@ function findCenterOfConc(n) {
     zTot = 0;
     concTot = 0;
 
+    // extents of the cluster
+    xMax = -100;
+    xMin = 100;
+    yMax = -100;
+    yMin = 100;
+    zMax = -100;
+    zMin = 100;
+
     for(var j = 0; j < clusterSize; j++) {
       // for each point in cluster i
+      var point = data[clusters[n][i][j]];
 
       // add x, y, z weighted by conc of point
-      thisConc = data[clusters[n][i][j]].concentration;
+      thisConc = point.concentration;
 
-      xTot += data[clusters[n][i][j]].Points0 * thisConc;
-      yTot += data[clusters[n][i][j]].Points1 * thisConc;
-      zTot += data[clusters[n][i][j]].Points2 * thisConc;
+      xTot += point.Points0 * thisConc;
+      yTot += point.Points1 * thisConc;
+      zTot += point.Points2 * thisConc;
       concTot += thisConc;
 
+      // calculating extents of cluster
+      if(point.Points0 < xMin) {
+        xMin = point.Points0;
+      }
+      if(point.Points0 > xMax) {
+        xMax = point.Points0;
+      }
+      if(point.Points1 < yMin) {
+        yMin = point.Points1;
+      }
+      if(point.Points1 > yMax) {
+        yMax = point.Points1;
+      }
+      if(point.Points2 < zMin) {
+        zMin = point.Points2;
+      }
+      if(point.Points2 > zMax) {
+        zMax = point.Points2;
+      }
+
     }
-    clusterCenters[n][i] = {size: clusterSize, cx: xTot/concTot, cy: yTot/concTot, cz: zTot/concTot, concTotal: concTot, clusterID: i};
+    clusterCenters[n][i] = {size: clusterSize, concTotal: concTot, clusterID: i,
+                            cx: xTot/concTot, cy: yTot/concTot, cz: zTot/concTot,
+                            xMax: xMax, xMin: xMin, yMax: yMax, yMin: yMin, zMax: zMax, zMin: zMin};
   }
 
   console.log("Centers Found:", n);
@@ -157,6 +221,24 @@ function readFileNumCSV(n) {
     });
 
 
+}
+
+function rangesWithinThreshold(aMin, aMax, bMin, bMax, tolerance) {
+  // range A inside range B
+  if((aMin < bMax) && (aMin > bMin) && (aMax < bMax) && (aMax > bMin)) {
+    return true;
+  }
+  // either bMax or bMin are within range A
+  else if(((bMin < aMax) && (bMin > aMin)) || ((bMax < aMax) && (bMax > aMin))) {
+    return true;
+  }
+  // if bMax is within tolerance of aMin or if bMin is within tolerance of aMax
+  else if((+(aMin-bMax) < tolerance) || (+(bMin-aMax) < tolerance)) {
+    return true;
+  }
+  else {
+    return false;
+  }
 }
 
 
