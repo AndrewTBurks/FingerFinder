@@ -92,13 +92,13 @@ p.view2 {
           align-items: center;
   -webkit-justify-content: center;
           justify-content: center;
+  overflow: hidden;
 }
 
 #wrapper {
-  overflow: hidden;
   width: 100%;
-  max-width: 1700px;
-  min-width: 1700px;
+  max-width: 1400px;
+  min-width: 1400px;
   max-height: 900px;
   /*min-height: 824px;*/
   position: relative;
@@ -111,8 +111,8 @@ p.view2 {
   min-height: 824px;
   display: inline-block;
   vertical-align: top;
-  padding-left: 34px;
-  position: relative;
+  margin-left: 34px;
+  /*position: relative;*/
 }
 
 #cylinderWrapper {
@@ -122,7 +122,7 @@ p.view2 {
   min-height: 824px;
   display: inline-block;
   vertical-align: top;
-  position: relative;
+  /*position: relative;*/
   /*left: 34px;*/
 }
 
@@ -152,6 +152,7 @@ form {
   display: inline-block;
   vertical-align: top;
   position: relative;
+  float: left;
   margin-right: 34px;
 } #menuWrapper p {text-align: left;}
 
