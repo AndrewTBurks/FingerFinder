@@ -15,7 +15,7 @@ var clusterCenters = new Array(121).fill([]); // data for clusters in each times
 
 
 // number of points in cluster, x,y,z center of cluster
-// clusterCenters[timestep][clusterNum] = {size: 0, cx: 0, cy: 0, cz: 0};
+// clusterCenters[timestep][clusterNum] = {size: 0, cx: 0, cy: 0, cz: 0, concTotal: 0, prevCluster: 0};
 
 
 var mean, stddev, maxConc;
@@ -27,8 +27,30 @@ var end = 45;
 readFileNumCSV(start);
 
 function clusterTimeline() {
+  var closestCluster;
+  var closestDistance;
+
+  var thisPoint;
+  var otherPoint;
+
   for(var i = start+1; i <= end; i++) {
-    
+    // for each timestep aside from the start
+
+    for(var j = 0; j < clusterCenters[i].length; j++)
+    {
+      // for each cluster in this timestep
+      thisPoint = new THREE.Vector3(clusterCenters[i][j].cx,
+                                    clusterCenters[i][j].cy,
+                                    clusterCenters[i][j].cz);
+
+      // find the closest cluster in the previous timestep
+      for(var k = 0; k < clusterCenters[i-1].length; k++)
+      {
+        // for each cluster in the previous timestep
+
+      }
+
+    }
   }
 }
 
@@ -62,7 +84,7 @@ function findCenterOfConc(n) {
       concTot += thisConc;
 
     }
-    clusterCenters[n][i] = {size: clusterSize, cx: xTot/concTot, cy: yTot/concTot, cz: zTot/concTot, concTotal: concTot, clusterID: i};
+    clusterCenters[n][i] = {size: clusterSize, cx: xTot/concTot, cy: yTot/concTot, cz: zTot/concTot, concTotal: concTot, prevCluster: i};
   }
 
   console.log("Centers Found:", n);
