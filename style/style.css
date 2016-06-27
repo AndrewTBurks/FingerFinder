@@ -18,6 +18,7 @@ h1 {
   padding-bottom: 0;
   margin-bottom: 0;
   text-transform: uppercase;
+  text-align: center;
 }
 
 .legendText {
@@ -42,6 +43,7 @@ p.subtitle {
   margin-top: 0;
   padding-top: 0;
   padding-bottom: 30px;
+  text-align: center;
 }
 
 p.view {
@@ -51,6 +53,7 @@ p.view {
   font-size: 16px;
   margin: 0;
   padding: 0;
+  text-align: center;
 }
 
 p.view2 {
@@ -61,6 +64,7 @@ p.view2 {
   margin: 0;
   padding: 0;
   padding-top: 14px;
+  text-align: center;
 }
 
 .colorLegend1 {
@@ -81,8 +85,21 @@ p.view2 {
   float: right;
 }
 
+.container {
+  display: -webkit-flex;
+  display:         flex;
+  -webkit-align-items: center;
+          align-items: center;
+  -webkit-justify-content: center;
+          justify-content: center;
+}
+
 #wrapper {
   overflow: hidden;
+  width: 100%;
+  max-width: 880px;
+  max-height: 900px;
+  position: relative;
 }
 
 #sliceWrapper {
@@ -102,6 +119,8 @@ p.view2 {
 
 #legend {
   max-width: 456px;
+  display: inline-block;
+  vertical-align: bottom;
 }
 
 #sliderDiv {

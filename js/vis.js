@@ -667,7 +667,7 @@ function sliderMove() {
 
   handle.append("text")
   .text(yMin)
-  .attr("transform", "translate(0, " + (sliderHeight / 2 - 10) + ")")
+  .attr("transform", "translate(" + -10 + ", " + (sliderHeight / 2 - 10) + ")")
 
 	slider
   .call(brush.event);
