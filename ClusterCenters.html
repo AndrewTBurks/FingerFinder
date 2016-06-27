@@ -26,6 +26,11 @@ var end = 45;
 
 readFileNumCSV(start);
 
+function clusterTimeline() {
+  for(var i = start+1; i <= end; i++) {
+    
+  }
+}
 
 function findCenterOfConc(n) {
   var numClusters = clusters[n].length;
@@ -57,13 +62,16 @@ function findCenterOfConc(n) {
       concTot += thisConc;
 
     }
-    clusterCenters[n][i] = {size: clusterSize, cx: xTot/concTot, cy: yTot/concTot, cz: zTot/concTot, concTotal: concTot};
+    clusterCenters[n][i] = {size: clusterSize, cx: xTot/concTot, cy: yTot/concTot, cz: zTot/concTot, concTotal: concTot, clusterID: i};
   }
 
   console.log("Centers Found:", n);
 
   if(n < end) {
     readFileNumCSV(n+1);
+  }
+  else {
+
   }
 }
 
