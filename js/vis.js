@@ -12,8 +12,13 @@ HEIGHT = 632;
 var WIDTH_SLICE = 380;
 var folderPath = "clean.44/";
 var numFiles = 121;
+// Range of file data available
+var startFile = 23;
+var endFile = 45;
+
 var data = [];
 var clusterData = [];
+var fingersOverTime;
 
 var keyboard = new THREEx.KeyboardState();
 var sliceWidth;
@@ -526,9 +531,10 @@ pMaterial = new THREE.PointsMaterial({
 // read 1 file
 readFileNumCSV(filePick, filePick+1);
 
-
 //readFileNumCSV(23, 24);
 //readFileNumJSON(0);
+
+
 
 var mean, stddev, maxConc;
 
