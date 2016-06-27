@@ -29,7 +29,7 @@ var sliceResolution = 50;
 var sliced = [];
 var sliceAccumulated = [];
 
-// 0 for Normal, 1 for desaturate, 2 for highlight, 3 for highlight fingers
+// 0 for Normal, 1 for desaturate outside of slice, 2 for highlight slice, 3 for highlight fingers
 var sliceColorMode = 3;
 
 for(var i = 0; i < sliceResolution; i++) {
@@ -352,42 +352,6 @@ pMaterial = new THREE.PointsMaterial({
 
  	// highlight the points which are within the slice
  	// draw all points as their normal colors first (gets rid of old hignlighted points)
- 	var particleCount = data.length;
-
- 	for(var p = 0; p < particleCount; p++) {
- 		particleSystem.geometry.colors[p] = new THREE.Color("#" + color(Number(data[p].concentration)));
-
- 		if(sliceColorMode === 1 || sliceColorMode === 3) {
- 			var oldHSL = particleSystem.geometry.colors[p].getHSL();
- 			particleSystem.geometry.colors[p].setHSL(oldHSL.h, .05, oldHSL.l);
- 		}
- 	}
-
- 	// makes all sliced points white
- 	for(var i = 0; i < sliced.length; i++) {
-
- 		if(sliceColorMode === 1) {
- 			// keep particles in slice same color
- 			particleSystem.geometry.colors[sliced[i].num] = new THREE.Color("#" + color(Number(data[sliced[i].num].concentration)));
- 		}
- 		else if(sliceColorMode === 2) {
- 			// hilight particles in slice
- 			particleSystem.geometry.colors[sliced[i].num].r += .2;
- 			particleSystem.geometry.colors[sliced[i].num].g += .2;
- 			particleSystem.geometry.colors[sliced[i].num].b += .2;
- 		}
-
- 	}
-
- 	// color the points that (we think) are viscous fingers
- 	if(sliceColorMode === 3){
- 		for(var i = 0; i < clusterData.length; i++) {
- 			for(var j = 0; j < clusterData[i].length; j++) {
- 				particleSystem.geometry.colors[clusterData[i][j]] = new THREE.Color("#" + color(Number(data[clusterData[i][j]].concentration)));
- 			}
- 		}
- 	}
- 	particleSystem.geometry.colorsNeedUpdate = true;
 
  	for(var i = 0; i < sliced.length; i++) {
 
@@ -522,6 +486,48 @@ pMaterial = new THREE.PointsMaterial({
  				" l " + -5 + " " + 5)
  		.style("stroke", "white")
  		.style("stroke-width", 2);
+
+	recolor3DModel();
+ }
+
+ function recolor3DModel(){
+	 var particleCount = data.length;
+
+  	for(var p = 0; p < particleCount; p++) {
+  		particleSystem.geometry.colors[p] = new THREE.Color("#" + color(Number(data[p].concentration)));
+
+  		if(sliceColorMode === 1 || sliceColorMode === 3) {
+  			var oldHSL = particleSystem.geometry.colors[p].getHSL();
+  			particleSystem.geometry.colors[p].setHSL(oldHSL.h, .05, oldHSL.l);
+  		}
+  	}
+
+  	// makes all sliced points white
+  	for(var i = 0; i < sliced.length; i++) {
+
+  		if(sliceColorMode === 1) {
+  			// keep particles in slice same color
+  			particleSystem.geometry.colors[sliced[i].num] = new THREE.Color("#" + color(Number(data[sliced[i].num].concentration)));
+  		}
+  		else if(sliceColorMode === 2) {
+  			// hilight particles in slice
+  			particleSystem.geometry.colors[sliced[i].num].r += .2;
+  			particleSystem.geometry.colors[sliced[i].num].g += .2;
+  			particleSystem.geometry.colors[sliced[i].num].b += .2;
+  		}
+
+  	}
+
+  	// color the points that (we think) are viscous fingers
+  	if(sliceColorMode === 3){
+  		for(var i = 0; i < clusterData.length; i++) {
+  			for(var j = 0; j < clusterData[i].length; j++) {
+  				particleSystem.geometry.colors[clusterData[i][j]] = new THREE.Color("#" + color(Number(data[clusterData[i][j]].concentration)));
+  			}
+  		}
+  	}
+  	particleSystem.geometry.colorsNeedUpdate = true;
+
  }
 
 // file reading
