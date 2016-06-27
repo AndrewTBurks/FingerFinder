@@ -29,8 +29,12 @@ var sliceResolution = 50;
 var sliced = [];
 var sliceAccumulated = [];
 
-// 0 for Normal, 1 for desaturate outside of slice, 2 for highlight slice, 3 for highlight fingers
-var sliceColorMode = 3;
+/**
+* <p>Used to select the coloring mode for the 3D cylinder view.</p>
+* <p>0 for Normal, 1 for desaturate outside of slice, 2 for highlight slice, 3 for highlight fingers.</p>
+* @type {number}
+*/
+var sliceColorMode = Number(d3.select('input[name="viewCylinder"]:checked').node().value);
 
 for(var i = 0; i < sliceResolution; i++) {
 	sliceAccumulated.push(new Array(sliceResolution));
@@ -41,9 +45,9 @@ for(var i = 0; i < sliceResolution; i++) {
 
 
 /**
- * Used to choose which file will be load into the visualization.
- * @type {number}
- */
+* Used to choose which file will be load into the visualization.
+* @type {number}
+*/
 var filePick = 45;
 
 /**
@@ -83,6 +87,7 @@ drawSlice();
 createColorLegend();
 mouseWheelZoom();
 sliderMove();
+menuListener();
 
 /**
 * Draws the cylinder slice using three.js lines.
@@ -222,7 +227,7 @@ var particleSystem;
 */
 function render() {
 	requestAnimationFrame( render );
-
+	// menuListener();
 	keyboardListener();
 	controls.update();
 
@@ -269,306 +274,309 @@ pMaterial = new THREE.PointsMaterial({
 });
 
 /**
- * Draws the particle system by receiving the file number (timestep).
- * @param fileNum - The number of the file.
- */
- function drawParticles(fileNum) {
+* Draws the particle system by receiving the file number (timestep).
+* @param fileNum - The number of the file.
+*/
+function drawParticles(fileNum) {
 
- 	scene.remove(particleSystem);
- 	particleSystem = null;
- 	if(particles) particles.dispose();
+	scene.remove(particleSystem);
+	particleSystem = null;
+	if(particles) particles.dispose();
 
 
 
 
 
 
- 	var particleCount = data.length, // 40th step
- 	particles = new THREE.Geometry();
+	var particleCount = data.length, // 40th step
+	particles = new THREE.Geometry();
 
 
- 	// now create the individual particles
- 	for(var p = 0; p < particleCount; p++) {
+	// now create the individual particles
+	for(var p = 0; p < particleCount; p++) {
 
- 		var pX = data[p].Points0,
- 		pY = data[p].Points1,
- 		pZ = data[p].concentration < (mean + stddev/8) ? -100 : data[p].Points2,
- 		// pZ = data[p].Points2,
- 		particle = new THREE.Vector3(pX, pY, pZ);
+		var pX = data[p].Points0,
+		pY = data[p].Points1,
+		pZ = data[p].concentration < (mean + stddev/8) ? -100 : data[p].Points2,
+		// pZ = data[p].Points2,
+		particle = new THREE.Vector3(pX, pY, pZ);
 
- 		// add it to the geometry
- 		particles.vertices.push(particle);
+		// add it to the geometry
+		particles.vertices.push(particle);
 
- 	}
+	}
 
- 	// create the particle system
- 	particleSystem = new THREE.Points(
- 		particles,
- 		pMaterial);
+	// create the particle system
+	particleSystem = new THREE.Points(
+		particles,
+		pMaterial);
 
- 		for(var p = 0; p < particleCount; p++) {
- 			particleSystem.geometry.colors[p] = new THREE.Color("#" + color(Number(data[p].concentration)));
- 		}
+		for(var p = 0; p < particleCount; p++) {
+			particleSystem.geometry.colors[p] = new THREE.Color("#" + color(Number(data[p].concentration)));
+		}
 
 
- 		particleSystem.geometry.colorsNeedUpdate = true;
+		particleSystem.geometry.colorsNeedUpdate = true;
 
 
- 		// add it to the scene
- 		scene.add(particleSystem);
- 		particleSystem.position.setZ(1);
+		// add it to the scene
+		scene.add(particleSystem);
+		particleSystem.position.setZ(1);
 
 
 
- 		// render again after particles created
- 		refreshSlice();
- 		render();
- 	}
+		// render again after particles created
+		refreshSlice();
+		render();
+	}
 
-/**
- * Updates the slice view to match the current position and rotation.
- */
- function refreshSlice() {
- 	var currRotation = particleSystem.rotation.z;
+	/**
+	* Updates the slice view to match the current position and rotation.
+	*/
+	function refreshSlice() {
+		var currRotation = particleSystem.rotation.z;
 
- 	sliced = [];
- 	for(var i = 0; i < data.length; i++){
- 		var loc = new THREE.Vector3(data[i].Points0, data[i].Points1, data[i].Points2);
- 		loc.applyAxisAngle(new THREE.Vector3(0,0,1), currRotation + (0*Math.PI/2));
- 		if(loc.y > (sliceGroup.position.y - (sliceWidth/2)) && loc.y < (sliceGroup.position.y + (sliceWidth/2)))
- 		{
- 			var vel = new THREE.Vector3(data[i].velocity0, data[i].velocity1, data[i].velocity2);
- 			vel.applyAxisAngle(new THREE.Vector3(0,0,1), currRotation + (0*Math.PI/2));
- 			sliced.push({num: i, position: loc, velocity: vel, concentration: data[i].concentration});
- 		}
- 	}
+		sliced = [];
+		for(var i = 0; i < data.length; i++){
+			var loc = new THREE.Vector3(data[i].Points0, data[i].Points1, data[i].Points2);
+			loc.applyAxisAngle(new THREE.Vector3(0,0,1), currRotation + (0*Math.PI/2));
+			if(loc.y > (sliceGroup.position.y - (sliceWidth/2)) && loc.y < (sliceGroup.position.y + (sliceWidth/2)))
+			{
+				var vel = new THREE.Vector3(data[i].velocity0, data[i].velocity1, data[i].velocity2);
+				vel.applyAxisAngle(new THREE.Vector3(0,0,1), currRotation + (0*Math.PI/2));
+				sliced.push({num: i, position: loc, velocity: vel, concentration: data[i].concentration});
+			}
+		}
 
- 	for(var i = 0; i < sliceResolution; i++) {
- 		for(var j = 0; j < sliceResolution; j++) {
- 			sliceAccumulated[i][j].conc = 0;
- 			sliceAccumulated[i][j].vel = new THREE.Vector3(0,0,0);
- 		}
- 	}
+		for(var i = 0; i < sliceResolution; i++) {
+			for(var j = 0; j < sliceResolution; j++) {
+				sliceAccumulated[i][j].conc = 0;
+				sliceAccumulated[i][j].vel = new THREE.Vector3(0,0,0);
+			}
+		}
 
- 	// highlight the points which are within the slice
- 	// draw all points as their normal colors first (gets rid of old hignlighted points)
+		// highlight the points which are within the slice
+		// draw all points as their normal colors first (gets rid of old hignlighted points)
 
- 	for(var i = 0; i < sliced.length; i++) {
+		for(var i = 0; i < sliced.length; i++) {
 
- 		var thisX = xScale(sliced[i].position.x),
- 				thisZ = yScale(sliced[i].position.z);
+			var thisX = xScale(sliced[i].position.x),
+			thisZ = yScale(sliced[i].position.z);
 
- 		sliceAccumulated[thisX][sliceResolution - thisZ - 1].conc += sliced[i].concentration;
- 		sliceAccumulated[thisX][sliceResolution - thisZ - 1].vel.x += data[sliced[i].num].velocity0;
- 		sliceAccumulated[thisX][sliceResolution - thisZ - 1].vel.y += data[sliced[i].num].velocity1;
- 		sliceAccumulated[thisX][sliceResolution - thisZ - 1].vel.z += data[sliced[i].num].velocity2;
- 	}
+			sliceAccumulated[thisX][sliceResolution - thisZ - 1].conc += sliced[i].concentration;
+			sliceAccumulated[thisX][sliceResolution - thisZ - 1].vel.x += data[sliced[i].num].velocity0;
+			sliceAccumulated[thisX][sliceResolution - thisZ - 1].vel.y += data[sliced[i].num].velocity1;
+			sliceAccumulated[thisX][sliceResolution - thisZ - 1].vel.z += data[sliced[i].num].velocity2;
+		}
 
- 	// create/color rectangles of slice
+		// create/color rectangles of slice
 
- 	var maxConcSlice = d3.max(sliceAccumulated, function(e) { return d3.max(e, function(e){ return e.conc;}); });
- 	var minConcSlice = d3.min(sliceAccumulated, function(e) { return d3.max(e, function(e){ return e.conc;}); });
+		var maxConcSlice = d3.max(sliceAccumulated, function(e) { return d3.max(e, function(e){ return e.conc;}); });
+		var minConcSlice = d3.min(sliceAccumulated, function(e) { return d3.max(e, function(e){ return e.conc;}); });
 
- 	var maxVel = d3.max(sliceAccumulated, function(e) {
- 		return d3.max(e, function(e) {
- 			return e.vel.length();
- 		});
- 	});
-
- 	colorSlice.domain([0, maxConcSlice]);
-
- 	d3.selectAll(".slicePixel").remove();
- 	d3.selectAll(".sliceLine").remove();
-
- 	var gridWidth = d3.min([WIDTH_SLICE, WIDTH_SLICE])/(sliceResolution);
-
- 	var velLength = d3.scale.linear()
- 		.range([0.5, gridWidth*15]);
-
- 	var velWidth = d3.scale.linear()
- 		.range([0.5, 3]);
-
- 	velLength.domain([0, maxVel]);
- 	velWidth.domain([0, maxVel]);
-
-
- 	// add colored values for concentration
- 	for(var i = 0; i < sliceResolution; i++) {
- 		for(var j = 0; j < sliceResolution; j++) {
- 			svg.append("rect")
- 					.attr("class", "slicePixel")
- 					.attr("width", gridWidth)
- 					.attr("height", gridWidth)
- 					.attr("x", (sliceAccumulated[i][j].x*gridWidth))
- 					.attr("y", (sliceAccumulated[i][j].y*gridWidth))
- 					.style("fill", d3.rgb("#" + color(sliceAccumulated[i][j].conc/3)));
-
-
- 			svg2.append("rect")
- 					.attr("class", "slicePixel")
- 					.attr("width", gridWidth)
- 					.attr("height", gridWidth)
- 					.attr("x", (sliceAccumulated[i][j].x*gridWidth))
- 					.attr("y", (sliceAccumulated[i][j].y*gridWidth))
- 					.style("fill", d3.rgb("#" + color(sliceAccumulated[i][j].conc/3)))
- 					.style("fill-opacity", 0.3);
-
- 		}
- 	}
- 	// draw lines for velocity
- 	for(var i = 0; i < sliceResolution; i++) {
- 		for(var j = 0; j < sliceResolution; j++) {
-
- 			var vecX = sliceAccumulated[i][j].vel.x < 0 ?
- 						-velLength(+sliceAccumulated[i][j].vel.x) :
- 						velLength(+sliceAccumulated[i][j].vel.x),
-
- 					vecY = sliceAccumulated[i][j].vel.z < 0 ?
- 								-velLength(+sliceAccumulated[i][j].vel.z) :
- 								velLength(+sliceAccumulated[i][j].vel.z); // z <-> y here
-
- 			var xCenter = (sliceAccumulated[i][j].x * gridWidth) + (gridWidth/2),
- 					yCenter = (sliceAccumulated[i][j].y * gridWidth) + (gridWidth/2);
-
- 			var xStart = xCenter,
- 					xEnd = xCenter + vecX,
- 					yStart = yCenter,
- 					yEnd = yCenter + vecY;
-
- 			var slope = (yEnd-yStart)/(xEnd-xStart);
-
- 			var slopeInv = -1*(1/slope);
-
- 			var dXSlopeInv = 1,
- 					dYSlopeInv = dXSlopeInv * slopeInv,
- 					dHSlopeInv = Math.sqrt(Math.pow(dXSlopeInv,2) + Math.pow(dYSlopeInv,2));
-
- 			var ratio = velWidth(sliceAccumulated[i][j].vel.length()) / dHSlopeInv,
- 					dXEndLine = ratio * dXSlopeInv;
- 					dYEndLine = ratio * dYSlopeInv;
-
- 			svg2.append("path")
- 					.attr("class", "sliceLine")
- 					.attr("d", "M " + (xStart-dXEndLine) + " " + (yStart-dYEndLine) +
- 						" L " + (xStart+dXEndLine) + " " + (yStart+dYEndLine) +
- 						" L " + xEnd + " " + yEnd + " Z")
- 					.attr('stroke-linecap', 'round')
- 					.style("fill", d3.rgb("#" + color(sliceAccumulated[i][j].conc/3)))
- 					.style("stroke-width", velWidth(sliceAccumulated[i][j].vel.length()));
- 		}
- 	}
- 	sliceArrow1.remove();
- 	sliceArrow1 = svg.append("path")
- 		.attr("class", "arrow")
- 		.attr("stroke-linecap", "round")
- 		.attr("d", "M " + (WIDTH_SLICE-15) + " " + (WIDTH_SLICE-10) +
- 				" l " + 8 + " " + 0 +
- 				" m " + 2 + " " + 0 +
- 				" l " + -5 + " " + -5 +
- 				" m " + -5 + " " + 5 +
- 				" l " + 8 + " " + 0 +
- 				" m " + 2 + " " + 0 +
- 				" l " + -5 + " " + 5)
- 		.style("stroke", "white")
- 		.style("stroke-width", 2);
-
- 	sliceArrow2.remove();
- 	sliceArrow2 = svg2.append("path")
- 		.attr("class", "arrow")
- 		.attr("stroke-linecap", "round")
- 		.attr("d", "M " + (WIDTH_SLICE-15) + " " + (WIDTH_SLICE-10) +
- 				" l " + 8 + " " + 0 +
- 				" m " + 2 + " " + 0 +
- 				" l " + -5 + " " + -5 +
- 				" m " + -5 + " " + 5 +
- 				" l " + 8 + " " + 0 +
- 				" m " + 2 + " " + 0 +
- 				" l " + -5 + " " + 5)
- 		.style("stroke", "white")
- 		.style("stroke-width", 2);
-
-	recolor3DModel();
- }
-
- function recolor3DModel(){
-	 var particleCount = data.length;
-
-  	for(var p = 0; p < particleCount; p++) {
-  		particleSystem.geometry.colors[p] = new THREE.Color("#" + color(Number(data[p].concentration)));
-
-  		if(sliceColorMode === 1 || sliceColorMode === 3) {
-  			var oldHSL = particleSystem.geometry.colors[p].getHSL();
-  			particleSystem.geometry.colors[p].setHSL(oldHSL.h, .05, oldHSL.l);
-  		}
-  	}
-
-  	// makes all sliced points white
-  	for(var i = 0; i < sliced.length; i++) {
-
-  		if(sliceColorMode === 1) {
-  			// keep particles in slice same color
-  			particleSystem.geometry.colors[sliced[i].num] = new THREE.Color("#" + color(Number(data[sliced[i].num].concentration)));
-  		}
-  		else if(sliceColorMode === 2) {
-  			// hilight particles in slice
-  			particleSystem.geometry.colors[sliced[i].num].r += .2;
-  			particleSystem.geometry.colors[sliced[i].num].g += .2;
-  			particleSystem.geometry.colors[sliced[i].num].b += .2;
-  		}
-
-  	}
-
-  	// color the points that (we think) are viscous fingers
-  	if(sliceColorMode === 3){
-  		for(var i = 0; i < clusterData.length; i++) {
-  			for(var j = 0; j < clusterData[i].length; j++) {
-  				particleSystem.geometry.colors[clusterData[i][j]] = new THREE.Color("#" + color(Number(data[clusterData[i][j]].concentration)));
-  			}
-  		}
-  	}
-  	particleSystem.geometry.colorsNeedUpdate = true;
-
- }
-
-// file reading
-
-// read all files
-// readFileNumCSV(0, numFiles);
-// read 1 file
-readFileNumCSV(filePick, filePick+1);
-
-//readFileNumCSV(23, 24);
-//readFileNumJSON(0);
-
-
-
-var mean, stddev, maxConc;
-
-/**
- * Reads the csv file specified.
- */
-function readFileNumCSV(n, end) {
-
-	d3.csv(folderPath + ('000' + n).substr(-3) + ".csv")
-	.row(function(d) {
-
-		var el = {
-			concentration: Number(d.concentration),
-			Points0: Number(d.Points0),
-			Points1: Number(d.Points1),
-			Points2: Number(d.Points2),
-			velocity0: Number(d.velocity0),
-			velocity1: Number(d.velocity1),
-			velocity2: Number(d.velocity2)
-
-		};
-
-		data.push(el);
-	})
-	.get(function(error, rows) {
-		/*
-		console.log(n, ":", d3.mean(data[n], function(d){
-		return d.concentration;
+		var maxVel = d3.max(sliceAccumulated, function(e) {
+			return d3.max(e, function(e) {
+				return e.vel.length();
+			});
+		});
+
+		colorSlice.domain([0, maxConcSlice]);
+
+		d3.selectAll(".slicePixel").remove();
+		d3.selectAll(".sliceLine").remove();
+
+		var gridWidth = d3.min([WIDTH_SLICE, WIDTH_SLICE])/(sliceResolution);
+
+		var velLength = d3.scale.linear()
+		.range([0.5, gridWidth*15]);
+
+		var velWidth = d3.scale.linear()
+		.range([0.5, 3]);
+
+		velLength.domain([0, maxVel]);
+		velWidth.domain([0, maxVel]);
+
+
+		// add colored values for concentration
+		for(var i = 0; i < sliceResolution; i++) {
+			for(var j = 0; j < sliceResolution; j++) {
+				svg.append("rect")
+				.attr("class", "slicePixel")
+				.attr("width", gridWidth)
+				.attr("height", gridWidth)
+				.attr("x", (sliceAccumulated[i][j].x*gridWidth))
+				.attr("y", (sliceAccumulated[i][j].y*gridWidth))
+				.style("fill", d3.rgb("#" + color(sliceAccumulated[i][j].conc/3)));
+
+
+				svg2.append("rect")
+				.attr("class", "slicePixel")
+				.attr("width", gridWidth)
+				.attr("height", gridWidth)
+				.attr("x", (sliceAccumulated[i][j].x*gridWidth))
+				.attr("y", (sliceAccumulated[i][j].y*gridWidth))
+				.style("fill", d3.rgb("#" + color(sliceAccumulated[i][j].conc/3)))
+				.style("fill-opacity", 0.3);
+
+			}
+		}
+		// draw lines for velocity
+		for(var i = 0; i < sliceResolution; i++) {
+			for(var j = 0; j < sliceResolution; j++) {
+
+				var vecX = sliceAccumulated[i][j].vel.x < 0 ?
+				-velLength(+sliceAccumulated[i][j].vel.x) :
+				velLength(+sliceAccumulated[i][j].vel.x),
+
+				vecY = sliceAccumulated[i][j].vel.z < 0 ?
+				-velLength(+sliceAccumulated[i][j].vel.z) :
+				velLength(+sliceAccumulated[i][j].vel.z); // z <-> y here
+
+				var xCenter = (sliceAccumulated[i][j].x * gridWidth) + (gridWidth/2),
+				yCenter = (sliceAccumulated[i][j].y * gridWidth) + (gridWidth/2);
+
+				var xStart = xCenter,
+				xEnd = xCenter + vecX,
+				yStart = yCenter,
+				yEnd = yCenter + vecY;
+
+				var slope = (yEnd-yStart)/(xEnd-xStart);
+
+				var slopeInv = -1*(1/slope);
+
+				var dXSlopeInv = 1,
+				dYSlopeInv = dXSlopeInv * slopeInv,
+				dHSlopeInv = Math.sqrt(Math.pow(dXSlopeInv,2) + Math.pow(dYSlopeInv,2));
+
+				var ratio = velWidth(sliceAccumulated[i][j].vel.length()) / dHSlopeInv,
+				dXEndLine = ratio * dXSlopeInv;
+				dYEndLine = ratio * dYSlopeInv;
+
+				svg2.append("path")
+				.attr("class", "sliceLine")
+				.attr("d", "M " + (xStart-dXEndLine) + " " + (yStart-dYEndLine) +
+				" L " + (xStart+dXEndLine) + " " + (yStart+dYEndLine) +
+				" L " + xEnd + " " + yEnd + " Z")
+				.attr('stroke-linecap', 'round')
+				.style("fill", d3.rgb("#" + color(sliceAccumulated[i][j].conc/3)))
+				.style("stroke-width", velWidth(sliceAccumulated[i][j].vel.length()));
+			}
+		}
+		sliceArrow1.remove();
+		sliceArrow1 = svg.append("path")
+		.attr("class", "arrow")
+		.attr("stroke-linecap", "round")
+		.attr("d", "M " + (WIDTH_SLICE-15) + " " + (WIDTH_SLICE-10) +
+		" l " + 8 + " " + 0 +
+		" m " + 2 + " " + 0 +
+		" l " + -5 + " " + -5 +
+		" m " + -5 + " " + 5 +
+		" l " + 8 + " " + 0 +
+		" m " + 2 + " " + 0 +
+		" l " + -5 + " " + 5)
+		.style("stroke", "white")
+		.style("stroke-width", 2);
+
+		sliceArrow2.remove();
+		sliceArrow2 = svg2.append("path")
+		.attr("class", "arrow")
+		.attr("stroke-linecap", "round")
+		.attr("d", "M " + (WIDTH_SLICE-15) + " " + (WIDTH_SLICE-10) +
+		" l " + 8 + " " + 0 +
+		" m " + 2 + " " + 0 +
+		" l " + -5 + " " + -5 +
+		" m " + -5 + " " + 5 +
+		" l " + 8 + " " + 0 +
+		" m " + 2 + " " + 0 +
+		" l " + -5 + " " + 5)
+		.style("stroke", "white")
+		.style("stroke-width", 2);
+
+		recolor3DModel();
+	}
+
+	/**
+	* Recolors the particle system according to the option selected.
+	*/
+	function recolor3DModel() {
+		var particleCount = data.length;
+
+		for(var p = 0; p < particleCount; p++) {
+			particleSystem.geometry.colors[p] = new THREE.Color("#" + color(Number(data[p].concentration)));
+
+			if(sliceColorMode === 1 || sliceColorMode === 3) {
+				var oldHSL = particleSystem.geometry.colors[p].getHSL();
+				particleSystem.geometry.colors[p].setHSL(oldHSL.h, .05, oldHSL.l);
+			}
+		}
+
+		// makes all sliced points white
+		for(var i = 0; i < sliced.length; i++) {
+
+			if(sliceColorMode === 1) {
+				// keep particles in slice same color
+				particleSystem.geometry.colors[sliced[i].num] = new THREE.Color("#" + color(Number(data[sliced[i].num].concentration)));
+			}
+			else if(sliceColorMode === 2) {
+				// hilight particles in slice
+				particleSystem.geometry.colors[sliced[i].num].r += .2;
+				particleSystem.geometry.colors[sliced[i].num].g += .2;
+				particleSystem.geometry.colors[sliced[i].num].b += .2;
+			}
+
+		}
+
+		// color the points that (we think) are viscous fingers
+		if(sliceColorMode === 3){
+			for(var i = 0; i < clusterData.length; i++) {
+				for(var j = 0; j < clusterData[i].length; j++) {
+					particleSystem.geometry.colors[clusterData[i][j]] = new THREE.Color("#" + color(Number(data[clusterData[i][j]].concentration)));
+				}
+			}
+		}
+		particleSystem.geometry.colorsNeedUpdate = true;
+
+	}
+
+	// file reading
+
+	// read all files
+	// readFileNumCSV(0, numFiles);
+	// read 1 file
+	readFileNumCSV(filePick, filePick+1);
+
+	//readFileNumCSV(23, 24);
+	//readFileNumJSON(0);
+
+
+
+	var mean, stddev, maxConc;
+
+	/**
+	* Reads the csv file specified.
+	*/
+	function readFileNumCSV(n, end) {
+
+		d3.csv(folderPath + ('000' + n).substr(-3) + ".csv")
+		.row(function(d) {
+
+			var el = {
+				concentration: Number(d.concentration),
+				Points0: Number(d.Points0),
+				Points1: Number(d.Points1),
+				Points2: Number(d.Points2),
+				velocity0: Number(d.velocity0),
+				velocity1: Number(d.velocity1),
+				velocity2: Number(d.velocity2)
+
+			};
+
+			data.push(el);
+		})
+		.get(function(error, rows) {
+			/*
+			console.log(n, ":", d3.mean(data[n], function(d){
+			return d.concentration;
 		}));
 		*/
 		console.log(n, "read (CSV).");
@@ -583,24 +591,24 @@ function readFileNumCSV(n, end) {
 		window.onload = function() {
 		document.getElementById("scaleMin").innerHTML = mean.toFixed(2);
 		document.getElementById("scaleMax").innerHTML = maxConc.toFixed(2);
-		}
-		*/
-		d3.select("#scaleMin").text(mean.toFixed(2));
-		d3.select("#scaleMax").text(maxConc.toFixed(2));
+	}
+	*/
+	d3.select("#scaleMin").text(mean.toFixed(2));
+	d3.select("#scaleMax").text(maxConc.toFixed(2));
 
-		color.domain([mean, maxConc]);
+	color.domain([mean, maxConc]);
 
+	drawParticles(n);
+	render();
+	console.log("done");
+
+	// read in cluster data
+	d3.json(folderPath + ('000' + n).substr(-3) + "Clusters.json", function(error, json) {
+		clusterData = json;
 		drawParticles(n);
 		render();
-		console.log("done");
-
-		// read in cluster data
-		d3.json(folderPath + ('000' + n).substr(-3) + "Clusters.json", function(error, json) {
-			clusterData = json;
-			drawParticles(n);
-			render();
-		});
 	});
+});
 
 }
 
@@ -625,8 +633,8 @@ function downloadJSON(data2JSON) {
 }
 
 /**
- * Draw a slider to move the slice position.
- */
+* Draw a slider to move the slice position.
+*/
 function sliderMove() {
 	var yMin = -5, yMax = 5;
 	var sliderHeight = 50;
@@ -637,9 +645,9 @@ function sliderMove() {
 	.clamp(true);
 
 	var brush = d3.svg.brush()
-  .x(x)
-  .extent([0, 0])
-  .on("brush", brushed);
+	.x(x)
+	.extent([0, 0])
+	.on("brush", brushed);
 
 	var svgSlider = d3.select("#sliderDiv").append("svg")
 	.attr("class", "svgSlider")
@@ -647,42 +655,42 @@ function sliderMove() {
 	.attr("height", sliderHeight);
 
 	svgSlider.append("g")
-  .attr("class", "x axis")
-  .attr("transform", "translate(0, " + sliderHeight / 2 + ")")
-  .call(d3.svg.axis()
-  .scale(x)
-  .orient("bottom")
-  // .tickFormat(function(d){return d.toFixed(2)})
-  .tickSize(0)
-  .tickPadding(10)
-  .tickValues([-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5]))
-  .select(".domain")
-  .select(function() { return this.parentNode.appendChild(this.cloneNode(true)); })
-  .attr("class", "halo");
+	.attr("class", "x axis")
+	.attr("transform", "translate(0, " + sliderHeight / 2 + ")")
+	.call(d3.svg.axis()
+	.scale(x)
+	.orient("bottom")
+	// .tickFormat(function(d){return d.toFixed(2)})
+	.tickSize(0)
+	.tickPadding(10)
+	.tickValues([-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5]))
+	.select(".domain")
+	.select(function() { return this.parentNode.appendChild(this.cloneNode(true)); })
+	.attr("class", "halo");
 
 	var slider = svgSlider.append("g")
-  .attr("class", "slider")
-  .call(brush);
+	.attr("class", "slider")
+	.call(brush);
 
 	slider.selectAll(".extent,.resize")
-  .remove();
+	.remove();
 
 	slider.select(".background")
-  .attr("height", sliderHeight);
+	.attr("height", sliderHeight);
 
 	var handle = slider.append("g")
-  .attr("class", "handle")
+	.attr("class", "handle")
 
-  handle.append("path")
-  .attr("transform", "translate(0, " + sliderHeight / 2 + ")")
-  .attr("d", "M 0 -5 V 5")
+	handle.append("path")
+	.attr("transform", "translate(0, " + sliderHeight / 2 + ")")
+	.attr("d", "M 0 -5 V 5")
 
-  handle.append("text")
-  .text(yMin)
-  .attr("transform", "translate(" + -10 + ", " + (sliderHeight / 2 - 10) + ")")
+	handle.append("text")
+	.text(yMin)
+	.attr("transform", "translate(" + -10 + ", " + (sliderHeight / 2 - 10) + ")")
 
 	slider
-  .call(brush.event);
+	.call(brush.event);
 
 	function brushed() {
 		var value = brush.extent()[0];
@@ -702,8 +710,8 @@ function sliderMove() {
 // mouse and keyboard control funtions
 
 /**
- * Zoom in and out the scene using mouse wheel. This uses the TrackballControls.js file.
- */
+* Zoom in and out the scene using mouse wheel. This uses the TrackballControls.js file.
+*/
 function mouseWheelZoom() {
 	controls.target.set(0, 0, 6);
 	controls.zoomSpeed = 0.15;
@@ -768,4 +776,15 @@ function keyboardListener() {
 		camera.updateProjectionMatrix();
 		camera.lookAt(new THREE.Vector3(0, 0, 6));
 	}
+}
+
+/**
+* Processes the selected options in the menu.
+*/
+function menuListener() {
+	d3.selectAll('input[name="viewCylinder"]').on("change", function() {
+			sliceColorMode = Number(this.value);
+			recolor3DModel();
+		});
+
 }
