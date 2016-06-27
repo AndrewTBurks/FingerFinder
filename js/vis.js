@@ -530,6 +530,15 @@ pMaterial = new THREE.PointsMaterial({
 
  }
 
+function createFingersGraph() {
+	var myDiv = d3.select("#fingerGraph");
+
+	var width = myDiv.width,
+			height = myDiv.height;
+
+			
+}
+
 // file reading
 
 // read all files
@@ -540,7 +549,10 @@ readFileNumCSV(filePick, filePick+1);
 //readFileNumCSV(23, 24);
 //readFileNumJSON(0);
 
-
+d3.json(folderPath + "allClusterCenters.json", function(error, json) {
+	fingersOverTime = json;
+	createFingersGraph();
+})
 
 var mean, stddev, maxConc;
 
