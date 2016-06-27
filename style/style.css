@@ -157,6 +157,7 @@ p.view2 {
   border-radius: 1px;
   display: inline-block;
   position: relative;
+  vertical-align: bottom;
 
 }
 
