@@ -786,5 +786,6 @@ function menuListener() {
 			sliceColorMode = Number(this.value);
 			recolor3DModel();
 		});
+		// commit hack comment
 
 }
