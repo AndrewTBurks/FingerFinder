@@ -10,8 +10,8 @@ var folderPath = "clean.44/";
 var data = [];
 var dataLength;
 
-var clusters = new Array(121);  // clusters of each timestep
-var clusterCenters = new Array(121); // data for clusters in each timestep
+var clusters = new Array(121).fill([]);  // clusters of each timestep
+var clusterCenters = new Array(121).fill([]); // data for clusters in each timestep
 
 
 // number of points in cluster, x,y,z center of cluster
@@ -20,11 +20,11 @@ var clusterCenters = new Array(121); // data for clusters in each timestep
 
 var mean, stddev, maxConc;
 
-var current = 23;
-var end = 44;
+var start = 23;
+var end = 45;
 
 
-readFileNumCSV(current);
+readFileNumCSV(start);
 
 
 function findCenterOfConc(n) {
@@ -58,6 +58,12 @@ function findCenterOfConc(n) {
 
     }
     clusterCenters[n][i] = {size: clusterSize, cx: xTot/concTot, cy: yTot/concTot, cz: zTot/concTot, concTotal: concTot};
+  }
+
+  console.log("Centers Found:", n);
+
+  if(n < end) {
+    readFileNumCSV(n+1);
   }
 }
 
