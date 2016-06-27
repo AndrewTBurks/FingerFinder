@@ -39,7 +39,7 @@ p.subtitle {
   color: #e0e0e0;
   font-family: 'Lato', sans-serif;
   font-weight: 300;
-  font-size: 16px;
+  font-size: 18px;
   margin-top: 0;
   padding-top: 0;
   padding-bottom: 30px;
@@ -97,8 +97,8 @@ p.view2 {
 #wrapper {
   overflow: hidden;
   width: 100%;
-  max-width: 880px;
-  min-width: 880px;
+  max-width: 1700px;
+  min-width: 1700px;
   max-height: 900px;
   /*min-height: 824px;*/
   position: relative;
@@ -111,7 +111,7 @@ p.view2 {
   min-height: 824px;
   display: inline-block;
   vertical-align: top;
-  left: 34px;
+  padding-left: 34px;
   position: relative;
 }
 
@@ -123,6 +123,64 @@ p.view2 {
   display: inline-block;
   vertical-align: top;
   position: relative;
+  /*left: 34px;*/
+}
+
+#cylinderWrapper2 {
+  max-width: 500px;
+  height: 100%;
+  max-height: 824px;
+  min-height: 824px;
+  display: inline-block;
+  vertical-align: top;
+  position: relative;
+  margin-left: 34px;
+}
+
+form {
+  color: #1C2329;
+  /*padding-left: 5px;
+  margin-left: 5px;*/
+}
+
+#menuWrapper {
+  width: 100%;
+  max-width: 225px;
+  height: 100%;
+  max-height: 824px;
+  min-height: 824px;
+  display: inline-block;
+  vertical-align: top;
+  position: relative;
+  margin-right: 34px;
+} #menuWrapper p {text-align: left;}
+
+#menu {
+  background-color: #e0e0e0;
+  width: 225px;
+  height: 805px;
+  border: solid #e0e0e0 3px;
+  border-radius: 1px;
+  padding-top: 0;
+  margin-top: 0;
+  position: absolute;
+  bottom: 0;
+} #menu p {
+  margin: 0;
+  padding: 0;
+  margin-bottom: 2px;
+  padding-bottom: 2px;
+} #menu select {
+  width: 60px;
+} #menu input {
+  margin: 0;
+  padding: 0;
+} #menu .title {
+  /*font-weight: bold;*/
+  background-color: #1c2329;
+  color: #e0e0e0;
+  /*text-align: center;*/
+  padding-left: 5px;
 }
 
 #legend {
@@ -148,6 +206,17 @@ p.view2 {
   display: inline-block;
   vertical-align: top;
   margin: auto;
+}
+
+#cylinder2 {
+  width: 100%;
+  max-width: 500px;
+  max-height: 1000px;
+  border: solid #e0e0e0 3px;
+  border-radius: 1px;
+  display: inline-block;
+  vertical-align: top;
+  /*margin: auto;*/
 }
 
 #slice {

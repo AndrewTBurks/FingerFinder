@@ -17,6 +17,26 @@
 <p class="subtitle">Scientific Visualization Contest 2016</p>
 <div class="container">
 	<div id="wrapper">
+		<div id="menuWrapper">
+			<p class="view"></p>
+			<div id="menu">
+				<form action="">
+					<p class="title">Views</p>
+					<input type="checkbox" name="views" value="cylinder">3D Cylinder<br>
+					<input type="checkbox" name="views" value="cylinder">2D Concentration Heatmap<br>
+					<input type="checkbox" name="views" value="cylinder">2D Velocity Vector Field<br>
+					<br>
+					<p class="title">3D Cylinder View</p>
+					<input type="radio" name="viewCylinder" value="all" checked>All Data<br>
+					<input type="radio" name="viewCylinder" value="fingers">Viscous Fingers Only<br>
+					<br>
+					<p class="title">Run</p>
+					<select name="run">
+						<option value="1">01</option>
+					</select>
+				</form>
+			</div>
+		</div>
 		<div id="cylinderWrapper">
 			<p class="view">3D Cylinder View</p>
 			<div id="cylinder"></div>
@@ -35,6 +55,10 @@
 			<p class="view2">2D Slice Velocity Vector Field</p>
 			<div id="slice2">
 			</div>
+		</div>
+		<div id="cylinderWrapper2">
+			<p class="view">Change this title in the HTML file</p>
+			<div id="cylinder2"></div>
 		</div>
 	</div>
 </div>
