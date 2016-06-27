@@ -98,7 +98,9 @@ p.view2 {
   overflow: hidden;
   width: 100%;
   max-width: 880px;
+  min-width: 880px;
   max-height: 900px;
+  /*min-height: 824px;*/
   position: relative;
 }
 
@@ -106,6 +108,7 @@ p.view2 {
   max-width: 500px;
   height: 100%;
   max-height: 824px;
+  min-height: 824px;
   display: inline-block;
   vertical-align: top;
   left: 34px;
@@ -116,6 +119,7 @@ p.view2 {
   max-width: 500px;
   height: 100%;
   max-height: 824px;
+  min-height: 824px;
   display: inline-block;
   vertical-align: top;
   position: relative;
