@@ -16,8 +16,6 @@ var clusterCenters = new Array(121).fill([]); // data for clusters in each times
 var distanceTolerance = 1;
 var edgeTolerance = 0;
 
-// number of points in cluster, x,y,z center of cluster
-// clusterCenters[timestep][clusterNum] = {size: 0, cx: 0, cy: 0, cz: 0, concTotal: 0, clusterID: 0};
 
 
 var mean, stddev, maxConc;
@@ -39,8 +37,9 @@ function clusterTimeline() {
 
   var thisDistance;
 
-  var maxIDUsed = clusterCenters[start].length; // one ID for each cluster in start
+  var maxIDUsed = clusterCenters[end].length-1; // one ID for each cluster in start
 
+  // assign clusterID
   for(var i = start+1; i <= end; i++) {
     // for each timestep aside from the start
 
@@ -81,21 +80,6 @@ function clusterTimeline() {
           closestDistance = thisDistance;
         }
 
-        /*
-        // if in all 3 dimenions the edges of the clusters are close enough...
-        if(rangesWithinThreshold(thisCluster.xMin, thisCluster.xMax, otherCluster.xMin, otherCluster.xMax, edgeTolerance) &&
-            rangesWithinThreshold(thisCluster.yMin, thisCluster.yMax, otherCluster.yMin, otherCluster.yMax, edgeTolerance) &&
-            rangesWithinThreshold(thisCluster.zMin, thisCluster.zMax, otherCluster.zMin, otherCluster.zMax, edgeTolerance))
-        {
-          // this cluster is acceptable
-          if(thisDistance < closestDistance) {
-            // set as new closest cluster
-            closestCluster = clusterCenters[i-1][k].clusterID;
-            closestDistance = thisDistance;
-          }
-        }
-        */
-
       } // END for(var k = 0; ...
 
       //if(closestCluster === -1 || closestDistance > distanceTolerance) {
@@ -106,6 +90,58 @@ function clusterTimeline() {
       else {
         clusterCenters[i][j].clusterID = closestCluster;
       }
+
+    } // END for(var j = 0...
+
+  } // END for(var i = 0...
+
+
+  // assign nextClusterID
+  for(var i = end-1; i >= start; i--) {
+    // for each timestep aside from the start
+
+    for(var j = 0; j < clusterCenters[i].length; j++)
+    {
+      // for each cluster in this timestep
+      thisCluster = clusterCenters[i][j];
+
+
+      thisPoint = new THREE.Vector3(thisCluster.cx,
+                                    thisCluster.cy,
+                                    thisCluster.cz);
+
+      // set distanceTolerance based on the max of the extent dimensions/2
+
+
+      closestCluster = -1;
+      closestDistance = 20;
+      // find the closest cluster in the previous timestep
+      for(var k = 0; k < clusterCenters[i+1].length; k++)
+      {
+        // for each cluster in the previous timestep
+        otherCluster = clusterCenters[i+1][k];
+        distanceTolerance = d3.max([otherCluster.xMax-otherCluster.xMin, otherCluster.yMax-otherCluster.ymin, otherCluster.zMax-otherCluster.zMin])/2;
+
+
+        otherPoint = new THREE.Vector3(otherCluster.cx,
+                                      otherCluster.cy,
+                                      otherCluster.cz);
+        // linear distance between points
+        thisDistance = thisPoint.distanceTo(otherPoint);
+
+
+        // if the distance between clusters is smaller than the closest so far
+        if((thisDistance < closestDistance) && (thisDistance < distanceTolerance)) {
+          // set as the new closest cluster
+          closestCluster = clusterCenters[i+1][k].clusterID;
+          closestDistance = thisDistance;
+        }
+
+
+      } // END for(var k = 0; ...
+
+      // nextClusterID = -1 if no next cluster, or a valid ID if there is a next
+      clusterCenters[i][j].nextClusterID = closestCluster;
 
     } // END for(var j = 0...
 
@@ -174,7 +210,7 @@ function findCenterOfConc(n) {
       }
 
     }
-    clusterCenters[n][i] = {size: clusterSize, concTotal: concTot, clusterID: i,
+    clusterCenters[n][i] = {size: clusterSize, concTotal: concTot, clusterID: i, nextClusterID: -1,
                             cx: xTot/concTot, cy: yTot/concTot, cz: zTot/concTot,
                             xMax: xMax, xMin: xMin, yMax: yMax, yMin: yMin, zMax: zMax, zMin: zMin};
   }

@@ -608,27 +608,43 @@ function drawFingerGraph(start, end) {
 
 		// draw horizontal lines
 
-	for(var i = 0; i < numClusters; i++){
-		mySVG.append("line")
-			.attr("x1", 0)
-			.attr("x2", width)
-			.attr("y1", ySpacing/2 + ySpacing*i)
-			.attr("y2", ySpacing/2 + ySpacing*i)
-			.style("stroke", "white");
-	}
+	// for(var i = 0; i < numClusters; i++){
+	// 	mySVG.append("line")
+	// 		.attr("x1", 0)
+	// 		.attr("x2", width)
+	// 		.attr("y1", ySpacing/2 + ySpacing*i)
+	// 		.attr("y2", ySpacing/2 + ySpacing*i)
+	// 		.style("stroke", "white");
+	// }
 
 	console.log(xSpacing);
 
 	var concArray = new Array(numClusters);
+	var nextArray = new Array(numClusters);
 
 	for(var i = start; i <= end; i++){
 		concArray.fill(0);
+		nextArray.fill(-1);
 
 		for(var j = 0; j < fingersOverTime[i].length; j++) {
 			concArray[fingersOverTime[i][j].clusterID] += fingersOverTime[i][j].concTotal;
+			nextArray[fingersOverTime[i][j].clusterID] = fingersOverTime[i][j].nextClusterID;
 		}
 
 		for(var j = 0; j < numClusters; j++) {
+			if(nextArray[j] != -1) {
+				mySVG.append("line")
+					.attr("class", "fingerTransition")
+					.attr("x1", (xSpacing * (i-start)) + xSpacing/2)
+					.attr("x2", (xSpacing * (i+1-start)) + xSpacing/2)
+					.attr("y1", (height - (3*ySpacing/2 + (ySpacing*j))))
+					.attr("y2", (height - (3*ySpacing/2 + (ySpacing*nextArray[j]))))
+					.style("stroke", "white");
+			}
+		}
+
+		for(var j = 0; j < numClusters; j++) {
+
 			mySVG.append("circle")
 				.attr("class", "fingerPoint")
 				.attr("cy", (height - (3*ySpacing/2 + (ySpacing*j))))
