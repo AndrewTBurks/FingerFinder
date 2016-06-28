@@ -565,7 +565,7 @@ function drawFingerGraph(start, end) {
 	var myDiv = d3.select("#fingerGraph");
 	// no idea how to size this stuff
 	var width = 494;
-	var height = 810;
+	var height = 799;
 
 	var mySVG = myDiv.append("svg")
 		.attr("width", width)
