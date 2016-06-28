@@ -280,8 +280,10 @@ pMaterial = new THREE.PointsMaterial({
 function drawParticles(fileNum) {
 
 	scene.remove(particleSystem);
-	particleSystem = null;
+	scene.remove(particles);
+	delete(particleSystem);
 	if(particles) particles.dispose();
+	delete(particles);
 
 
 
@@ -327,7 +329,7 @@ function drawParticles(fileNum) {
 
 		// render again after particles created
 		refreshSlice();
-		render();
+		// render();
 	}
 
 	/**
@@ -748,16 +750,14 @@ function updateFingerGraphFileLine() {
 
 	color.domain([mean, maxConc]);
 
-	drawParticles(n);
-	render();
-	console.log("done");
-
 	// read in cluster data
 	d3.json(folderPath + "allClusters.json", function(error, json) {
 		clusterData = json;
-		drawParticles(n);
-		render();
 	});
+
+	drawParticles(n);
+	render();
+	console.log("done");
 });
 
 }
