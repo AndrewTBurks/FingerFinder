@@ -595,7 +595,7 @@ function drawFingerGraph(start, end) {
 	console.log(maxFingerConc, minFingerConc);
 
 	sizeScale.domain([minFingerConc, maxFingerConc]);
-	sizeScale.range([4,10]);
+	sizeScale.range([2,d3.min([xSpacing/2, ySpacing/2])]);
 
 	fingerColor.domain([minFingerConc, maxFingerConc]);
 
@@ -605,8 +605,7 @@ function drawFingerGraph(start, end) {
 		.attr("height", "100%")
 		.style("fill", "#0F0F0F");
 
-
-		// draw horizontal lines
+	// draw horizontal lines
 
 	// for(var i = 0; i < numClusters; i++){
 	// 	mySVG.append("line")
@@ -616,6 +615,16 @@ function drawFingerGraph(start, end) {
 	// 		.attr("y2", ySpacing/2 + ySpacing*i)
 	// 		.style("stroke", "white");
 	// }
+
+	// vertical line for which file is currently selected
+	mySVG.append("line")
+		.attr("class", "fingerFileIndicator")
+		.attr("x1", (xSpacing * (filePick-start)) + xSpacing/2)
+		.attr("x2", (xSpacing * (filePick-start)) + xSpacing/2)
+		.attr("y1", 0)
+		.attr("y2", height)
+		.style("stroke", "white")
+		.style("stroke-width", 3);
 
 	console.log(xSpacing);
 
@@ -655,6 +664,12 @@ function drawFingerGraph(start, end) {
 		}
 	}
 
+}
+
+function updateFingerGraphFileLine() {
+	d3.select(".fingerFileIndicator")
+	.attr("x1", (xSpacing * (filePick-start)) + xSpacing/2)
+	.attr("x2", (xSpacing * (filePick-start)) + xSpacing/2);
 }
 
 	var mean, stddev, maxConc;
