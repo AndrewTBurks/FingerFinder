@@ -226,12 +226,12 @@ var particleSystem;
 * Renders the three.js scene.
 */
 function render() {
-	requestAnimationFrame( render );
+	requestAnimationFrame(render);
 	// menuListener();
 	keyboardListener();
 	controls.update();
 
-	renderer.render( scene, camera );
+	renderer.render(scene, camera);
 }
 
 /**
@@ -268,9 +268,6 @@ var particles,
 pMaterial = new THREE.PointsMaterial({
 	size: .2,
 	vertexColors: THREE.VertexColors,
-	//map: new THREE.TextureLoader().load("ball.png"),
-	//blending: THREE.AdditiveBlending,
-	//transparent: true
 });
 
 /**
@@ -282,9 +279,7 @@ function drawParticles(fileNum) {
 	scene.remove(particleSystem);
 	scene.remove(particles);
 	delete(particleSystem);
-	if(particles) particles.dispose();
 	delete(particles);
-
 
 
 
@@ -766,9 +761,8 @@ function readFileNumJSON(n) {
 	d3.csv(folderPath + ('000' + n).substr(-3) + ".json", function(error, json) {
 		data = json;
 		console.log(n, "read (JSON).");
-
-		render();
 		drawParticles(n);
+		render();
 	});
 
 }
