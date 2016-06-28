@@ -43,13 +43,6 @@ for(var i = 0; i < sliceResolution; i++) {
 	}
 }
 
-
-/**
-* Used to choose which file will be load into the visualization.
-* @type {number}
-*/
-var filePick = 45;
-
 /**
 * List containing different color schemes for the visualization.
 * @type {list}
@@ -88,6 +81,13 @@ createColorLegend();
 mouseWheelZoom();
 sliderMove();
 menuListener();
+populateDropdown();
+
+/**
+* Used to choose which file will be load into the visualization.
+* @type {number}
+*/
+var filePick = Number(d3.select('select[name="time"]').node().value);
 
 /**
 * Draws the cylinder slice using three.js lines.
@@ -885,6 +885,19 @@ function keyboardListener() {
 	}
 }
 
+function populateDropdown() {
+	var select = document.getElementById("timeDropdown");
+	var first = 23, last = 45;
+	var i;
+	for(i = 23; i <= 45; i++) {
+	    var opt = i.toString();
+	    var el = document.createElement("option");
+	    el.textContent = opt;
+	    el.value = opt;
+	    select.appendChild(el);
+	}
+}
+
 /**
 * Processes the selected options in the menu.
 */
@@ -893,6 +906,9 @@ function menuListener() {
 			sliceColorMode = Number(this.value);
 			recolor3DModel();
 		});
-		// commit hack comment
+	d3.selectAll('select[name="time"]').on("change", function() {
+		filePick = Number(this.value);
+		readFileNumCSV(filePick, filePick + 1);
+	});
 
 }

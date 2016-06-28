@@ -37,7 +37,7 @@ h1 {
 
 p.subtitle {
   color: #e0e0e0;
-  font-family: 'Lato', sans-serif;
+  /*font-family: 'Lato', sans-serif;*/
   font-weight: 300;
   font-size: 18px;
   margin-top: 0;
@@ -50,7 +50,7 @@ p.view {
   /*color: #e0e0e0;*/
   color: #1c2329;
   background-color: #e0e0e0;
-  font-family: 'Lato', sans-serif;
+  /*font-family: 'Lato', sans-serif;*/
   font-weight: normal;
   font-size: 16px;
   margin: 0;
@@ -63,7 +63,7 @@ p.view {
 p.view2 {
   color: #e0e0e0;
 
-  font-family: 'Lato', sans-serif;
+  /*font-family: 'Lato', sans-serif;*/
   font-weight: normal;
   font-size: 16px;
   margin: 0;
@@ -74,7 +74,7 @@ p.view2 {
 
 .colorLegend1 {
   color: #e0e0e0;
-  font-family: 'Lato', sans-serif;
+  /*font-family: 'Lato', sans-serif;*/
   margin: 0;
   padding: 0;
   display: inline-block;
@@ -83,7 +83,7 @@ p.view2 {
 
 .colorLegend2 {
   color: #e0e0e0;
-  font-family: 'Lato', sans-serif;
+  /*font-family: 'Lato', sans-serif;*/
   margin: 0;
   padding: 0;
   display: inline-block;
