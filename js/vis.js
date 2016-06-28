@@ -58,7 +58,7 @@ var colorSplit = colorScheme[3].split(","); // change the number to change the c
 
 var scene = new THREE.Scene();
 var camera = new THREE.PerspectiveCamera( 75, WIDTH/HEIGHT, 0.1, 1000 );
-var renderer = new THREE.WebGLRenderer({antialias: true});
+var renderer = new THREE.WebGLRenderer();
 renderer.setClearColor(new THREE.Color("#050505")); // scene background color
 renderer.setSize(WIDTH, HEIGHT); // scene size
 var container = document.getElementById('cylinder'); // to add the scene to the correct div
@@ -551,74 +551,74 @@ function drawParticles(fileNum) {
 
 	});
 
-var sizeScale = d3.scale.linear()
+	var sizeScale = d3.scale.linear()
 	.range([2, 10])
 	.clamp(true);
 
-var fingerColor = d3.scale.quantize()
+	var fingerColor = d3.scale.quantize()
 	.range(colorSplit);
 
-var xSpacing;
-var indexMap;
-var maxConcAllTimesteps;
+	var xSpacing;
+	var indexMap;
+	var maxConcAllTimesteps;
 
-function drawFingerGraph(start, end) {
-	var myDiv = d3.select("#fingerGraph");
-	// no idea how to size this stuff
-	var width = 494;
-	var height = 799;
+	function drawFingerGraph(start, end) {
+		var myDiv = d3.select("#fingerGraph");
+		// no idea how to size this stuff
+		var width = 494;
+		var height = 799;
 
-	var mySVG = myDiv.append("svg")
+		var mySVG = myDiv.append("svg")
 		.attr("width", width)
 		.attr("height", height);
 
-	var numClusters = d3.max(fingersOverTime, function(el) {
-		return d3.max(el, function(el2) {
-			return el2.clusterID;
-		})
-	}) + 1;
+		var numClusters = d3.max(fingersOverTime, function(el) {
+			return d3.max(el, function(el2) {
+				return el2.clusterID;
+			})
+		}) + 1;
 
-	xSpacing = (width/(end - start + 1));
-	var ySpacing = height/(numClusters + 1);
+		xSpacing = (width/(end - start + 1));
+		var ySpacing = height/(numClusters + 1);
 
-	var maxFingerConc = d3.max(fingersOverTime, function(el) {
-		return d3.max(el, function(el2) {
-			return el2.concTotal;
-		})
-	});
+		var maxFingerConc = d3.max(fingersOverTime, function(el) {
+			return d3.max(el, function(el2) {
+				return el2.concTotal;
+			})
+		});
 
-	var minFingerConc = d3.min(fingersOverTime, function(el) {
-		return d3.min(el, function(el2) {
-			return el2.concTotal;
-		})
-	});
+		var minFingerConc = d3.min(fingersOverTime, function(el) {
+			return d3.min(el, function(el2) {
+				return el2.concTotal;
+			})
+		});
 
-	console.log(maxFingerConc, minFingerConc);
+		console.log(maxFingerConc, minFingerConc);
 
-	sizeScale.domain([minFingerConc, maxFingerConc]);
-	sizeScale.range([2,d3.min([xSpacing/2, ySpacing/2])]);
+		sizeScale.domain([minFingerConc, maxFingerConc]);
+		sizeScale.range([2,d3.min([xSpacing/2, ySpacing/2])]);
 
-	fingerColor.domain([minFingerConc, maxFingerConc]);
+		fingerColor.domain([minFingerConc, maxFingerConc]);
 
-	// draw background
-	mySVG.append("rect")
+		// draw background
+		mySVG.append("rect")
 		.attr("width", "100%")
 		.attr("height", "100%")
 		.style("fill", "#0F0F0F");
 
-	// draw horizontal lines
+		// draw horizontal lines
 
-	// for(var i = 0; i < numClusters; i++){
-	// 	mySVG.append("line")
-	// 		.attr("x1", 0)
-	// 		.attr("x2", width)
-	// 		.attr("y1", ySpacing/2 + ySpacing*i)
-	// 		.attr("y2", ySpacing/2 + ySpacing*i)
-	// 		.style("stroke", "white");
-	// }
+		// for(var i = 0; i < numClusters; i++){
+		// 	mySVG.append("line")
+		// 		.attr("x1", 0)
+		// 		.attr("x2", width)
+		// 		.attr("y1", ySpacing/2 + ySpacing*i)
+		// 		.attr("y2", ySpacing/2 + ySpacing*i)
+		// 		.style("stroke", "white");
+		// }
 
-	// vertical line for which file is currently selected
-	mySVG.append("line")
+		// vertical line for which file is currently selected
+		mySVG.append("line")
 		.attr("class", "fingerFileIndicator")
 		.attr("x1", (xSpacing * (filePick-start)) + xSpacing/2)
 		.attr("x2", (xSpacing * (filePick-start)) + xSpacing/2)
@@ -628,72 +628,72 @@ function drawFingerGraph(start, end) {
 		.style("stroke-width", xSpacing)
 		.style("stroke-opacity", .1);
 
-	console.log(xSpacing);
+		console.log(xSpacing);
 
-	var concArray = new Array(numClusters);
-	var nextArray = new Array(numClusters);
+		var concArray = new Array(numClusters);
+		var nextArray = new Array(numClusters);
 
-	maxConcAllTimesteps = new Array(numClusters).fill(0);
-	indexMap = new Array(numClusters);
+		maxConcAllTimesteps = new Array(numClusters).fill(0);
+		indexMap = new Array(numClusters);
 
-	// make mapping from ID to height to "sort"
-	for(var i = 0; i < numClusters; i++){
-		indexMap[i] = i;
-	}
+		// make mapping from ID to height to "sort"
+		for(var i = 0; i < numClusters; i++){
+			indexMap[i] = i;
+		}
 
-	for(var i = start; i <= end; i++){
-		for(var j = 0; j < fingersOverTime[i].length; j++) {
-			//if(maxConcAllTimesteps[fingersOverTime[i][j].clusterID] < fingersOverTime[i][j].concTotal){
+		for(var i = start; i <= end; i++){
+			for(var j = 0; j < fingersOverTime[i].length; j++) {
+				//if(maxConcAllTimesteps[fingersOverTime[i][j].clusterID] < fingersOverTime[i][j].concTotal){
 				maxConcAllTimesteps[fingersOverTime[i][j].clusterID] += fingersOverTime[i][j].concTotal;
-			//}
-		}
-	}
-
-	indexMap.sort(function(a, b) {
-		return maxConcAllTimesteps[b] - maxConcAllTimesteps[a];
-	});
-
-
-	for(var i = start; i <= end; i++){
-		concArray.fill(0);
-		nextArray.fill(-1);
-
-		for(var j = 0; j < fingersOverTime[i].length; j++) {
-			concArray[fingersOverTime[i][j].clusterID] += fingersOverTime[i][j].concTotal;
-			nextArray[fingersOverTime[i][j].clusterID] = fingersOverTime[i][j].nextClusterID;
+				//}
+			}
 		}
 
-		for(var j = 0; j < numClusters; j++) {
-			if(nextArray[j] != -1) {
-				mySVG.append("line")
+		indexMap.sort(function(a, b) {
+			return maxConcAllTimesteps[b] - maxConcAllTimesteps[a];
+		});
+
+
+		for(var i = start; i <= end; i++){
+			concArray.fill(0);
+			nextArray.fill(-1);
+
+			for(var j = 0; j < fingersOverTime[i].length; j++) {
+				concArray[fingersOverTime[i][j].clusterID] += fingersOverTime[i][j].concTotal;
+				nextArray[fingersOverTime[i][j].clusterID] = fingersOverTime[i][j].nextClusterID;
+			}
+
+			for(var j = 0; j < numClusters; j++) {
+				if(nextArray[j] != -1) {
+					mySVG.append("line")
 					.attr("class", "fingerTransition")
 					.attr("x1", (xSpacing * (i-start)) + xSpacing/2)
 					.attr("x2", (xSpacing * (i+1-start)) + xSpacing/2)
 					.attr("y1", (height - (3*ySpacing/2 + (ySpacing*indexMap[j]))))
 					.attr("y2", (height - (3*ySpacing/2 + (ySpacing*indexMap[nextArray[j]]))))
 					.style("stroke", "white");
+				}
 			}
-		}
 
-		for(var j = 0; j < numClusters; j++) {
+			for(var j = 0; j < numClusters; j++) {
 
-			mySVG.append("circle")
+				mySVG.append("circle")
 				.attr("class", "fingerPoint")
 				.attr("cy", (height - (3*ySpacing/2 + (ySpacing*indexMap[j]))))
 				.attr("cx", (xSpacing * (i-start)) + xSpacing/2)
 				.attr("r", concArray[j] === 0 ? 0 : sizeScale(concArray[j]))
 				.style("fill", fingerColor(concArray[j]))
 				.style("stroke", "white");
+			}
 		}
+
 	}
 
-}
-
-function updateFingerGraphFileLine() {
-	d3.select(".fingerFileIndicator")
-	.attr("x1", (xSpacing * (filePick-startFile)) + xSpacing/2)
-	.attr("x2", (xSpacing * (filePick-startFile)) + xSpacing/2);
-}
+	function updateFingerGraphFileLine() {
+		d3.select(".fingerFileIndicator")
+		.attr("x1", (xSpacing * (filePick-startFile)) + xSpacing/2)
+		.attr("x2", (xSpacing * (filePick-startFile)) + xSpacing/2);
+	}
 
 	var mean, stddev, maxConc;
 
@@ -927,11 +927,11 @@ function populateDropdown() {
 	var first = 23, last = 45;
 	var i;
 	for(i = 23; i <= 45; i++) {
-	    var opt = i.toString();
-	    var el = document.createElement("option");
-	    el.textContent = opt;
-	    el.value = opt;
-	    select.appendChild(el);
+		var opt = i.toString();
+		var el = document.createElement("option");
+		el.textContent = opt;
+		el.value = opt;
+		select.appendChild(el);
 	}
 }
 
@@ -940,9 +940,9 @@ function populateDropdown() {
 */
 function menuListener() {
 	d3.selectAll('input[name="viewCylinder"]').on("change", function() {
-			sliceColorMode = Number(this.value);
-			recolor3DModel();
-		});
+		sliceColorMode = Number(this.value);
+		recolor3DModel();
+	});
 	d3.selectAll('select[name="time"]').on("change", function() {
 		filePick = Number(this.value);
 		readFileNumCSV(filePick, filePick + 1);
