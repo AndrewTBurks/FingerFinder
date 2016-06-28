@@ -554,11 +554,18 @@ function drawParticles(fileNum) {
 
 	});
 
+var sizeScale = d3.scale.linear()
+	.range([2, 10])
+	.clamp(true);
+
+var fingerColor = d3.scale.quantize()
+	.range(colorSplit);
+
 function drawFingerGraph(start, end) {
 	var myDiv = d3.select("#fingerGraph");
 	// no idea how to size this stuff
 	var width = 494;
-	var height = 818;
+	var height = 810;
 
 	var mySVG = myDiv.append("svg")
 		.attr("width", width)
@@ -568,7 +575,7 @@ function drawFingerGraph(start, end) {
 		return d3.max(el, function(el2) {
 			return el2.clusterID;
 		})
-	});
+	}) + 1;
 
 	var xSpacing = (width/(end - start + 1));
 	var ySpacing = height/(numClusters + 1);
@@ -580,45 +587,55 @@ function drawFingerGraph(start, end) {
 	});
 
 	var minFingerConc = d3.min(fingersOverTime, function(el) {
-		return d3.max(el, function(el2) {
+		return d3.min(el, function(el2) {
 			return el2.concTotal;
 		})
 	});
 
-	var sizeScale = d3.scale.linear()
-		.domain([minFingerConc, maxFingerConc])
-		.range([2, 10]);
+	console.log(maxFingerConc, minFingerConc);
+
+	sizeScale.domain([minFingerConc, maxFingerConc]);
+	sizeScale.range([4,10]);
+
+	fingerColor.domain([minFingerConc, maxFingerConc]);
 
 	// draw background
 	mySVG.append("rect")
 		.attr("width", "100%")
 		.attr("height", "100%")
-		.style("fill", "#AAAAAA");
+		.style("fill", "#0F0F0F");
 
 
 		// draw horizontal lines
 
-	for(var i = 1; i <= numClusters; i++){
+	for(var i = 0; i < numClusters; i++){
 		mySVG.append("line")
 			.attr("x1", 0)
 			.attr("x2", width)
-			.attr("y1", ySpacing*i)
-			.attr("y2", ySpacing*i)
-			.style("stroke", "black");
+			.attr("y1", ySpacing/2 + ySpacing*i)
+			.attr("y2", ySpacing/2 + ySpacing*i)
+			.style("stroke", "white");
 	}
 
 	console.log(xSpacing);
 
+	var concArray = new Array(numClusters);
+
 	for(var i = start; i <= end; i++){
+		concArray.fill(0);
+
 		for(var j = 0; j < fingersOverTime[i].length; j++) {
+			concArray[fingersOverTime[i][j].clusterID] += fingersOverTime[i][j].concTotal;
+		}
+
+		for(var j = 0; j < numClusters; j++) {
 			mySVG.append("circle")
 				.attr("class", "fingerPoint")
-				//.attr("cx", (xSpacing + (xSpacing*i)))
-				.attr("cy", (height - (ySpacing + (ySpacing*fingersOverTime[i][j].clusterID))))
-				.attr("cx", xSpacing * (i-start))
-				//.attr("cy", height/2)
-				.attr("r", 5)
-				.style("fill", "black");
+				.attr("cy", (height - (3*ySpacing/2 + (ySpacing*j))))
+				.attr("cx", (xSpacing * (i-start)) + xSpacing/2)
+				.attr("r", concArray[j] === 0 ? 0 : sizeScale(concArray[j]))
+				.style("fill", fingerColor(concArray[j]))
+				.style("stroke", "white");
 		}
 	}
 
