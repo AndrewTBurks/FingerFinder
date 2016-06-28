@@ -562,6 +562,8 @@ var fingerColor = d3.scale.quantize()
 	.range(colorSplit);
 
 var xSpacing;
+var indexMap;
+var maxConcAllTimesteps;
 
 function drawFingerGraph(start, end) {
 	var myDiv = d3.select("#fingerGraph");
@@ -634,6 +636,27 @@ function drawFingerGraph(start, end) {
 	var concArray = new Array(numClusters);
 	var nextArray = new Array(numClusters);
 
+	maxConcAllTimesteps = new Array(numClusters).fill(0);
+	indexMap = new Array(numClusters);
+
+	// make mapping from ID to height to "sort"
+	for(var i = 0; i < numClusters; i++){
+		indexMap[i] = i;
+	}
+
+	for(var i = start; i <= end; i++){
+		for(var j = 0; j < fingersOverTime[i].length; j++) {
+			//if(maxConcAllTimesteps[fingersOverTime[i][j].clusterID] < fingersOverTime[i][j].concTotal){
+				maxConcAllTimesteps[fingersOverTime[i][j].clusterID] += fingersOverTime[i][j].concTotal;
+			//}
+		}
+	}
+
+	indexMap.sort(function(a, b) {
+		return maxConcAllTimesteps[b] - maxConcAllTimesteps[a];
+	});
+
+
 	for(var i = start; i <= end; i++){
 		concArray.fill(0);
 		nextArray.fill(-1);
@@ -649,8 +672,8 @@ function drawFingerGraph(start, end) {
 					.attr("class", "fingerTransition")
 					.attr("x1", (xSpacing * (i-start)) + xSpacing/2)
 					.attr("x2", (xSpacing * (i+1-start)) + xSpacing/2)
-					.attr("y1", (height - (3*ySpacing/2 + (ySpacing*j))))
-					.attr("y2", (height - (3*ySpacing/2 + (ySpacing*nextArray[j]))))
+					.attr("y1", (height - (3*ySpacing/2 + (ySpacing*indexMap[j]))))
+					.attr("y2", (height - (3*ySpacing/2 + (ySpacing*indexMap[nextArray[j]]))))
 					.style("stroke", "white");
 			}
 		}
@@ -659,7 +682,7 @@ function drawFingerGraph(start, end) {
 
 			mySVG.append("circle")
 				.attr("class", "fingerPoint")
-				.attr("cy", (height - (3*ySpacing/2 + (ySpacing*j))))
+				.attr("cy", (height - (3*ySpacing/2 + (ySpacing*indexMap[j]))))
 				.attr("cx", (xSpacing * (i-start)) + xSpacing/2)
 				.attr("r", concArray[j] === 0 ? 0 : sizeScale(concArray[j]))
 				.style("fill", fingerColor(concArray[j]))
