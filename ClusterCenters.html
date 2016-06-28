@@ -76,8 +76,7 @@ function clusterTimeline() {
         // if the distance between clusters is smaller than the closest so far
         // if((thisDistance < closestDistance) && (thisDistance < distanceTolerance)) {
         if((thisDistance < closestDistance) &&
-            (+(thisCluster.concTotal - otherCluster.concTotal) < 10000) &&
-            (thisDistance < distanceTolerance/2)){
+            (thisDistance < distanceTolerance)){
           // set as the new closest cluster
           closestCluster = clusterCenters[i-1][k].clusterID;
           closestDistance = thisDistance;
@@ -134,7 +133,8 @@ function clusterTimeline() {
 
 
         // if the distance between clusters is smaller than the closest so far
-        if((thisDistance < closestDistance) && (thisDistance < distanceTolerance)) {
+        if((thisDistance < closestDistance)
+            && (+(thisCluster.concTotal - otherCluster.concTotal) < 10000)) {
           // set as the new closest cluster
           closestCluster = clusterCenters[i+1][k].clusterID;
           closestDistance = thisDistance;

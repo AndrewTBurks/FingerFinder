@@ -561,6 +561,8 @@ var sizeScale = d3.scale.linear()
 var fingerColor = d3.scale.quantize()
 	.range(colorSplit);
 
+var xSpacing;
+
 function drawFingerGraph(start, end) {
 	var myDiv = d3.select("#fingerGraph");
 	// no idea how to size this stuff
@@ -577,7 +579,7 @@ function drawFingerGraph(start, end) {
 		})
 	}) + 1;
 
-	var xSpacing = (width/(end - start + 1));
+	xSpacing = (width/(end - start + 1));
 	var ySpacing = height/(numClusters + 1);
 
 	var maxFingerConc = d3.max(fingersOverTime, function(el) {
@@ -624,7 +626,8 @@ function drawFingerGraph(start, end) {
 		.attr("y1", 0)
 		.attr("y2", height)
 		.style("stroke", "white")
-		.style("stroke-width", 3);
+		.style("stroke-width", xSpacing)
+		.style("stroke-opacity", .1);
 
 	console.log(xSpacing);
 
@@ -668,8 +671,8 @@ function drawFingerGraph(start, end) {
 
 function updateFingerGraphFileLine() {
 	d3.select(".fingerFileIndicator")
-	.attr("x1", (xSpacing * (filePick-start)) + xSpacing/2)
-	.attr("x2", (xSpacing * (filePick-start)) + xSpacing/2);
+	.attr("x1", (xSpacing * (filePick-startFile)) + xSpacing/2)
+	.attr("x2", (xSpacing * (filePick-startFile)) + xSpacing/2);
 }
 
 	var mean, stddev, maxConc;
@@ -678,6 +681,8 @@ function updateFingerGraphFileLine() {
 	* Reads the csv file specified.
 	*/
 	function readFileNumCSV(n, end) {
+
+		data = [];
 
 		d3.csv(folderPath + ('000' + n).substr(-3) + ".csv")
 		.row(function(d) {
@@ -924,6 +929,7 @@ function menuListener() {
 	d3.selectAll('select[name="time"]').on("change", function() {
 		filePick = Number(this.value);
 		readFileNumCSV(filePick, filePick + 1);
+		updateFingerGraphFileLine();
 	});
 
 }
