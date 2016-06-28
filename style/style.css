@@ -47,23 +47,28 @@ p.subtitle {
 }
 
 p.view {
-  color: #e0e0e0;
+  /*color: #e0e0e0;*/
+  color: #1c2329;
+  background-color: #e0e0e0;
   font-family: 'Lato', sans-serif;
   font-weight: normal;
   font-size: 16px;
   margin: 0;
   padding: 0;
   text-align: center;
+  font-weight: bold;
+  /*text-transform: uppercase;*/
 }
 
 p.view2 {
   color: #e0e0e0;
+
   font-family: 'Lato', sans-serif;
   font-weight: normal;
   font-size: 16px;
   margin: 0;
   padding: 0;
-  padding-top: 14px;
+  /*margin-top: 14px;*/
   text-align: center;
 }
 
@@ -111,7 +116,7 @@ p.view2 {
   min-height: 824px;
   display: inline-block;
   vertical-align: top;
-  margin-left: 34px;
+  margin-left: 16px;
   /*position: relative;*/
 }
 
@@ -134,7 +139,7 @@ p.view2 {
   display: inline-block;
   vertical-align: top;
   position: relative;
-  margin-left: 34px;
+  margin-left: 16px;
 }
 
 form {
@@ -153,13 +158,13 @@ form {
   vertical-align: top;
   position: relative;
   float: left;
-  margin-right: 34px;
+  margin-right: 16px;
 } #menuWrapper p {text-align: left;}
 
 #menu {
   background-color: #e0e0e0;
   width: 225px;
-  height: 805px;
+  height: 824px;
   border: solid #e0e0e0 3px;
   border-radius: 1px;
   padding-top: 0;
@@ -197,6 +202,7 @@ form {
   /*cursor: default !important;*/
   padding-top: 20px;
   position: relative;
+
 }
 
 #cylinder {

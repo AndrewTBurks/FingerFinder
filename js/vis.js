@@ -732,7 +732,7 @@ function sliderMove() {
 
 	var x = d3.scale.linear()
 	.domain([yMin, yMax])
-	.range([WIDTH * .1, WIDTH * .9])
+	.range([WIDTH * .04, WIDTH * .96])
 	.clamp(true);
 
 	var brush = d3.svg.brush()
@@ -778,7 +778,7 @@ function sliderMove() {
 
 	handle.append("text")
 	.text(yMin)
-	.attr("transform", "translate(" + -10 + ", " + (sliderHeight / 2 - 10) + ")")
+	.attr("transform", "translate(" + -12 + ", " + (sliderHeight / 2 - 10) + ")")
 
 	slider
 	.call(brush.event);
