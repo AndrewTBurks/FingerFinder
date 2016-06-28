@@ -528,9 +528,9 @@ function drawParticles(fileNum) {
 
 		// color the points that (we think) are viscous fingers
 		if(sliceColorMode === 3){
-			for(var i = 0; i < clusterData.length; i++) {
-				for(var j = 0; j < clusterData[i].length; j++) {
-					particleSystem.geometry.colors[clusterData[i][j]] = new THREE.Color("#" + color(Number(data[clusterData[i][j]].concentration)));
+			for(var i = 0; i < clusterData[filePick].length; i++) {
+				for(var j = 0; j < clusterData[filePick][i].length; j++) {
+					particleSystem.geometry.colors[clusterData[filePick][i][j]] = new THREE.Color("#" + color(Number(data[clusterData[filePick][i][j]].concentration)));
 				}
 			}
 		}
@@ -753,7 +753,7 @@ function updateFingerGraphFileLine() {
 	console.log("done");
 
 	// read in cluster data
-	d3.json(folderPath + ('000' + n).substr(-3) + "Clusters.json", function(error, json) {
+	d3.json(folderPath + "allClusters.json", function(error, json) {
 		clusterData = json;
 		drawParticles(n);
 		render();
