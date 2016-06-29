@@ -61,14 +61,14 @@ p.view {
 }
 
 p.view2 {
-  color: #1c2329;
-  background-color: #e0e0e0;
+  color: #e0e0e0;
+
   /*font-family: 'Lato', sans-serif;*/
-  font-weight: bold;
-  font-size: 17px;
+  font-weight: normal;
+  font-size: 16px;
   margin: 0;
   padding: 0;
-  margin-top: 16px;
+  /*margin-top: 14px;*/
   text-align: center;
 }
 
@@ -241,7 +241,7 @@ form {
   max-height: 606px;
   border: solid #e0e0e0 3px;
   border-radius: 1px;
-  display: inline-block;
+  /*display: inline-block;*/
   /*display: table-cell;*/
   position: absolute;
   /*vertical-align: bottom;*/
