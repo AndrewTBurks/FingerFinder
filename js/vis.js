@@ -276,6 +276,9 @@ pMaterial = new THREE.PointsMaterial({
 */
 function drawParticles(fileNum) {
 
+	var oldRotation = 0;
+	if (particleSystem) oldRotation = particleSystem.rotation.z;
+
 	scene.remove(particleSystem);
 	scene.remove(particles);
 	delete(particleSystem);
@@ -319,12 +322,13 @@ function drawParticles(fileNum) {
 		// add it to the scene
 		scene.add(particleSystem);
 		particleSystem.position.setZ(1);
-
+		particleSystem.rotation.z = oldRotation;
 
 
 		// render again after particles created
 		refreshSlice();
 		// render();
+
 	}
 
 	/**
@@ -536,14 +540,10 @@ function drawParticles(fileNum) {
 	}
 
 	// file reading
-
-	// read all files
-	// readFileNumCSV(0, numFiles);
 	// read 1 file
-	readFileNumCSV(filePick, filePick+1);
 
-	//readFileNumCSV(23, 24);
-	//readFileNumJSON(0);
+	// readFileNumCSV(filePick);
+	readFileNumJSON(filePick);
 
 	d3.json(folderPath + "allClusterCenters.json", function(err, json) {
 		fingersOverTime = json;
@@ -649,9 +649,9 @@ function drawParticles(fileNum) {
 			}
 		}
 
-		indexMap.sort(function(a, b) {
-			return maxConcAllTimesteps[b] - maxConcAllTimesteps[a];
-		});
+		// indexMap.sort(function(a, b) {
+		// 	return maxConcAllTimesteps[b] - maxConcAllTimesteps[a];
+		// });
 
 
 		for(var i = start; i <= end; i++){
@@ -700,7 +700,7 @@ function drawParticles(fileNum) {
 	/**
 	* Reads the csv file specified.
 	*/
-	function readFileNumCSV(n, end) {
+	function readFileNumCSV(n) {
 
 		data = [];
 
@@ -758,11 +758,42 @@ function drawParticles(fileNum) {
 }
 
 function readFileNumJSON(n) {
-	d3.csv(folderPath + ('000' + n).substr(-3) + ".json", function(error, json) {
+	d3.json(folderPath + ('000' + n).substr(-3) + ".json", function(error, json) {
 		data = json;
+
+		for(var i = 0; i < data.length; i++){
+			data[i].concentration = Number(data[i].concentration);
+			data[i].Points0 = Number(data[i].Points0);
+			data[i].Points1 = Number(data[i].Points1);
+			data[i].Points2 = Number(data[i].Points2);
+			data[i].velocity0 = Number(data[i].velocity0);
+			data[i].velocity1 = Number(data[i].velocity1);
+			data[i].velocity2 = Number(data[i].velocity2);
+
+		}
+
 		console.log(n, "read (JSON).");
+
+		mean = d3.mean(data, function (e) { return e.concentration; });
+		stddev = d3.deviation(data, function (e) { return e.concentration; });
+
+		maxConc = d3.max(data, function(el) {
+			return el.concentration;
+		});
+
+		d3.select("#scaleMin").text(mean.toFixed(2));
+		d3.select("#scaleMax").text(maxConc.toFixed(2));
+
+		color.domain([mean, maxConc]);
+
+		// read in cluster data
+		d3.json(folderPath + "allClusters.json", function(error, json) {
+			clusterData = json;
+		});
+
 		drawParticles(n);
 		render();
+		console.log("done");
 	});
 
 }
@@ -945,7 +976,8 @@ function menuListener() {
 	});
 	d3.selectAll('select[name="time"]').on("change", function() {
 		filePick = Number(this.value);
-		readFileNumCSV(filePick, filePick + 1);
+		// readFileNumCSV(filePick);
+		readFileNumJSON(filePick);
 		updateFingerGraphFileLine();
 	});
 
