@@ -924,9 +924,9 @@ function keyboardListener() {
 
 function populateDropdown() {
 	var select = document.getElementById("timeDropdown");
-	var first = 23, last = 45;
+	// var first = 23, last = 45;
 	var i;
-	for(i = 23; i <= 45; i++) {
+	for(i = startFile; i <= endFile; i++) {
 		var opt = i.toString();
 		var el = document.createElement("option");
 		el.textContent = opt;
