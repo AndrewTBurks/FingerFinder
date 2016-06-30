@@ -295,9 +295,9 @@ function drawParticles(fileNum) {
 	// now create the individual particles
 	for(var p = 0; p < particleCount; p++) {
 
-		var pX = data[p].Points0,
-		pY = data[p].Points1,
-		pZ = data[p].concentration < (mean + stddev/8) ? -100 : data[p].Points2,
+		var pX = data[p].concentration < (mean + stddev/8) ? 1001 : data[p].Points0,
+		pY = data[p].concentration < (mean + stddev/8) ? 1001 : data[p].Points1,
+		pZ = data[p].Points2,
 		// pZ = data[p].Points2,
 		particle = new THREE.Vector3(pX, pY, pZ);
 
@@ -1080,23 +1080,51 @@ function mouseWheelZoom() {
 function mouseDragRotate (){
 	var myClock = new THREE.Clock();
 	var isDragging = false;
-	var previousMousePosition = 0;
+	var isPanning = false;
+	var previousMousePosition = {
+		x: 0,
+		y: 0
+	};
 	$(renderer.domElement).on('mousedown', function(e) {
-		d3.select('#cylinder').style('cursor', 'ew-resize');
-		isDragging = true;
+			switch (e.which) {
+				case 1:
+					d3.select('#cylinder').style('cursor', 'ew-resize');
+					isDragging = true;
+					break;
+				case 3:
+					d3.select('#cylinder').style('cursor', 'move');
+					isPanning = true;
+					break;
+			}
 	})
 	.on('mousemove', function(e) {
 		//console.log(e);
-		var deltaMove = e.offsetX - previousMousePosition;
+		var deltaMove = {
+			x: e.offsetX - previousMousePosition.x,
+			y: e.offsetY - previousMousePosition.y
+		};
 		if(isDragging) {
-			particleSystem.rotation.z += (deltaMove * 1) * Math.PI/180;
+			particleSystem.rotation.z += (deltaMove.x * 1) * Math.PI/180;
 		}
-		previousMousePosition = e.offsetX;
+		if(isPanning) {
+			camera.position.applyAxisAngle(new THREE.Vector3(0, 0, 1), deltaMove.x * -0.4 * Math.PI/180);
+			if (camera.position.z >= 5 && camera.position.z <= 12.5)
+				camera.position.z += deltaMove.y * 0.07;
+			if (camera.position.z < 5)
+				camera.position.z = 5;
+			if (camera.position.z > 12.5)
+			 camera.position.z = 12.5;
+		}
+		previousMousePosition = {
+			x: e.offsetX,
+			y: e.offsetY
+		};
 	});
 	/* */
 
 	$(document).on('mouseup', function(e) {
 		isDragging = false;
+		isPanning = false;
 		// refresh the slice after the user is done dragging
 		refreshSlice();
 		d3.select('#cylinder').style('cursor', 'default');
