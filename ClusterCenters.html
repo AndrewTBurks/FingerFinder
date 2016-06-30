@@ -50,9 +50,9 @@ function clusterTimeline() {
       thisCluster = clusterCenters[i][j];
 
 
-      thisPoint = new THREE.Vector3(thisCluster.cx-thisCluster.vx,
-                                    thisCluster.cy-thisCluster.vy,
-                                    thisCluster.cz-thisCluster.vz);
+      thisPoint = new THREE.Vector3(thisCluster.cx-(thisCluster.vx/2),
+                                    thisCluster.cy-(thisCluster.vy/2),
+                                    thisCluster.cz-(thisCluster.vz/2));
 
       // set distanceTolerance based on the max of the extent dimensions/2
 
@@ -67,9 +67,9 @@ function clusterTimeline() {
         distanceTolerance = d3.max([otherCluster.xMax-otherCluster.xMin, otherCluster.yMax-otherCluster.ymin, otherCluster.zMax-otherCluster.zMin])/2;
 
 
-        otherPoint = new THREE.Vector3(otherCluster.cx,
-                                      otherCluster.cy,
-                                      otherCluster.cz);
+        otherPoint = new THREE.Vector3(otherCluster.cx+(otherCluster.vx/2),
+                                      otherCluster.cy+(otherCluster.vy/2),
+                                      otherCluster.cz+(otherCluster.vz/2));
         // linear distance between points
         thisDistance = thisPoint.distanceTo(otherPoint);
 
@@ -113,9 +113,9 @@ function clusterTimeline() {
       thisCluster = clusterCenters[i][j];
 
 
-      thisPoint = new THREE.Vector3(thisCluster.cx+thisCluster.vx,
-                                    thisCluster.cy+thisCluster.vy,
-                                    thisCluster.cz+thisCluster.vz);
+      thisPoint = new THREE.Vector3(thisCluster.cx+(thisCluster.vx/2),
+                                    thisCluster.cy+(thisCluster.vy/2),
+                                    thisCluster.cz+(thisCluster.vz/2));
 
       // set distanceTolerance based on the max of the extent dimensions/2
 
@@ -133,9 +133,9 @@ function clusterTimeline() {
         distanceTolerance = d3.max([thisCluster.xMax-thisCluster.xMin, thisCluster.yMax-thisCluster.ymin, thisCluster.zMax-thisCluster.zMin])/2;
 
 
-        otherPoint = new THREE.Vector3(otherCluster.cx,
-                                      otherCluster.cy,
-                                      otherCluster.cz);
+        otherPoint = new THREE.Vector3(otherCluster.cx-(otherCluster.vx/2),
+                                      otherCluster.cy-(otherCluster.vx/2),
+                                      otherCluster.cz-(otherCluster.vx/2));
 
         // linear distance between points
         thisDistance = thisPoint.distanceTo(otherPoint);
@@ -154,7 +154,7 @@ function clusterTimeline() {
         // using weights and then finding max
         thisWeight = 0;
         thisWeight += thisDistance < distanceTolerance ? 2*(distanceTolerance-thisDistance)/distanceTolerance : 0;
-        thisWeight += thisCluster.concTotal < otherCluster.concTotal ? 0.5 : 0;
+        thisWeight += thisCluster.concTotal < otherCluster.concTotal ? 0.2 : 0;
 
         if(thisWeight > maxWeight) {
           maxWeight = thisWeight;
