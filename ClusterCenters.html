@@ -36,6 +36,7 @@ function clusterTimeline() {
   var otherCluster;
 
   var thisDistance;
+  var thisWeight;
 
   var maxIDUsed = clusterCenters[end].length-1; // one ID for each cluster in start
 
@@ -49,9 +50,9 @@ function clusterTimeline() {
       thisCluster = clusterCenters[i][j];
 
 
-      thisPoint = new THREE.Vector3(thisCluster.cx,
-                                    thisCluster.cy,
-                                    thisCluster.cz);
+      thisPoint = new THREE.Vector3(thisCluster.cx-thisCluster.vx,
+                                    thisCluster.cy-thisCluster.vy,
+                                    thisCluster.cz-thisCluster.vz);
 
       // set distanceTolerance based on the max of the extent dimensions/2
 
@@ -98,8 +99,12 @@ function clusterTimeline() {
   } // END for(var i = 0...
 
 
+  // use some metric to assign a weight to each cluster in timestep i+1
+  // both distance and difference in concentration
+  var maxWeight;
+
   // assign nextClusterID
-  for(var i = end-1; i >= start; i--) {
+  for(var i = start; i < end; i++) {
     // for each timestep aside from the start
 
     for(var j = 0; j < clusterCenters[i].length; j++)
@@ -108,49 +113,69 @@ function clusterTimeline() {
       thisCluster = clusterCenters[i][j];
 
 
-      thisPoint = new THREE.Vector3(thisCluster.cx,
-                                    thisCluster.cy,
-                                    thisCluster.cz);
+      thisPoint = new THREE.Vector3(thisCluster.cx+thisCluster.vx,
+                                    thisCluster.cy+thisCluster.vy,
+                                    thisCluster.cz+thisCluster.vz);
 
       // set distanceTolerance based on the max of the extent dimensions/2
 
 
       closestCluster = -1;
       closestDistance = 20;
+      maxWeight = 0;
+
+
       // find the closest cluster in the previous timestep
       for(var k = 0; k < clusterCenters[i+1].length; k++)
       {
         // for each cluster in the previous timestep
         otherCluster = clusterCenters[i+1][k];
-        distanceTolerance = d3.max([otherCluster.xMax-otherCluster.xMin, otherCluster.yMax-otherCluster.ymin, otherCluster.zMax-otherCluster.zMin])/2;
+        distanceTolerance = d3.max([thisCluster.xMax-thisCluster.xMin, thisCluster.yMax-thisCluster.ymin, thisCluster.zMax-thisCluster.zMin])/2;
 
 
         otherPoint = new THREE.Vector3(otherCluster.cx,
                                       otherCluster.cy,
                                       otherCluster.cz);
+
         // linear distance between points
         thisDistance = thisPoint.distanceTo(otherPoint);
 
-
+        // simply calculating min distance
+        /*
         // if the distance between clusters is smaller than the closest so far
         if((thisDistance < closestDistance)
-            && (+(thisCluster.concTotal - otherCluster.concTotal) < 10000)) {
+        && (+(thisCluster.concTotal - otherCluster.concTotal) < 10000)) {
           // set as the new closest cluster
           closestCluster = clusterCenters[i+1][k].clusterID;
           closestDistance = thisDistance;
         }
+        */
+
+        // using weights and then finding max
+        thisWeight = 0;
+        thisWeight += thisDistance < distanceTolerance ? 2*(distanceTolerance-thisDistance)/distanceTolerance : 0;
+        thisWeight += thisCluster.concTotal < otherCluster.concTotal ? 0.5 : 0;
+
+        if(thisWeight > maxWeight) {
+          maxWeight = thisWeight;
+          closestCluster = clusterCenters[i+1][k].clusterID;
+          // closestCluster = k;
+        }
 
 
       } // END for(var k = 0; ...
+
+      // assign nextClusterID
 
       // nextClusterID = -1 if no next cluster, or a valid ID if there is a next
       clusterCenters[i][j].nextClusterID = closestCluster;
 
     } // END for(var j = 0...
 
-  } // END for(var i = 0...
+  } // END for(var i = start...
 
     console.log(maxIDUsed);
+    downloadJSON(clusterCenters);
 } // END clusterTimeline() { ...
 
 function findCenterOfConc(n) {
@@ -159,6 +184,7 @@ function findCenterOfConc(n) {
 
   var clusterSize;
   var xTot, yTot, zTot, concTot;
+  var xVelTot, yVelTot, zVelTot;
   var xMax, xMin, yMax, yMin, zMax, zMin;
   var thisConc;
 
@@ -171,6 +197,11 @@ function findCenterOfConc(n) {
     yTot = 0;
     zTot = 0;
     concTot = 0;
+
+    // get center of conc avg vel
+    xVelTot = 0;
+    yVelTot = 0;
+    zVelTot = 0;
 
     // extents of the cluster
     xMax = -100;
@@ -192,6 +223,10 @@ function findCenterOfConc(n) {
       zTot += point.Points2 * thisConc;
       concTot += thisConc;
 
+      xVelTot += point.velocity0 * thisConc;
+      yVelTot += point.velocity1 * thisConc;
+      zVelTot += point.velocity2 * thisConc;
+
       // calculating extents of cluster
       if(point.Points0 < xMin) {
         xMin = point.Points0;
@@ -211,10 +246,13 @@ function findCenterOfConc(n) {
       if(point.Points2 > zMax) {
         zMax = point.Points2;
       }
-
+      // find average velocity of points in
     }
+
+
     clusterCenters[n][i] = {size: clusterSize, concTotal: concTot, clusterID: i, nextClusterID: -1,
                             cx: xTot/concTot, cy: yTot/concTot, cz: zTot/concTot,
+                            vx: xVelTot/concTot, vy: yVelTot/concTot, vz: zVelTot/concTot,
                             xMax: xMax, xMin: xMin, yMax: yMax, yMin: yMin, zMax: zMax, zMin: zMin};
   }
 
@@ -239,6 +277,9 @@ function readFileNumCSV(n) {
         Points0: Number(d.Points0),
         Points1: Number(d.Points1),
         Points2: Number(d.Points2),
+        velocity0: Number(d.velocity0),
+        velocity1: Number(d.velocity1),
+        velocity2: Number(d.velocity2),
         adjPoints: [],
         inCluster: -1
       };

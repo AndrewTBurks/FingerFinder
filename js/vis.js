@@ -542,8 +542,8 @@ function drawParticles(fileNum) {
 	// file reading
 	// read 1 file
 
-	// readFileNumCSV(filePick);
-	readFileNumJSON(filePick);
+	readFileNumCSV(filePick);
+	// readFileNumJSON(filePick);
 
 	d3.json(folderPath + "allClusterCenters.json", function(err, json) {
 		fingersOverTime = json;
@@ -660,7 +660,12 @@ function drawParticles(fileNum) {
 
 			for(var j = 0; j < fingersOverTime[i].length; j++) {
 				concArray[fingersOverTime[i][j].clusterID] += fingersOverTime[i][j].concTotal;
-				nextArray[fingersOverTime[i][j].clusterID] = fingersOverTime[i][j].nextClusterID;
+
+				if(nextArray[fingersOverTime[i][j].clusterID] === -1) { // only update if no value
+						// max concentration nextClusterID will be chosen as concentration is in
+						// descending order
+						nextArray[fingersOverTime[i][j].clusterID] = fingersOverTime[i][j].nextClusterID;
+				}
 			}
 
 			for(var j = 0; j < numClusters; j++) {
@@ -976,8 +981,8 @@ function menuListener() {
 	});
 	d3.selectAll('select[name="time"]').on("change", function() {
 		filePick = Number(this.value);
-		// readFileNumCSV(filePick);
-		readFileNumJSON(filePick);
+		readFileNumCSV(filePick);
+		// readFileNumJSON(filePick);
 		updateFingerGraphFileLine();
 	});
 
