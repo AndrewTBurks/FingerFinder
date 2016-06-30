@@ -130,7 +130,7 @@ function clusterTimeline() {
       {
         // for each cluster in the previous timestep
         otherCluster = clusterCenters[i+1][k];
-        distanceTolerance = d3.max([thisCluster.xMax-thisCluster.xMin, thisCluster.yMax-thisCluster.ymin, thisCluster.zMax-thisCluster.zMin])/2;
+        distanceTolerance = d3.max([thisCluster.xMax-thisCluster.xMin, thisCluster.yMax-thisCluster.ymin, thisCluster.zMax-thisCluster.zMin]);
 
 
         otherPoint = new THREE.Vector3(otherCluster.cx-(otherCluster.vx/2),
@@ -154,7 +154,7 @@ function clusterTimeline() {
         // using weights and then finding max
         thisWeight = 0;
         thisWeight += thisDistance < distanceTolerance ? 2*(distanceTolerance-thisDistance)/distanceTolerance : 0;
-        thisWeight += thisCluster.concTotal < otherCluster.concTotal ? 0.2 : 0;
+        thisWeight += thisCluster.concTotal < otherCluster.concTotal ? 0.1 : 0;
 
         if(thisWeight > maxWeight) {
           maxWeight = thisWeight;
