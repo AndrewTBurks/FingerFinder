@@ -562,6 +562,8 @@ function drawParticles(fileNum) {
 	var indexMap;
 	var maxConcAllTimesteps;
 
+	var prevIDs;
+
 	function drawFingerGraph(start, end) {
 		var myDiv = d3.select("#fingerGraph");
 		// no idea how to size this stuff
@@ -596,7 +598,7 @@ function drawParticles(fileNum) {
 		console.log(maxFingerConc, minFingerConc);
 
 		sizeScale.domain([minFingerConc, maxFingerConc]);
-		sizeScale.range([2,d3.min([xSpacing/2, ySpacing/2])]);
+		sizeScale.range([2,d3.min([xSpacing/2, ySpacing/2])-1]);
 
 		fingerColor.domain([minFingerConc, maxFingerConc]);
 
@@ -630,8 +632,25 @@ function drawParticles(fileNum) {
 
 		console.log(xSpacing);
 
-		var concArray = new Array(numClusters);
-		var nextArray = new Array(numClusters);
+		// aggregate concentrations if more than one cluster is considered
+		// to have the same index
+		var concArray = new Array(numFiles);
+		var nextArray = new Array(numFiles);
+
+		for(var i = start; i <= end; i++){
+			concArray[i] = new Array(numClusters).fill(0);
+			nextArray[i] = new Array(numClusters).fill(-1);
+
+			for(var j = 0; j < fingersOverTime[i].length; j++) {
+				concArray[i][fingersOverTime[i][j].clusterID] += fingersOverTime[i][j].concTotal;
+
+				if(nextArray[i][fingersOverTime[i][j].clusterID] === -1) { // only update if no value
+						// max concentration nextClusterID will be chosen as concentration is in
+						// descending order
+						nextArray[i][fingersOverTime[i][j].clusterID] = fingersOverTime[i][j].nextClusterID;
+				}
+			}
+		}
 
 		maxConcAllTimesteps = new Array(numClusters).fill(0);
 		indexMap = new Array(numClusters);
@@ -641,41 +660,123 @@ function drawParticles(fileNum) {
 			indexMap[i] = i;
 		}
 
-		for(var i = start; i <= end; i++){
+/* ===== BALANCE THE GRAPH! ===== */
+		var rangeActive = new Array(numClusters); // range that each clusterID exists
+		prevIDs = new Array(numClusters);
+
+		// calculate the range that each clusterID exists
+		// initiate to have earliest be end, latest be start
+		for(var i = 0; i < numClusters; i++)
+		{
+			rangeActive[i] = {earliest: end, latest: start};
+		}
+
+		// for each ID, find all IDs which lead into it
+		// initialize to have only its own value
+		for(var i = 0; i < numClusters; i++)
+		{
+			prevIDs[i] = {fullSubArr: [], values: [i]};
+		}
+
+		// find ranges
+		// and all IDs which lead into each ID
+		for(var i = start; i <= end; i++)
+		{
+			// for each timestep
 			for(var j = 0; j < fingersOverTime[i].length; j++) {
-				//if(maxConcAllTimesteps[fingersOverTime[i][j].clusterID] < fingersOverTime[i][j].concTotal){
-				maxConcAllTimesteps[fingersOverTime[i][j].clusterID] += fingersOverTime[i][j].concTotal;
-				//}
+				// for each finger in the timestep
+				var thisFinger = fingersOverTime[i][j];
+
+				if(i < rangeActive[thisFinger.clusterID].earliest) {
+					// change the earliest timestep
+					rangeActive[thisFinger.clusterID].earliest = i;
+				}
+
+				if(i > rangeActive[thisFinger.clusterID].latest) {
+					// change the latest timestep
+					rangeActive[thisFinger.clusterID].latest = i;
+				}
+
 			}
 		}
 
-		// indexMap.sort(function(a, b) {
-		// 	return maxConcAllTimesteps[b] - maxConcAllTimesteps[a];
-		// });
-
-
 		for(var i = start; i <= end; i++){
-			concArray.fill(0);
-			nextArray.fill(-1);
-
-			for(var j = 0; j < fingersOverTime[i].length; j++) {
-				concArray[fingersOverTime[i][j].clusterID] += fingersOverTime[i][j].concTotal;
-
-				if(nextArray[fingersOverTime[i][j].clusterID] === -1) { // only update if no value
-						// max concentration nextClusterID will be chosen as concentration is in
-						// descending order
-						nextArray[fingersOverTime[i][j].clusterID] = fingersOverTime[i][j].nextClusterID;
+			for(var j = 0; j < numClusters; j++) {
+				// add the finger to the list of previous
+				if(nextArray[i][j] !== -1) {
+					if(arrGetIndOfVal(prevIDs[nextArray[i][j]].values, j) === -1){
+						prevIDs[nextArray[i][j]].values.push(j);
+						console.log("Pushing", j, "to", nextArray[i][j]);
+					}
 				}
 			}
+		}
+
+		// Arrange values in each prevIDs index by the end time of the index
+		// with the sameID in the middle, earlier clusters closer to the middle
+		// later clusters to the sides
+		for(var i = 0; i < numClusters; i++) {
+			prevIDs[i].values.sort(function(a,b) {
+				return rangeActive[b].latest - rangeActive[a].latest;
+			});
+
+			var newArr1 = [];
+			var newArr2 = [];
+			var addToNext = 1;
+
+			// iterate through values and place in array back and forth on sides
+			var currentElement = 0;
+			while(currentElement < prevIDs[i].values.length) {
+				if(prevIDs[i].values[currentElement] !== i) {
+					// if it's not the current ID
+					if(addToNext === 1){
+						newArr1.push(prevIDs[i].values[currentElement]);
+						addToNext = 2;
+					}
+					else {
+						newArr2.push(prevIDs[i].values[currentElement]);
+						addToNext = 1;
+					}
+				}
+
+				currentElement++;
+			}
+
+			// now that they are split into arrays, concatenate them back
+			// after reversing newArr2
+			// [newArr1] + [i] + [2rrAwen]
+			newArr2.reverse();
+			prevIDs[i].values = newArr1.concat([i], newArr2);
+			console.log(prevIDs[i].values);
+
+		}
+		// construct map [0, ... , numClusters] -> [(more balanced graph)]
+		var mapArr = [];
+		for(var i = 0; i < fingersOverTime[end].length; i++){
+			mapArr = mapArr.concat(constructGraphMapArr(fingersOverTime[end][i].clusterID, prevIDs));
+		}
+
+		for(var i = 0; i < numClusters; i++){
+			indexMap[i] = -1;
+		}
+
+		// create array to do mapping
+		for(var i = 0; i < mapArr.length; i++){
+			if(indexMap[mapArr[i]] === -1) {
+				indexMap[mapArr[i]] = i;
+			}
+		}
+
+		for(var i = start; i <= end; i++){
 
 			for(var j = 0; j < numClusters; j++) {
-				if(nextArray[j] != -1) {
+				if(nextArray[i][j] != -1) {
 					mySVG.append("line")
 					.attr("class", "fingerTransition")
 					.attr("x1", (xSpacing * (i-start)) + xSpacing/2)
 					.attr("x2", (xSpacing * (i+1-start)) + xSpacing/2)
 					.attr("y1", (height - (3*ySpacing/2 + (ySpacing*indexMap[j]))))
-					.attr("y2", (height - (3*ySpacing/2 + (ySpacing*indexMap[nextArray[j]]))))
+					.attr("y2", (height - (3*ySpacing/2 + (ySpacing*indexMap[nextArray[i][j]]))))
 					.style("stroke", "white");
 				}
 			}
@@ -686,12 +787,83 @@ function drawParticles(fileNum) {
 				.attr("class", "fingerPoint")
 				.attr("cy", (height - (3*ySpacing/2 + (ySpacing*indexMap[j]))))
 				.attr("cx", (xSpacing * (i-start)) + xSpacing/2)
-				.attr("r", concArray[j] === 0 ? 0 : sizeScale(concArray[j]))
-				.style("fill", fingerColor(concArray[j]))
+				.attr("r", concArray[i][j] === 0 ? 0 : sizeScale(concArray[i][j]))
+				.style("fill", fingerColor(concArray[i][j]))
 				.style("stroke", "white");
 			}
 		}
 
+	}
+
+	function arrGetIndOfVal(arr, val) {
+		console.log("Finding", arr, val);
+
+		for(var i = 0; i < arr.length; i++) {
+			if(arr[i] === val) {
+				return i;
+			}
+		}
+		return -1;
+	}
+
+	/*
+	// arr MUST BE IN THE SAME FORMAT AS prevIDs FROM drawFingerGraph()
+	// IN THE FORM [[],[],...] WHERE THE INNER ARRAYS HAVE VALUES WHICH
+	// CORRESPOND TO THE OTHER IDs CONNECTED AT ANY POINT TO THE ID AT THAT
+	// INDEX, ALSO CONTAINING ITS OWN ID.
+	function getSubtreeWidths(arr) {
+		var totalWidth;
+		for(var i = 0; i < arr.length; i++) {
+			if(arr[i].subSize === -1) {
+				// if the subtree width is not yet known
+				getSubtreeWidthsREC(arr, i);
+			}
+		}
+	}
+
+	// RECURSIVE HELPER METHOD - used since graph isn't rooted
+	function getSubtreeWidthsREC(arr, index) {
+		var totalWidth = 1; // starts with self
+		for(var i = 0; i < arr[index].values.length; i++) {
+
+		}
+	}
+	USING OTHER METHOD */
+
+	// USE FOR EACH NODE IN THE LAST TIMESTEP, THEN CONCATENATE IN A NICE ORDER
+	function constructGraphMapArr(index, prevIDs) {
+		console.log("construchGraphMapArr(", index);
+
+		var previousArr = [];
+		var nextArr = [];
+		var insertInto = 0; // 0-previous, 1-next
+
+		if(prevIDs[index].values.length === 1){ // base case, has no prev besides itself
+			console.log("Index:",index,"Returning:",[index]);
+			return [index];
+		}
+		else if(prevIDs[index].fullSubArr.length != 0){ // if already calculated (shouldnt ever be though)
+			console.log("Index:",index,"Returning:",prevIDs[index].fullSubArr);
+			return prevIDs[index].fullSubArr;
+		}
+		else {
+			for(var i = 0; i < prevIDs[index].values.length; i++) {
+				if(prevIDs[index].values[i] === index) {
+					insertInto = 1;
+				}
+				else {
+					if(insertInto === 0){
+						previousArr = previousArr.concat(constructGraphMapArr(prevIDs[index].values[i], prevIDs));
+					}
+					else{
+						nextArr = nextArr.concat(constructGraphMapArr(prevIDs[index].values[i], prevIDs));
+					}
+				}
+			}
+			prevIDs[index].fullSubArr = previousArr.concat([index], nextArr);
+			console.log("Index:",index,"Returning:",prevIDs[index].fullSubArr);
+			return prevIDs[index].fullSubArr;
+		}
 	}
 
 	function updateFingerGraphFileLine() {
