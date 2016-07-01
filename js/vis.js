@@ -542,8 +542,8 @@ function drawParticles(fileNum) {
 	// file reading
 	// read 1 file
 
-	readFileNumCSV(filePick);
-	// readFileNumJSON(filePick);
+	// readFileNumCSV(filePick);
+	readFileNumJSON(filePick);
 
 	d3.json(folderPath + "allClusterCenters.json", function(err, json) {
 		fingersOverTime = json;
@@ -1181,8 +1181,8 @@ function menuListener() {
 	});
 	d3.selectAll('select[name="time"]').on("change", function() {
 		filePick = Number(this.value);
-		readFileNumCSV(filePick);
-		// readFileNumJSON(filePick);
+		// readFileNumCSV(filePick);
+		readFileNumJSON(filePick);
 		updateFingerGraphFileLine();
 	});
 
