@@ -506,6 +506,11 @@ function drawParticles(fileNum) {
 		recolor3DModel();
 	}
 
+	/**
+	* Recolors the all parts of vis according to the option selected.
+	* Also invokes {@link recolor3DModel}, {@link recolorHeatMaps}, {@link recolorFingerGraph},
+	* and {@link createColorLegend}.
+	*/
 	function recolorAll() {
 		color.range(colorSplit);
 		fingerColor.range(colorSplit);
@@ -568,6 +573,9 @@ function drawParticles(fileNum) {
 
 	}
 
+	/**
+	* Recolors the heatmaps according to the option selected.
+	*/
 	function recolorHeatMaps() {
 		var gridWidth = d3.min([WIDTH_SLICE, WIDTH_SLICE])/(sliceResolution);
 
@@ -669,6 +677,10 @@ function drawParticles(fileNum) {
 		.style("stroke", "white")
 		.style("stroke-width", 2);
 	}
+
+	/**
+	* Recolors the viscous finger graph according to the option selected.
+	*/
 	function recolorFingerGraph() {
 		fingerColor.range(colorSplit); // update range
 		drawFingerGraph(startFile, endFile); // unfortunately this is the only way to recolor
