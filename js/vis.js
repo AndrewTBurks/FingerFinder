@@ -154,6 +154,8 @@ function drawSlice() {
 */
 function createColorLegend() {
 
+	d3.select("#canvas").remove();
+
 	var canvas = d3.select("#legend").append("canvas")
 	.attr("id", "canvas")
 	.attr("width", 450)
@@ -503,6 +505,13 @@ function drawParticles(fileNum) {
 	function recolorAll() {
 		color.range(colorSplit);
 		fingerColor.range(colorSplit);
+
+		if (colorSchemeChoice == 0 || colorSchemeChoice == 1) {
+			renderer.setClearColor("#454545");
+		}
+		if (colorSchemeChoice == 2 || colorSchemeChoice == 3) {
+			renderer.setClearColor("#050505");
+		}
 
 		recolor3DModel();
 		recolorHeatMaps();
@@ -1346,15 +1355,14 @@ function menuListener() {
 		readFileNumJSON(filePick);
 		updateFingerGraphFileLine();
 	});
-	// d3.selectAll('input[name="colorScheme"]').on("change", function() {
-	// 	colorSchemeChoice = Number(this.value);
-	// 	colorSplit = colorScheme[colorSchemeChoice].split(",");
-	// 	color = d3.scale.quantile()
-	// 	.range(colorSplit);
-	// 	colorSlice = d3.scale.quantile()
-	// 	.range(colorSplit);
-	// 	recolor3DModel();
-	// 	render();
-	// });
+	d3.selectAll('input[name="colorScheme"]').on("change", function() {
+		colorSchemeChoice = Number(this.value);
+		colorSplit = colorScheme[colorSchemeChoice].split(",");
+		// color = d3.scale.quantile()
+		// .range(colorSplit);
+		// colorSlice = d3.scale.quantile()
+		// .range(colorSplit);
+		recolorAll();
+	});
 
 }
