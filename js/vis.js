@@ -796,7 +796,16 @@ function drawParticles(fileNum) {
 		// to have the same index
 		var concArray = new Array(numFiles);
 		var sizeArray = new Array(numFiles);
+		var includedArray = new Array(numFiles);
 		var nextArray = new Array(numFiles);
+
+		// initialize includedArray to be full of empty arrays
+		for(var i = 0; i < numFiles; i++){
+			includedArray[i] = new Array(numClusters);
+			for(var j = 0; j < numClusters; j++) {
+				includedArray[i][j] = [];
+			}
+		}
 
 		for(var i = start; i <= end; i++){
 			concArray[i] = new Array(numClusters).fill(0);
@@ -810,6 +819,8 @@ function drawParticles(fileNum) {
 					(thisFinger.xMax - thisFinger.xMin)
 					+ (thisFinger.yMax - thisFinger.yMin)
 					+ (thisFinger.zMax - thisFinger.zMin);
+
+				includedArray[i][fingersOverTime[i][j].clusterID].push(j);
 
 				if(nextArray[i][fingersOverTime[i][j].clusterID] === -1) { // only update if no value
 						// max concentration nextClusterID will be chosen as concentration is in
@@ -954,7 +965,7 @@ function drawParticles(fileNum) {
 			for(var j = 0; j < numClusters; j++) {
 
 				mySVG.append("circle")
-					.datum({timestep: i, id: j, conc: concArray[i][j]})
+					.datum({timestep: i, id: j, conc: concArray[i][j].toFixed(2), includes: includedArray[i][j]})
 					.attr("class", "fingerPoint")
 					.attr("cy", (height - (ySpacing + (ySpacing*indexMap[j]))))
 					.attr("cx", (xSpacing * (i-start)) + xSpacing/2)
