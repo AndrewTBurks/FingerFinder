@@ -89,6 +89,10 @@ populateDropdown();
 */
 var filePick = Number(d3.select('select[name="time"]').node().value);
 
+var tooltip = d3.select("#fingerGraph")
+	.append("div")
+	.attr("class", "hidden tooltip");
+
 /**
 * Draws the cylinder slice using three.js lines.
 */
@@ -972,7 +976,19 @@ function drawParticles(fileNum) {
 					.attr("r", concArray[i][j] === 0 ? 0 : fingerSize(sizeArray[i][j]))
 					.style("fill", fingerColor(concArray[i][j]))
 					.style("stroke", "white")
-					.on("click", function(d){ console.log(d); });
+					// .on("click", function(d){ console.log(d); });
+					.on('mousemove', function(d) {
+						var mouse = d3.mouse(svg.node()).map(function(d) {
+							return parseInt(d);
+						});
+						tooltip.classed("hidden", false)
+							// .attr("transform", "translate(" + mouse[0] + "," + mouse[1] + ")")
+							.attr("style", "left:" +(mouse[0] - 400) + 'px; top:' + (mouse[1] - 30) + 'px')
+							.html(d.conc);
+					})
+					.on('mouseout', function() {
+						tooltip.classed("hidden", true);
+					});
 			}
 		}
 

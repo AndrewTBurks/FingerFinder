@@ -286,3 +286,18 @@ form {
 .svgSlider rect.background {
   cursor: ew-resize !important;
 }
+
+.hidden {
+  display: none;
+}
+
+div.tooltip {
+  color: #333;
+  background-color: #fff;
+  padding: .5em;
+  text-shadow: #f5f5f5 0 1px 0;
+  border-radius: 2px;
+  opacity: 0.85;
+  position: absolute;
+  /*font-family: sans-serif;*/
+}
