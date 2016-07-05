@@ -558,6 +558,9 @@ function drawParticles(fileNum) {
 	var fingerColor = d3.scale.quantize()
 	.range(colorSplit);
 
+	var lineThickness = d3.scale.linear()
+		.range([1, 6]);
+
 	var xSpacing;
 	var indexMap;
 	var maxConcAllTimesteps;
@@ -613,7 +616,11 @@ function drawParticles(fileNum) {
 		fingerSize.domain([minFingerSize, maxFingerSize]);
 		fingerSize.range([2,d3.min([xSpacing/2, ySpacing/2])-1]);
 
+
+
 		fingerColor.domain([minFingerConc, maxFingerConc]);
+
+		lineThickness.domain([minFingerConc, maxFingerConc]);
 
 		// draw background
 		mySVG.append("rect")
@@ -799,7 +806,8 @@ function drawParticles(fileNum) {
 						.attr("x2", (xSpacing * (i+1-start)) + xSpacing/2)
 						.attr("y1", (height - (ySpacing + (ySpacing*indexMap[j]))))
 						.attr("y2", (height - (ySpacing + (ySpacing*indexMap[nextArray[i][j]]))))
-						.style("stroke", "white");
+						.style("stroke", "white")
+						.style("stroke-width", lineThickness(concArray[i][j]));
 				}
 			}
 
