@@ -794,24 +794,24 @@ function drawParticles(fileNum) {
 			for(var j = 0; j < numClusters; j++) {
 				if(nextArray[i][j] != -1) {
 					mySVG.append("line")
-					.attr("class", "fingerTransition")
-					.attr("x1", (xSpacing * (i-start)) + xSpacing/2)
-					.attr("x2", (xSpacing * (i+1-start)) + xSpacing/2)
-					.attr("y1", (height - (3*ySpacing/2 + (ySpacing*indexMap[j]))))
-					.attr("y2", (height - (3*ySpacing/2 + (ySpacing*indexMap[nextArray[i][j]]))))
-					.style("stroke", "white");
+						.attr("class", "fingerTransition")
+						.attr("x1", (xSpacing * (i-start)) + xSpacing/2)
+						.attr("x2", (xSpacing * (i+1-start)) + xSpacing/2)
+						.attr("y1", (height - (ySpacing + (ySpacing*indexMap[j]))))
+						.attr("y2", (height - (ySpacing + (ySpacing*indexMap[nextArray[i][j]]))))
+						.style("stroke", "white");
 				}
 			}
 
 			for(var j = 0; j < numClusters; j++) {
 
 				mySVG.append("circle")
-				.attr("class", "fingerPoint")
-				.attr("cy", (height - (3*ySpacing/2 + (ySpacing*indexMap[j]))))
-				.attr("cx", (xSpacing * (i-start)) + xSpacing/2)
-				.attr("r", concArray[i][j] === 0 ? 0 : fingerSize(sizeArray[i][j]))
-				.style("fill", fingerColor(concArray[i][j]))
-				.style("stroke", "white");
+					.attr("class", "fingerPoint")
+					.attr("cy", (height - (ySpacing + (ySpacing*indexMap[j]))))
+					.attr("cx", (xSpacing * (i-start)) + xSpacing/2)
+					.attr("r", concArray[i][j] === 0 ? 0 : fingerSize(sizeArray[i][j]))
+					.style("fill", fingerColor(concArray[i][j]))
+					.style("stroke", "white");
 			}
 		}
 
