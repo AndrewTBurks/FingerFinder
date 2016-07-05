@@ -551,7 +551,7 @@ function drawParticles(fileNum) {
 
 	});
 
-	var sizeScale = d3.scale.linear()
+	var fingerSize = d3.scale.linear()
 	.range([2, 10])
 	.clamp(true);
 
@@ -595,10 +595,23 @@ function drawParticles(fileNum) {
 			})
 		});
 
-		console.log(maxFingerConc, minFingerConc);
+		var maxFingerSize = d3.max(fingersOverTime, function(el) {
+			return d3.max(el, function(el2) {
+				return (el2.xMax - el2.xMin) + (el2.yMax - el2.yMin) + (el2.zMax - el2.zMin);
+			})
+		});
 
-		sizeScale.domain([minFingerConc, maxFingerConc]);
-		sizeScale.range([2,d3.min([xSpacing/2, ySpacing/2])-1]);
+		var minFingerSize = d3.min(fingersOverTime, function(el) {
+			return d3.min(el, function(el2) {
+				return (el2.xMax - el2.xMin) + (el2.yMax - el2.yMin) + (el2.zMax - el2.zMin);
+			})
+		});
+
+		console.log(maxFingerConc, minFingerConc);
+		console.log(maxFingerSize, minFingerSize);
+
+		fingerSize.domain([minFingerSize, maxFingerSize]);
+		fingerSize.range([2,d3.min([xSpacing/2, ySpacing/2])-1]);
 
 		fingerColor.domain([minFingerConc, maxFingerConc]);
 
@@ -635,14 +648,21 @@ function drawParticles(fileNum) {
 		// aggregate concentrations if more than one cluster is considered
 		// to have the same index
 		var concArray = new Array(numFiles);
+		var sizeArray = new Array(numFiles);
 		var nextArray = new Array(numFiles);
 
 		for(var i = start; i <= end; i++){
 			concArray[i] = new Array(numClusters).fill(0);
+			sizeArray[i] = new Array(numClusters).fill(0);
 			nextArray[i] = new Array(numClusters).fill(-1);
 
 			for(var j = 0; j < fingersOverTime[i].length; j++) {
+				var thisFinger = fingersOverTime[i][j];
 				concArray[i][fingersOverTime[i][j].clusterID] += fingersOverTime[i][j].concTotal;
+				sizeArray[i][fingersOverTime[i][j].clusterID] +=
+					(thisFinger.xMax - thisFinger.xMin)
+					+ (thisFinger.yMax - thisFinger.yMin)
+					+ (thisFinger.zMax - thisFinger.zMin);
 
 				if(nextArray[i][fingersOverTime[i][j].clusterID] === -1) { // only update if no value
 						// max concentration nextClusterID will be chosen as concentration is in
@@ -706,7 +726,7 @@ function drawParticles(fileNum) {
 				if(nextArray[i][j] !== -1) {
 					if(arrGetIndOfVal(prevIDs[nextArray[i][j]].values, j) === -1){
 						prevIDs[nextArray[i][j]].values.push(j);
-						console.log("Pushing", j, "to", nextArray[i][j]);
+						// console.log("Pushing", j, "to", nextArray[i][j]); // debug
 					}
 				}
 			}
@@ -724,7 +744,9 @@ function drawParticles(fileNum) {
 			var newArr2 = [];
 			var addToNext = 1;
 
-			// iterate through values and place in array back and forth on sides
+			// iterate through values and alternate pushing to 2 arrays
+			// after we will have newArr1 and newArr2 each with every other
+			// number in prevIDs (descending)
 			var currentElement = 0;
 			while(currentElement < prevIDs[i].values.length) {
 				if(prevIDs[i].values[currentElement] !== i) {
@@ -744,10 +766,10 @@ function drawParticles(fileNum) {
 
 			// now that they are split into arrays, concatenate them back
 			// after reversing newArr2
-			// [newArr1] + [i] + [2rrAwen]
+			// => [newArr1] + [i] + [newArr2].reverse()
 			newArr2.reverse();
 			prevIDs[i].values = newArr1.concat([i], newArr2);
-			console.log(prevIDs[i].values);
+			// console.log(prevIDs[i].values); // debug
 
 		}
 		// construct map [0, ... , numClusters] -> [(more balanced graph)]
@@ -787,7 +809,7 @@ function drawParticles(fileNum) {
 				.attr("class", "fingerPoint")
 				.attr("cy", (height - (3*ySpacing/2 + (ySpacing*indexMap[j]))))
 				.attr("cx", (xSpacing * (i-start)) + xSpacing/2)
-				.attr("r", concArray[i][j] === 0 ? 0 : sizeScale(concArray[i][j]))
+				.attr("r", concArray[i][j] === 0 ? 0 : fingerSize(sizeArray[i][j]))
 				.style("fill", fingerColor(concArray[i][j]))
 				.style("stroke", "white");
 			}
@@ -796,7 +818,7 @@ function drawParticles(fileNum) {
 	}
 
 	function arrGetIndOfVal(arr, val) {
-		console.log("Finding", arr, val);
+		// console.log("Finding", arr, val); // debug
 
 		for(var i = 0; i < arr.length; i++) {
 			if(arr[i] === val) {
@@ -832,18 +854,18 @@ function drawParticles(fileNum) {
 
 	// USE FOR EACH NODE IN THE LAST TIMESTEP, THEN CONCATENATE IN A NICE ORDER
 	function constructGraphMapArr(index, prevIDs) {
-		console.log("construchGraphMapArr(", index);
+		// console.log("construchGraphMapArr(", index); //debug
 
 		var previousArr = [];
 		var nextArr = [];
 		var insertInto = 0; // 0-previous, 1-next
 
 		if(prevIDs[index].values.length === 1){ // base case, has no prev besides itself
-			console.log("Index:",index,"Returning:",[index]);
+			// console.log("Index:",index,"Returning:",[index]); // debug
 			return [index];
 		}
 		else if(prevIDs[index].fullSubArr.length != 0){ // if already calculated (shouldnt ever be though)
-			console.log("Index:",index,"Returning:",prevIDs[index].fullSubArr);
+			// console.log("Index:",index,"Returning:",prevIDs[index].fullSubArr); // debug
 			return prevIDs[index].fullSubArr;
 		}
 		else {
@@ -861,7 +883,7 @@ function drawParticles(fileNum) {
 				}
 			}
 			prevIDs[index].fullSubArr = previousArr.concat([index], nextArr);
-			console.log("Index:",index,"Returning:",prevIDs[index].fullSubArr);
+			// console.log("Index:",index,"Returning:",prevIDs[index].fullSubArr); // debug
 			return prevIDs[index].fullSubArr;
 		}
 	}
