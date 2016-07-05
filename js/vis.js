@@ -954,12 +954,14 @@ function drawParticles(fileNum) {
 			for(var j = 0; j < numClusters; j++) {
 
 				mySVG.append("circle")
+					.datum({timestep: i, id: j, conc: concArray[i][j]})
 					.attr("class", "fingerPoint")
 					.attr("cy", (height - (ySpacing + (ySpacing*indexMap[j]))))
 					.attr("cx", (xSpacing * (i-start)) + xSpacing/2)
 					.attr("r", concArray[i][j] === 0 ? 0 : fingerSize(sizeArray[i][j]))
 					.style("fill", fingerColor(concArray[i][j]))
-					.style("stroke", "white");
+					.style("stroke", "white")
+					.on("click", function(d){ console.log(d); });
 			}
 		}
 
