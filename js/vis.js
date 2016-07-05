@@ -977,14 +977,14 @@ function drawParticles(fileNum) {
 					.style("fill", fingerColor(concArray[i][j]))
 					.style("stroke", "white")
 					// .on("click", function(d){ console.log(d); });
+
 					.on('mousemove', function(d) {
-						var mouse = d3.mouse(svg.node()).map(function(d) {
-							return parseInt(d);
-						});
+						var matrix = this.getScreenCTM()
+        			.translate(+ this.getAttribute("cx"), + this.getAttribute("cy"));
 						tooltip.classed("hidden", false)
-							// .attr("transform", "translate(" + mouse[0] + "," + mouse[1] + ")")
-							.attr("style", "left:" +(mouse[0] + 780) + 'px; top:' + (mouse[1] + 60) + 'px')
-							.html("ID: " + d.id + "<br>Timestep: " + d.timestep + "<br>Concentration: " + d.conc);
+							.html("ID: " + d.id + "<br>Timestep: " + d.timestep + "<br>Concentration: " + d.conc)
+							.style("left", (window.pageXOffset + matrix.e + 15) + "px")
+			        .style("top", (window.pageYOffset + matrix.f - 80) + "px");
 					})
 					.on('mouseout', function() {
 						tooltip.classed("hidden", true);
