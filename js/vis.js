@@ -153,6 +153,7 @@ function drawSlice() {
 * Creates a color legend to show the concentration scale. Uses canvas.
 */
 function createColorLegend() {
+
 	var canvas = d3.select("#legend").append("canvas")
 	.attr("id", "canvas")
 	.attr("width", 450)
@@ -251,6 +252,9 @@ var color = d3.scale.quantile()
 
 var colorSlice = d3.scale.quantile()
 .range(colorSplit);
+
+var velWidth;
+var velLength;
 
 // FOR DRAWING SLICES:
 // [-5,5] -> [0, sliceResolution)
@@ -375,7 +379,7 @@ function drawParticles(fileNum) {
 		var maxConcSlice = d3.max(sliceAccumulated, function(e) { return d3.max(e, function(e){ return e.conc;}); });
 		var minConcSlice = d3.min(sliceAccumulated, function(e) { return d3.max(e, function(e){ return e.conc;}); });
 
-		var maxVel = d3.max(sliceAccumulated, function(e) {
+		var maxVelSlice = d3.max(sliceAccumulated, function(e) {
 			return d3.max(e, function(e) {
 				return e.vel.length();
 			});
@@ -388,14 +392,14 @@ function drawParticles(fileNum) {
 
 		var gridWidth = d3.min([WIDTH_SLICE, WIDTH_SLICE])/(sliceResolution);
 
-		var velLength = d3.scale.linear()
+		velLength = d3.scale.linear()
 		.range([0.5, gridWidth*15]);
 
-		var velWidth = d3.scale.linear()
+		velWidth = d3.scale.linear()
 		.range([0.5, 3]);
 
-		velLength.domain([0, maxVel]);
-		velWidth.domain([0, maxVel]);
+		velLength.domain([0, maxVelSlice]);
+		velWidth.domain([0, maxVelSlice]);
 
 
 		// add colored values for concentration
@@ -496,11 +500,23 @@ function drawParticles(fileNum) {
 		recolor3DModel();
 	}
 
+	function recolorAll() {
+		color.range(colorSplit);
+		fingerColor.range(colorSplit);
+
+		recolor3DModel();
+		recolorHeatMaps();
+		recolorFingerGraph();
+		createColorLegend();
+	}
+
+
 	/**
 	* Recolors the particle system according to the option selected.
 	*/
 	function recolor3DModel() {
 		var particleCount = data.length;
+		color.range(colorSplit);
 
 		for(var p = 0; p < particleCount; p++) {
 			particleSystem.geometry.colors[p] = new THREE.Color("#" + color(Number(data[p].concentration)));
@@ -539,6 +555,112 @@ function drawParticles(fileNum) {
 
 	}
 
+	function recolorHeatMaps() {
+		var gridWidth = d3.min([WIDTH_SLICE, WIDTH_SLICE])/(sliceResolution);
+
+		d3.selectAll(".slicePixel").remove();
+		d3.selectAll(".sliceLine").remove();
+
+		// add colored values for concentration
+		for(var i = 0; i < sliceResolution; i++) {
+			for(var j = 0; j < sliceResolution; j++) {
+				svg.append("rect")
+				.attr("class", "slicePixel")
+				.attr("width", gridWidth)
+				.attr("height", gridWidth)
+				.attr("x", (sliceAccumulated[i][j].x*gridWidth))
+				.attr("y", (sliceAccumulated[i][j].y*gridWidth))
+				.style("fill", d3.rgb("#" + color(sliceAccumulated[i][j].conc/3)));
+
+
+				svg2.append("rect")
+				.attr("class", "slicePixel")
+				.attr("width", gridWidth)
+				.attr("height", gridWidth)
+				.attr("x", (sliceAccumulated[i][j].x*gridWidth))
+				.attr("y", (sliceAccumulated[i][j].y*gridWidth))
+				.style("fill", d3.rgb("#" + color(sliceAccumulated[i][j].conc/3)))
+				.style("fill-opacity", 0.3);
+
+			}
+		}
+		// draw lines for velocity
+		for(var i = 0; i < sliceResolution; i++) {
+			for(var j = 0; j < sliceResolution; j++) {
+
+				var vecX = sliceAccumulated[i][j].vel.x < 0 ?
+				-velLength(+sliceAccumulated[i][j].vel.x) :
+				velLength(+sliceAccumulated[i][j].vel.x),
+
+				vecY = sliceAccumulated[i][j].vel.z < 0 ?
+				-velLength(+sliceAccumulated[i][j].vel.z) :
+				velLength(+sliceAccumulated[i][j].vel.z); // z <-> y here
+
+				var xCenter = (sliceAccumulated[i][j].x * gridWidth) + (gridWidth/2),
+				yCenter = (sliceAccumulated[i][j].y * gridWidth) + (gridWidth/2);
+
+				var xStart = xCenter,
+				xEnd = xCenter + vecX,
+				yStart = yCenter,
+				yEnd = yCenter + vecY;
+
+				var slope = (yEnd-yStart)/(xEnd-xStart);
+
+				var slopeInv = -1*(1/slope);
+
+				var dXSlopeInv = 1,
+				dYSlopeInv = dXSlopeInv * slopeInv,
+				dHSlopeInv = Math.sqrt(Math.pow(dXSlopeInv,2) + Math.pow(dYSlopeInv,2));
+
+				var ratio = velWidth(sliceAccumulated[i][j].vel.length()) / dHSlopeInv,
+				dXEndLine = ratio * dXSlopeInv;
+				dYEndLine = ratio * dYSlopeInv;
+
+				svg2.append("path")
+				.attr("class", "sliceLine")
+				.attr("d", "M " + (xStart-dXEndLine) + " " + (yStart-dYEndLine) +
+				" L " + (xStart+dXEndLine) + " " + (yStart+dYEndLine) +
+				" L " + xEnd + " " + yEnd + " Z")
+				.attr('stroke-linecap', 'round')
+				.style("fill", d3.rgb("#" + color(sliceAccumulated[i][j].conc/3)))
+				.style("stroke-width", velWidth(sliceAccumulated[i][j].vel.length()));
+			}
+		}
+		sliceArrow1.remove();
+		sliceArrow1 = svg.append("path")
+		.attr("class", "arrow")
+		.attr("stroke-linecap", "round")
+		.attr("d", "M " + (WIDTH_SLICE-15) + " " + (WIDTH_SLICE-10) +
+		" l " + 8 + " " + 0 +
+		" m " + 2 + " " + 0 +
+		" l " + -5 + " " + -5 +
+		" m " + -5 + " " + 5 +
+		" l " + 8 + " " + 0 +
+		" m " + 2 + " " + 0 +
+		" l " + -5 + " " + 5)
+		.style("stroke", "white")
+		.style("stroke-width", 2);
+
+		sliceArrow2.remove();
+		sliceArrow2 = svg2.append("path")
+		.attr("class", "arrow")
+		.attr("stroke-linecap", "round")
+		.attr("d", "M " + (WIDTH_SLICE-15) + " " + (WIDTH_SLICE-10) +
+		" l " + 8 + " " + 0 +
+		" m " + 2 + " " + 0 +
+		" l " + -5 + " " + -5 +
+		" m " + -5 + " " + 5 +
+		" l " + 8 + " " + 0 +
+		" m " + 2 + " " + 0 +
+		" l " + -5 + " " + 5)
+		.style("stroke", "white")
+		.style("stroke-width", 2);
+	}
+	function recolorFingerGraph() {
+		fingerColor.range(colorSplit); // update range
+		drawFingerGraph(startFile, endFile); // unfortunately this is the only way to recolor
+	}
+
 	// file reading
 	// read 1 file
 
@@ -573,9 +695,18 @@ function drawParticles(fileNum) {
 		var width = 494;
 		var height = 799;
 
+		// horribly inefficient, need to fix badly
+		d3.selectAll(".fingerPoint").remove();
+		d3.selectAll(".fingerTransition").remove();
+		d3.selectAll(".fingerFileIndicator").remove();
+		d3.selectAll(".graphSVG").remove();
+
 		var mySVG = myDiv.append("svg")
+		.attr("class", "graphSVG")
 		.attr("width", width)
 		.attr("height", height);
+
+
 
 		var numClusters = d3.max(fingersOverTime, function(el) {
 			return d3.max(el, function(el2) {
