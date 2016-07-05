@@ -1148,7 +1148,7 @@ function mouseDragRotate (){
 		isDragging = false;
 		isPanning = false;
 		// refresh the slice after the user is done dragging
-		refreshSlice();
+		if (e.which === 1) { refreshSlice(); } // only needs slice refresh on left click up
 		d3.select('#cylinder').style('cursor', 'default');
 	});
 }
