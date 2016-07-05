@@ -291,12 +291,6 @@ function drawParticles(fileNum) {
 
 	scene.remove(particleSystem);
 	scene.remove(particles);
-	delete(particleSystem);
-	delete(particles);
-
-
-
-
 
 	var particleCount = data.length, // 40th step
 	particles = new THREE.Geometry();
