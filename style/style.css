@@ -292,12 +292,13 @@ form {
 }
 
 div.tooltip {
-  color: #333;
-  background-color: #fff;
+  color: #1c2329;
+  background-color: #e0e0e0;
   padding: .5em;
-  text-shadow: #f5f5f5 0 1px 0;
-  border-radius: 2px;
-  opacity: 0.85;
+  /*text-shadow: #f5f5f5 0 1px 0;*/
+  border-radius: 1px;
+  opacity: 0.95;
   position: absolute;
+  min-width: 100px;
   /*font-family: sans-serif;*/
 }

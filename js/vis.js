@@ -89,7 +89,7 @@ populateDropdown();
 */
 var filePick = Number(d3.select('select[name="time"]').node().value);
 
-var tooltip = d3.select("#fingerGraph")
+var tooltip = d3.select("body")
 	.append("div")
 	.attr("class", "hidden tooltip");
 
@@ -983,8 +983,8 @@ function drawParticles(fileNum) {
 						});
 						tooltip.classed("hidden", false)
 							// .attr("transform", "translate(" + mouse[0] + "," + mouse[1] + ")")
-							.attr("style", "left:" +(mouse[0] - 400) + 'px; top:' + (mouse[1] - 30) + 'px')
-							.html(d.conc);
+							.attr("style", "left:" +(mouse[0] + 780) + 'px; top:' + (mouse[1] + 60) + 'px')
+							.html("ID: " + d.id + "<br>Timestep: " + d.timestep + "<br>Concentration: " + d.conc);
 					})
 					.on('mouseout', function() {
 						tooltip.classed("hidden", true);
