@@ -406,6 +406,7 @@ function drawParticles(fileNum) {
 		for(var i = 0; i < sliceResolution; i++) {
 			for(var j = 0; j < sliceResolution; j++) {
 				svg.append("rect")
+				.datum({i: i, j: j})
 				.attr("class", "slicePixel")
 				.attr("width", gridWidth)
 				.attr("height", gridWidth)
@@ -415,6 +416,7 @@ function drawParticles(fileNum) {
 
 
 				svg2.append("rect")
+				.datum({i: i, j: j})
 				.attr("class", "slicePixel")
 				.attr("width", gridWidth)
 				.attr("height", gridWidth)
@@ -458,13 +460,13 @@ function drawParticles(fileNum) {
 				dYEndLine = ratio * dYSlopeInv;
 
 				svg2.append("path")
+				.datum({i: i, j: j})
 				.attr("class", "sliceLine")
 				.attr("d", "M " + (xStart-dXEndLine) + " " + (yStart-dYEndLine) +
 				" L " + (xStart+dXEndLine) + " " + (yStart+dYEndLine) +
 				" L " + xEnd + " " + yEnd + " Z")
 				.attr('stroke-linecap', 'round')
-				.style("fill", d3.rgb("#" + color(sliceAccumulated[i][j].conc/3)))
-				.style("stroke-width", velWidth(sliceAccumulated[i][j].vel.length()));
+				.style("fill", d3.rgb("#" + color(sliceAccumulated[i][j].conc/3)));
 			}
 		}
 		sliceArrow1.remove();
@@ -571,105 +573,12 @@ function drawParticles(fileNum) {
 	* Recolors the heatmaps according to the option selected.
 	*/
 	function recolorHeatMaps() {
-		var gridWidth = d3.min([WIDTH_SLICE, WIDTH_SLICE])/(sliceResolution);
-
-		d3.selectAll(".slicePixel").remove();
-		d3.selectAll(".sliceLine").remove();
-
-		// add colored values for concentration
-		for(var i = 0; i < sliceResolution; i++) {
-			for(var j = 0; j < sliceResolution; j++) {
-				svg.append("rect")
-				.attr("class", "slicePixel")
-				.attr("width", gridWidth)
-				.attr("height", gridWidth)
-				.attr("x", (sliceAccumulated[i][j].x*gridWidth))
-				.attr("y", (sliceAccumulated[i][j].y*gridWidth))
-				.style("fill", d3.rgb("#" + color(sliceAccumulated[i][j].conc/3)));
-
-
-				svg2.append("rect")
-				.attr("class", "slicePixel")
-				.attr("width", gridWidth)
-				.attr("height", gridWidth)
-				.attr("x", (sliceAccumulated[i][j].x*gridWidth))
-				.attr("y", (sliceAccumulated[i][j].y*gridWidth))
-				.style("fill", d3.rgb("#" + color(sliceAccumulated[i][j].conc/3)))
-				.style("fill-opacity", 0.3);
-
-			}
-		}
-		// draw lines for velocity
-		for(var i = 0; i < sliceResolution; i++) {
-			for(var j = 0; j < sliceResolution; j++) {
-
-				var vecX = sliceAccumulated[i][j].vel.x < 0 ?
-				-velLength(+sliceAccumulated[i][j].vel.x) :
-				velLength(+sliceAccumulated[i][j].vel.x),
-
-				vecY = sliceAccumulated[i][j].vel.z < 0 ?
-				-velLength(+sliceAccumulated[i][j].vel.z) :
-				velLength(+sliceAccumulated[i][j].vel.z); // z <-> y here
-
-				var xCenter = (sliceAccumulated[i][j].x * gridWidth) + (gridWidth/2),
-				yCenter = (sliceAccumulated[i][j].y * gridWidth) + (gridWidth/2);
-
-				var xStart = xCenter,
-				xEnd = xCenter + vecX,
-				yStart = yCenter,
-				yEnd = yCenter + vecY;
-
-				var slope = (yEnd-yStart)/(xEnd-xStart);
-
-				var slopeInv = -1*(1/slope);
-
-				var dXSlopeInv = 1,
-				dYSlopeInv = dXSlopeInv * slopeInv,
-				dHSlopeInv = Math.sqrt(Math.pow(dXSlopeInv,2) + Math.pow(dYSlopeInv,2));
-
-				var ratio = velWidth(sliceAccumulated[i][j].vel.length()) / dHSlopeInv,
-				dXEndLine = ratio * dXSlopeInv;
-				dYEndLine = ratio * dYSlopeInv;
-
-				svg2.append("path")
-				.attr("class", "sliceLine")
-				.attr("d", "M " + (xStart-dXEndLine) + " " + (yStart-dYEndLine) +
-				" L " + (xStart+dXEndLine) + " " + (yStart+dYEndLine) +
-				" L " + xEnd + " " + yEnd + " Z")
-				.attr('stroke-linecap', 'round')
-				.style("fill", d3.rgb("#" + color(sliceAccumulated[i][j].conc/3)))
-				.style("stroke-width", velWidth(sliceAccumulated[i][j].vel.length()));
-			}
-		}
-		sliceArrow1.remove();
-		sliceArrow1 = svg.append("path")
-		.attr("class", "arrow")
-		.attr("stroke-linecap", "round")
-		.attr("d", "M " + (WIDTH_SLICE-15) + " " + (WIDTH_SLICE-10) +
-		" l " + 8 + " " + 0 +
-		" m " + 2 + " " + 0 +
-		" l " + -5 + " " + -5 +
-		" m " + -5 + " " + 5 +
-		" l " + 8 + " " + 0 +
-		" m " + 2 + " " + 0 +
-		" l " + -5 + " " + 5)
-		.style("stroke", "white")
-		.style("stroke-width", 2);
-
-		sliceArrow2.remove();
-		sliceArrow2 = svg2.append("path")
-		.attr("class", "arrow")
-		.attr("stroke-linecap", "round")
-		.attr("d", "M " + (WIDTH_SLICE-15) + " " + (WIDTH_SLICE-10) +
-		" l " + 8 + " " + 0 +
-		" m " + 2 + " " + 0 +
-		" l " + -5 + " " + -5 +
-		" m " + -5 + " " + 5 +
-		" l " + 8 + " " + 0 +
-		" m " + 2 + " " + 0 +
-		" l " + -5 + " " + 5)
-		.style("stroke", "white")
-		.style("stroke-width", 2);
+		d3.selectAll(".slicePixel").style("fill", function(d) {
+			return d3.rgb("#" + color(sliceAccumulated[d.i][d.j].conc/3));
+		});
+		d3.selectAll(".sliceLine").style("fill", function(d) {
+			return d3.rgb("#" + color(sliceAccumulated[d.i][d.j].conc/3));
+		});
 	}
 
 	/**
@@ -677,7 +586,9 @@ function drawParticles(fileNum) {
 	*/
 	function recolorFingerGraph() {
 		fingerColor.range(colorSplit); // update range
-		drawFingerGraph(startFile, endFile); // unfortunately this is the only way to recolor
+		d3.selectAll(".fingerPoint").style("fill", function(d) {
+			return fingerColor(d.conc);
+		});
 	}
 
 	// file reading
