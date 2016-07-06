@@ -7,8 +7,11 @@
 
 var folderPath = "clean.44/";
 
+var rawData = [];
 var data = [];
 var dataLength;
+
+var indexToDataIndex = new Map();
 
 var clusters = [];      // all clusters found
 var keptClusters = new Array(121);  // clusters over sizeThreshold
@@ -19,8 +22,8 @@ var minClusterConc;
 
 var mean, stddev, maxConc;
 
-var current = 36;
-var end = 44;
+var current = 12;
+var end = 22;
 
 
 readFileNumCSV(current);
@@ -28,15 +31,18 @@ readFileNumCSV(current);
 // build clusters (fingers) from graph of nodes
 function createClusters() {
   var done = false;
+  var start = new Date().getTime();
 
   clusters.push(new Array());
 
-  var ind = findLargestNotInTopOrUsed();
+  // ind = index in data array
+  // var ind = findLargestNotInTopOrUsed();
+  var ind = 0;
   var cNum = 0;
 
   if(data[ind]) {
     data[ind].inCluster = cNum;
-    clusters[cNum].push(ind);
+    clusters[cNum].push(data[ind].index);
   }
   else {
     done = true;
@@ -59,9 +65,11 @@ function createClusters() {
     nodeFoundTwice = false;
 
 
-    ind = findLargestNotInTopOrUsed();
+    // ind = findLargestNotInTopOrUsed();
+    ind++;
 
-    if(ind === -1) {
+    // if(ind === -1) {
+    if(ind >= dataLength) {
       done = true;
     }
     else {
@@ -76,7 +84,7 @@ function createClusters() {
           // current node in cluster
           clusterNode = cluster[j];
           // points adjacent to current node
-          adjNodes = data[cluster[j]].adjPoints;
+          adjNodes = data[indexToDataIndex.get(cluster[j])].adjPoints;
 
           // for all points adjacent to this node
           for(var k = 0; k < adjNodes.length; k++) {
@@ -88,7 +96,7 @@ function createClusters() {
                 firstCluster = i;
 
                 data[ind].inCluster = i;
-                cluster.push(ind);
+                cluster.push(data[ind].index);
 
                 //console.log("Added", ind, "to Cluster", i);
               } // END if(!nodeAdded
@@ -116,7 +124,7 @@ function createClusters() {
         clusters.push(new Array());
         // add this node to the new cluster
         data[ind].inCluster = newClusterInd;
-        clusters[newClusterInd].push(ind);
+        clusters[newClusterInd].push(data[ind].index);
 
         //console.log("Added", ind, "to NEW Cluster", newClusterInd);
       } // END if(!nodeAdded ...
@@ -125,7 +133,9 @@ function createClusters() {
 
   } // END while(!done ...
 
-  console.log("Done Grouping Points");
+    var end = new Date().getTime();
+    var time = end - start;
+    console.log('CLUSTERING: Execution time: ' + time + 'ms.');
   filterSortClusters(50);
 }
 
@@ -135,7 +145,7 @@ function joinClusters(indA, indB) {
     // add value to first cluster
     clusters[indA].push(clusters[indB][i]);
     // set the datas value to indicate it is in the first cluster from second
-    data[clusters[indB][i]].inCluster = indA;
+    data[indexToDataIndex.get(clusters[indB][i])].inCluster = indA;
   }
   // remove the data of the second cluster
   clusters[indB] = [];
@@ -163,6 +173,8 @@ function filterSortClusters(sizeThreshold) {
 }
 
 function findAdjPoints() {
+  var done = false;
+  var start = new Date().getTime();
   var thisPoint = new THREE.Vector3();
   var otherPoint = new THREE.Vector3();
 
@@ -177,34 +189,66 @@ function findAdjPoints() {
       console.log("Adj Found for:", consoleDisplayThreshold);
       consoleDisplayThreshold += 5000;
     }
-    for(var j = 0; j < dataLength; j++) {
+    done = false;
+
+    // one loop goes forwards until their x differs by more than maxDistance
+    for(var j = i; (j < dataLength) && !done; j++) {
+      if( +(data[j].Points0-thisPoint.x) > maxDistance){
+        done = true;
+      }
 
       otherPoint.x = data[j].Points0;
       otherPoint.y = data[j].Points1;
-      otherPoint.z = data[j].Points2;
 
-      pointDistance = thisPoint.distanceTo(otherPoint);
+      if(+(otherPoint.y-thisPoint.y) < maxDistance) {
+        otherPoint.z = data[j].Points2;
 
-      if((pointDistance < maxDistance) && (i !== j)) {
-        data[i].adjPoints.push(j);
+        pointDistance = thisPoint.distanceTo(otherPoint);
+
+        if((pointDistance < maxDistance) && (i !== j)) {
+          data[i].adjPoints.push(j);
+        }
+      }
+    }
+
+    done = false;
+    // the other goes backward until their x differs by more than maxDistance
+    for(var j = i; (j > 0) && !done; j--) {
+
+      if(+(data[j].Points0-thisPoint.x) > maxDistance){
+        done = true;
+      }
+      otherPoint.x = data[j].Points0;
+      otherPoint.y = data[j].Points1;
+      if(+(otherPoint.y-thisPoint.y) < maxDistance) {
+        otherPoint.z = data[j].Points2;
+
+        pointDistance = thisPoint.distanceTo(otherPoint);
+
+        if((pointDistance < maxDistance) && (i !== j)) {
+          data[i].adjPoints.push(j);
+        }
       }
     }
   }
 
-  console.log("Done Finding ADJ Points");
-  //console.log("Max Neighbors", d3.max(data, function(e) { return e.adjPoints.length; }));
+  var end = new Date().getTime();
+  var time = end - start;
+  console.log('ADJ POINTS: Execution time: ' + time + 'ms.');
 
   createClusters();
 }
 
 function readFileNumCSV(n) {
   data = [];
+  rawData = [];
   clusters = [];
 
   d3.csv(folderPath + ('000' + n).substr(-3) + ".csv")
-  .row(function(d) {
+  .row(function(d, i) {
 
     var el = {
+      index: i,
       concentration: Number(d.concentration),
       Points0: Number(d.Points0),
       Points1: Number(d.Points1),
@@ -213,20 +257,36 @@ function readFileNumCSV(n) {
       inCluster: -1
     };
 
-    data.push(el);
+    rawData.push(el);
   })
   .get(function(error, rows) {
   console.log(n, "read (CSV).");
 
-  maxConc = d3.max(data, function(el) {
+  maxConc = d3.max(rawData, function(el) {
     return el.concentration;
   });
 
-  mean = d3.mean(data, function (e) { return e.concentration; });
-  stddev = d3.deviation(data, function (e) { return e.concentration; });
+  mean = d3.mean(rawData, function (e) { return e.concentration; });
+  stddev = d3.deviation(rawData, function (e) { return e.concentration; });
+
+  minClusterConc = mean + (stddev/7);
+
+  for(var i = 0; i < rawData.length; i++) {
+    if(canAddPointToCluster(rawData[i])){
+      data.push(rawData[i]);
+    }
+  }
 
   dataLength = data.length;
-  minClusterConc = mean + (stddev/7);
+  // sort by x
+  data.sort(function(a, b){
+    return a.Points0 - b.Points0;
+  });
+
+  for(var i = 0; i < dataLength; i++){
+    indexToDataIndex.set(data[i].index, i);
+  }
+
 
   findAdjPoints();
 });
@@ -257,17 +317,17 @@ function findLargestNotInTopOrUsed() {
   return index;
 }
 
-function canAddPointToCluster(ind) {
+function canAddPointToCluster(point) {
   // Looks messy but I wanted to make it check the fewest amount of cases
   // instead of doing in 1 return statement.
 
-  if(data[current][ind].inCluster !== -1) {
+  if(point.inCluster !== -1) {
     return false;
   }
-  else if(data[current][ind].Points2 >= (10-topThickness)) {
+  else if(point.Points2 >= (10-topThickness)) {
       return false;
   }
-  else if(data[current][ind].concentration <= minClusterConc) {
+  else if(point.concentration <= minClusterConc) {
       return false;
   }
   else {
