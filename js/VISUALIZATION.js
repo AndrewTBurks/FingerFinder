@@ -285,6 +285,7 @@ pMaterial = new THREE.PointsMaterial({
 * @param fileNum - The number of the file.
 */
 function drawParticles(fileNum) {
+	var startTime = new Date().getTime();
 
 	var oldRotation = 0;
 	if (particleSystem) oldRotation = particleSystem.rotation.z;
@@ -328,17 +329,22 @@ function drawParticles(fileNum) {
 		particleSystem.position.setZ(1);
 		particleSystem.rotation.z = oldRotation;
 
+		var end = new Date().getTime();
+		var time = end - startTime;
+		console.log('DRAW PARTICLES: Execution time: ' + time + 'ms.');
+
 
 		// render again after particles created
 		refreshSlice();
 		// render();
-
 	}
 
 	/**
 	* Updates the slice view to match the current position and rotation.
 	*/
 	function refreshSlice() {
+		var startTime = new Date().getTime();
+
 		var currRotation = particleSystem.rotation.z;
 
 		sliced = [];
@@ -499,6 +505,10 @@ function drawParticles(fileNum) {
 		.style("stroke", "white")
 		.style("stroke-width", 2);
 
+		var end = new Date().getTime();
+		var time = end - startTime;
+		console.log('REFRESH SLICE: Execution time: ' + time + 'ms.');
+
 		recolor3DModel();
 	}
 
@@ -594,8 +604,8 @@ function drawParticles(fileNum) {
 	// file reading
 	// read 1 file
 
-	// readFileNumCSV(filePick);
-	readFileNumJSON(filePick);
+	readFileNumCSV(filePick);
+	// readFileNumJSON(filePick);
 
 	d3.json(folderPath + "allClusterCenters.json", function(err, json) {
 		fingersOverTime = json;
@@ -1047,7 +1057,7 @@ function drawParticles(fileNum) {
 	* Reads the csv file specified.
 	*/
 	function readFileNumCSV(n) {
-
+		var startTime = new Date().getTime();
 		data = [];
 
 		d3.csv(folderPath + ('000' + n).substr(-3) + ".csv")
@@ -1096,6 +1106,10 @@ function drawParticles(fileNum) {
 		clusterData = json;
 	});
 
+	var end = new Date().getTime();
+	var time = end - startTime;
+	console.log('READ CSV: Execution time: ' + time + 'ms.');
+
 	drawParticles(n);
 	render();
 	console.log("done");
@@ -1104,6 +1118,8 @@ function drawParticles(fileNum) {
 }
 
 function readFileNumJSON(n) {
+	var startTime = new Date().getTime();
+
 	d3.json(folderPath + ('000' + n).substr(-3) + ".json", function(error, json) {
 		data = json;
 
@@ -1137,9 +1153,14 @@ function readFileNumJSON(n) {
 			clusterData = json;
 		});
 
+		var end = new Date().getTime();
+		var time = end - startTime;
+		console.log('LOAD JSON: Execution time: ' + time + 'ms.');
+
 		drawParticles(n);
 		render();
 		console.log("done");
+
 	});
 
 }
@@ -1291,7 +1312,7 @@ function mouseDragRotate (){
 	});
 	/* */
 
-	$(document).on('mouseup', function(e) {
+	$(renderer.domElement).on('mouseup', function(e) {
 		isDragging = false;
 		isPanning = false;
 		// refresh the slice after the user is done dragging
@@ -1350,8 +1371,8 @@ function menuListener() {
 	});
 	d3.selectAll('select[name="time"]').on("change", function() {
 		filePick = Number(this.value);
-		// readFileNumCSV(filePick);
-		readFileNumJSON(filePick);
+		readFileNumCSV(filePick);
+		// readFileNumJSON(filePick);
 		updateFingerGraphFileLine();
 	});
 	d3.selectAll('input[name="colorScheme"]').on("change", function() {
