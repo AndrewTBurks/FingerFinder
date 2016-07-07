@@ -1189,7 +1189,11 @@ function sliderMove() {
 	var brush = d3.svg.brush()
 	.x(x)
 	.extent([0, 0])
-	.on("brush", brushed);
+	.on("brush", brushed)
+	.on("brushend", function() {
+		if (particleSystem)
+			refreshSlice();
+	});
 
 	var svgSlider = d3.select("#sliderDiv").append("svg")
 	.attr("class", "svgSlider")
