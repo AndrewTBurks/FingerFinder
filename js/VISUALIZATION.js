@@ -658,7 +658,7 @@ function drawParticles(fileNum) {
 		.append("g")
 		.call(zoom);
 
-		var myElementG = mySVG.append("g").on("click", clicked);
+		var myElementG = mySVG.append("g").on("contextmenu", clicked);
 
 
 		var numClusters = d3.max(fingersOverTime, function(el) {
@@ -986,6 +986,7 @@ function drawParticles(fileNum) {
 		}
 
 		function clicked() {
+			d3.event.preventDefault();
 			myElementG.attr("transform", "translate(" + 0 + ", " + 0 + ")");
 			zoom.translate([0,0]);
 		}
