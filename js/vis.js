@@ -14,7 +14,7 @@ var folderPath = "clean.44/";
 var numFiles = 121;
 // Range of file data available
 var startFile = 0;
-var endFile = 40;
+var endFile = 80;
 
 var data = [];
 var clusterData = [];
@@ -620,10 +620,27 @@ function drawParticles(fileNum) {
 	var prevIDs;
 
 	function drawFingerGraph(start, end) {
+
 		var myDiv = d3.select("#fingerGraph");
 		// no idea how to size this stuff
 		var width = 494;
 		var height = 799;
+
+		// var myBrush = d3.brush()
+		// 	.on("brush", function(e) {
+		// 		var selection = d3.event.selection(),
+		// 			x0 = s[0][0],
+		// 	    y0 = s[0][1],
+		// 	    dx = s[1][0] - x0,
+		// 	    dy = s[1][1] - y0;
+		//
+		// 			d3.select(".graphSVG")
+		// 				.attr("transform", null);
+		//
+		// 	});
+
+
+
 
 		// horribly inefficient, need to fix badly
 		d3.selectAll(".fingerPoint").remove();
@@ -637,15 +654,24 @@ function drawParticles(fileNum) {
 		.attr("height", height);
 
 
-
 		var numClusters = d3.max(fingersOverTime, function(el) {
 			return d3.max(el, function(el2) {
 				return el2.clusterID;
 			})
-		}) + 1;
+		}) + 20;
+
+		var clusterIDUsed = new Array(numClusters).fill(false);
+
+		for(var i = 0; i < fingersOverTime.length; i++) {
+			for(var j = 0; j < fingersOverTime[i].length; j++) {
+				clusterIDUsed[fingersOverTime[i][j].clusterID] = true;
+			}
+		}
+
+		console.log(clusterIDUsed);
 
 		xSpacing = (width/(end - start + 1));
-		var ySpacing = height/(numClusters + 1);
+		var ySpacing = Math.floor(height/(numClusters + 1));
 
 		var maxFingerConc = d3.max(fingersOverTime, function(el) {
 			return d3.max(el, function(el2) {
@@ -682,6 +708,7 @@ function drawParticles(fileNum) {
 		fingerColor.domain([minFingerConc, maxFingerConc]);
 
 		lineThickness.domain([minFingerConc, maxFingerConc]);
+		lineThickness.range([1,d3.min([xSpacing/2, ySpacing/2])-4]);
 
 		// draw background
 		mySVG.append("rect")
