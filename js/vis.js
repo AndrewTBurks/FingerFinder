@@ -14,7 +14,7 @@ var folderPath = "clean.44/";
 var numFiles = 121;
 // Range of file data available
 var startFile = 0;
-var endFile = 60;
+var endFile = 40;
 
 var data = [];
 var clusterData = [];
