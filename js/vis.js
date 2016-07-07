@@ -620,27 +620,13 @@ function drawParticles(fileNum) {
 	var prevIDs;
 
 	function drawFingerGraph(start, end) {
+		var useGraphBrush = false;
+
 
 		var myDiv = d3.select("#fingerGraph");
 		// no idea how to size this stuff
 		var width = 494;
 		var height = 799;
-
-		// var myBrush = d3.brush()
-		// 	.on("brush", function(e) {
-		// 		var selection = d3.event.selection(),
-		// 			x0 = s[0][0],
-		// 	    y0 = s[0][1],
-		// 	    dx = s[1][0] - x0,
-		// 	    dy = s[1][1] - y0;
-		//
-		// 			d3.select(".graphSVG")
-		// 				.attr("transform", null);
-		//
-		// 	});
-
-
-
 
 		// horribly inefficient, need to fix badly
 		d3.selectAll(".fingerPoint").remove();
@@ -652,6 +638,8 @@ function drawParticles(fileNum) {
 		.attr("class", "graphSVG")
 		.attr("width", width)
 		.attr("height", height);
+
+		var myElementG = mySVG.append("g");
 
 
 		var numClusters = d3.max(fingersOverTime, function(el) {
@@ -711,7 +699,7 @@ function drawParticles(fileNum) {
 		lineThickness.range([1,d3.min([xSpacing/2, ySpacing/2])-4]);
 
 		// draw background
-		mySVG.append("rect")
+		myElementG.append("rect")
 		.attr("width", "100%")
 		.attr("height", "100%")
 		.style("fill", "#0F0F0F");
@@ -719,7 +707,7 @@ function drawParticles(fileNum) {
 		// draw horizontal lines
 
 		// for(var i = 0; i < numClusters; i++){
-		// 	mySVG.append("line")
+		// 	myElementG.append("line")
 		// 		.attr("x1", 0)
 		// 		.attr("x2", width)
 		// 		.attr("y1", ySpacing/2 + ySpacing*i)
@@ -728,7 +716,7 @@ function drawParticles(fileNum) {
 		// }
 
 		// vertical line for which file is currently selected
-		mySVG.append("line")
+		myElementG.append("line")
 		.attr("class", "fingerFileIndicator")
 		.attr("x1", (xSpacing * (filePick-start)) + xSpacing/2)
 		.attr("x2", (xSpacing * (filePick-start)) + xSpacing/2)
@@ -899,7 +887,7 @@ function drawParticles(fileNum) {
 
 			for(var j = 0; j < numClusters; j++) {
 				if(nextArray[i][j] != -1) {
-					mySVG.append("line")
+					myElementG.append("line")
 						.attr("class", "fingerTransition")
 						.attr("x1", (xSpacing * (i-start)) + xSpacing/2)
 						.attr("x2", (xSpacing * (i+1-start)) + xSpacing/2)
@@ -912,7 +900,7 @@ function drawParticles(fileNum) {
 
 			for(var j = 0; j < numClusters; j++) {
 
-				mySVG.append("circle")
+				myElementG.append("circle")
 					.datum({timestep: i, id: j, conc: concArray[i][j].toFixed(2), includes: includedArray[i][j]})
 					.attr("class", "fingerPoint")
 					.attr("cy", (height - (ySpacing + (ySpacing*indexMap[j]))))
@@ -920,8 +908,7 @@ function drawParticles(fileNum) {
 					.attr("r", concArray[i][j] === 0 ? 0 : fingerSize(sizeArray[i][j]))
 					.style("fill", fingerColor(concArray[i][j]))
 					.style("stroke", "white")
-					// .on("click", function(d){ console.log(d); });
-
+					.style("stroke-width", 0.5)
 					.on('mousemove', function(d) {
 						var matrix = this.getScreenCTM()
         			.translate(+ this.getAttribute("cx"), + this.getAttribute("cy"));
@@ -934,6 +921,45 @@ function drawParticles(fileNum) {
 						tooltip.classed("hidden", true);
 					});
 			}
+		}
+
+
+		var myBrush = d3.svg.brush()
+			.x(d3.scale.identity().domain([0, width]))
+			.y(d3.scale.identity().domain([0, height]))
+			.on("brushend", function() {
+				var extent = d3.event.target.extent();
+
+				var x0 = extent[0][0],
+						y0 = extent[0][1],
+						dx = extent[1][0] - x0,
+						dy = extent[1][1] - y0,
+						cx = x0 + (dx/2),
+						cy = y0 + (dy/2);
+
+				var newScale, scaleBy, newTranslate;
+
+				if(dx === 0 && dy === 0){
+					newScale = "scale(1,1)";
+					newTranslate = "translate(0,0)";
+				}
+				else {
+					scaleBy = d3.min([(width/dx),(height/dy)]);
+					newScale = "scale("+ scaleBy + "," + scaleBy + ")";
+					newTranslate = "translate(" + ((dx/2)-cx) + "," + ((dy/2)-cy) + ")";
+
+				}
+
+				myElementG.attr("transform", newScale + newTranslate);
+				d3.select(".graphBrush").call(myBrush.clear());
+				return false;
+			});
+
+		// add brush on top
+		if(useGraphBrush){
+			var graphBrush = myElementG.append("g")
+	      .attr("class", "graphBrush")
+	      .call(myBrush);
 		}
 
 	}
