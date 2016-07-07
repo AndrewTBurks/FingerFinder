@@ -630,7 +630,10 @@ function drawParticles(fileNum) {
 	var prevIDs;
 
 	function drawFingerGraph(start, end) {
+
 		var useGraphBrush = false;
+
+		var zoomCenter = false;
 
 
 		var myDiv = d3.select("#fingerGraph");
@@ -644,10 +647,16 @@ function drawParticles(fileNum) {
 		d3.selectAll(".fingerFileIndicator").remove();
 		d3.selectAll(".graphSVG").remove();
 
+		var zoom = d3.behavior.zoom()
+		.scaleExtent([1,10])
+		.on("zoom", zoomed);
+
 		var mySVG = myDiv.append("svg")
 		.attr("class", "graphSVG")
 		.attr("width", width)
-		.attr("height", height);
+		.attr("height", height)
+		.append("g")
+		.call(zoom);
 
 		var myElementG = mySVG.append("g");
 
@@ -970,6 +979,10 @@ function drawParticles(fileNum) {
 			var graphBrush = myElementG.append("g")
 	      .attr("class", "graphBrush")
 	      .call(myBrush);
+		}
+
+		function zoomed() {
+			myElementG.attr("transform", "translate(" + d3.event.translate + ") " + "scale(" + d3.event.scale + ")");
 		}
 
 	}
