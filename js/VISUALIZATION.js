@@ -658,7 +658,7 @@ function drawParticles(fileNum) {
 		.append("g")
 		.call(zoom);
 
-		var myElementG = mySVG.append("g");
+		var myElementG = mySVG.append("g").on("click", clicked);
 
 
 		var numClusters = d3.max(fingersOverTime, function(el) {
@@ -983,6 +983,11 @@ function drawParticles(fileNum) {
 
 		function zoomed() {
 			myElementG.attr("transform", "translate(" + d3.event.translate + ") " + "scale(" + d3.event.scale + ")");
+		}
+
+		function clicked() {
+			myElementG.attr("transform", "translate(" + 0 + ", " + 0 + ")");
+			zoom.translate([0,0]);
 		}
 
 	}
