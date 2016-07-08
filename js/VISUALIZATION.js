@@ -13,8 +13,11 @@ var WIDTH_SLICE = 380;
 var folderPath = "clean.44/";
 var numFiles = 121;
 // Range of file data available
-var startFile = 60;
+var startFile = 0;
 var endFile = 80;
+
+var graphStartFile = 30,
+		graphEndFile = 50;
 
 var data = [];
 var clusterData = [];
@@ -609,8 +612,7 @@ function drawParticles(fileNum) {
 
 	d3.json(folderPath + "allClusterCenters.json", function(err, json) {
 		fingersOverTime = json;
-		drawFingerGraph(startFile, endFile);
-
+		drawFingerGraph(graphStartFile, graphEndFile);
 	});
 
 	var fingerSize = d3.scale.linear()
@@ -749,13 +751,13 @@ function drawParticles(fileNum) {
 		// vertical line for which file is currently selected
 		myElementG.append("line")
 		.attr("class", "fingerFileIndicator")
-		.attr("x1", (xSpacing * (filePick-start)) + xSpacing/2)
-		.attr("x2", (xSpacing * (filePick-start)) + xSpacing/2)
 		.attr("y1", 0)
 		.attr("y2", height)
 		.style("stroke", "white")
 		.style("stroke-width", xSpacing)
 		.style("stroke-opacity", .1);
+
+		updateFingerGraphFileLine();
 
 		console.log(xSpacing);
 
@@ -1080,9 +1082,22 @@ function drawParticles(fileNum) {
 	}
 
 	function updateFingerGraphFileLine() {
-		d3.select(".fingerFileIndicator")
-		.attr("x1", (xSpacing * (filePick-startFile)) + xSpacing/2)
-		.attr("x2", (xSpacing * (filePick-startFile)) + xSpacing/2);
+		if(filePick > graphEndFile) {
+			d3.select(".fingerFileIndicator")
+				.attr("x1", (xSpacing * (graphEndFile-graphStartFile+1.25)))
+				.attr("x2", (xSpacing * (graphEndFile-graphStartFile+1.25)));
+		}
+		else if(filePick < graphStartFile) {
+			d3.select(".fingerFileIndicator")
+				.attr("x1", (xSpacing * -.25))
+				.attr("x2", (xSpacing * -.25));
+		}
+		else {
+			d3.select(".fingerFileIndicator")
+				.attr("x1", (xSpacing * (filePick-graphStartFile)) + xSpacing/2)
+				.attr("x2", (xSpacing * (filePick-graphStartFile)) + xSpacing/2);
+		}
+
 	}
 
 	var mean, stddev, maxConc;
