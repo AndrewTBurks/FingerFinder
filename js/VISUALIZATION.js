@@ -989,6 +989,7 @@ function drawParticles(fileNum) {
 			d3.event.preventDefault();
 			myElementG.attr("transform", "translate(" + 0 + ", " + 0 + ")");
 			zoom.translate([0,0]);
+			zoom.scale([1]);
 		}
 
 	}
