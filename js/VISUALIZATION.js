@@ -934,7 +934,7 @@ function drawParticles(fileNum) {
 			for(var j = 0; j < numClustersReduced; j++) {
 
 				myElementG.append("circle")
-					.datum({timestep: i, id: j, conc: concArray[i][j].toFixed(2), includes: includedArray[i][j]})
+					.datum({timestep: i+start, id: j, conc: concArray[i][j].toFixed(2), includes: includedArray[i][j]})
 					.attr("class", "fingerPoint")
 					.attr("cy", (height - (3*ySpacing/2 + (ySpacing*indexMap[j]))))
 					.attr("cx", (xSpacing * (i)) + xSpacing/2)
