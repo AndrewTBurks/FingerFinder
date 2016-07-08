@@ -13,7 +13,7 @@ var WIDTH_SLICE = 380;
 var folderPath = "clean.44/";
 var numFiles = 121;
 // Range of file data available
-var startFile = 0;
+var startFile = 60;
 var endFile = 80;
 
 var data = [];
@@ -661,44 +661,56 @@ function drawParticles(fileNum) {
 		var myElementG = mySVG.append("g").on("contextmenu", clicked);
 
 
+		// array to use for creating graph
+		// sliced from start to end+1 (to include end)
+		var reducedArray = fingersOverTime.slice(start, end+1);
+
 		var numClusters = d3.max(fingersOverTime, function(el) {
 			return d3.max(el, function(el2) {
 				return el2.clusterID;
 			})
-		}) + 20;
+		}) + 1;
 
 		var clusterIDUsed = new Array(numClusters).fill(false);
+		var IDs = [];
 
-		for(var i = 0; i < fingersOverTime.length; i++) {
-			for(var j = 0; j < fingersOverTime[i].length; j++) {
-				clusterIDUsed[fingersOverTime[i][j].clusterID] = true;
+		for(var i = 0; i < reducedArray.length; i++) {
+			for(var j = 0; j < reducedArray[i].length; j++) {
+				if(clusterIDUsed[reducedArray[i][j].clusterID] === false) {
+					clusterIDUsed[reducedArray[i][j].clusterID] = true;
+					IDs.push(reducedArray[i][j].clusterID);
+				}
 			}
 		}
 
-		console.log(clusterIDUsed);
+		console.log(IDs);
+		var numClustersReduced = IDs.length;
+
+		console.log(reducedArray);
+		console.log(numClustersReduced);
 
 		xSpacing = (width/(end - start + 1));
-		var ySpacing = Math.floor(height/(numClusters + 1));
+		var ySpacing = Math.floor(height/(numClustersReduced + 3));
 
-		var maxFingerConc = d3.max(fingersOverTime, function(el) {
+		var maxFingerConc = d3.max(reducedArray, function(el) {
 			return d3.max(el, function(el2) {
 				return el2.concTotal;
 			})
 		});
 
-		var minFingerConc = d3.min(fingersOverTime, function(el) {
+		var minFingerConc = d3.min(reducedArray, function(el) {
 			return d3.min(el, function(el2) {
 				return el2.concTotal;
 			})
 		});
 
-		var maxFingerSize = d3.max(fingersOverTime, function(el) {
+		var maxFingerSize = d3.max(reducedArray, function(el) {
 			return d3.max(el, function(el2) {
 				return (el2.xMax - el2.xMin) + (el2.yMax - el2.yMin) + (el2.zMax - el2.zMin);
 			})
 		});
 
-		var minFingerSize = d3.min(fingersOverTime, function(el) {
+		var minFingerSize = d3.min(reducedArray, function(el) {
 			return d3.min(el, function(el2) {
 				return (el2.xMax - el2.xMin) + (el2.yMax - el2.yMin) + (el2.zMax - el2.zMin);
 			})
@@ -762,35 +774,35 @@ function drawParticles(fileNum) {
 			}
 		}
 
-		for(var i = start; i <= end; i++){
-			concArray[i] = new Array(numClusters).fill(0);
-			sizeArray[i] = new Array(numClusters).fill(0);
-			nextArray[i] = new Array(numClusters).fill(-1);
+		for(var i = 0; i < reducedArray.length; i++){
+			concArray[i] = new Array(numClustersReduced).fill(0);
+			sizeArray[i] = new Array(numClustersReduced).fill(0);
+			nextArray[i] = new Array(numClustersReduced).fill(-1);
 
-			for(var j = 0; j < fingersOverTime[i].length; j++) {
-				var thisFinger = fingersOverTime[i][j];
-				concArray[i][fingersOverTime[i][j].clusterID] += fingersOverTime[i][j].concTotal;
-				sizeArray[i][fingersOverTime[i][j].clusterID] +=
+			for(var j = 0; j < reducedArray[i].length; j++) {
+				var thisFinger = reducedArray[i][j];
+				concArray[i][reducedArray[i][j].clusterID] += reducedArray[i][j].concTotal;
+				sizeArray[i][reducedArray[i][j].clusterID] +=
 					(thisFinger.xMax - thisFinger.xMin)
 					+ (thisFinger.yMax - thisFinger.yMin)
 					+ (thisFinger.zMax - thisFinger.zMin);
 
-				includedArray[i][fingersOverTime[i][j].clusterID].push(j);
+				includedArray[i][reducedArray[i][j].clusterID].push(j);
 
-				if(nextArray[i][fingersOverTime[i][j].clusterID] === -1) { // only update if no value
+				if(nextArray[i][reducedArray[i][j].clusterID] === -1) { // only update if no value
 						// max concentration nextClusterID will be chosen as concentration is in
 						// descending order
-						nextArray[i][fingersOverTime[i][j].clusterID] = fingersOverTime[i][j].nextClusterID;
+						nextArray[i][reducedArray[i][j].clusterID] = reducedArray[i][j].nextClusterID;
 				}
 			}
 		}
 
-		maxConcAllTimesteps = new Array(numClusters).fill(0);
-		indexMap = new Array(numClusters);
+		maxConcAllTimesteps = new Array(numClustersReduced).fill(0);
+		indexMap = new Array(numClustersReduced);
 
 		// make mapping from ID to height to "sort"
-		for(var i = 0; i < numClusters; i++){
-			indexMap[i] = i;
+		for(var i = 0; i < numClustersReduced; i++){
+			indexMap[i] = IDs[i];
 		}
 
 /* ===== BALANCE THE GRAPH! ===== */
@@ -813,12 +825,12 @@ function drawParticles(fileNum) {
 
 		// find ranges
 		// and all IDs which lead into each ID
-		for(var i = start; i <= end; i++)
+		for(var i = 0; i < reducedArray.length; i++)
 		{
 			// for each timestep
-			for(var j = 0; j < fingersOverTime[i].length; j++) {
+			for(var j = 0; j < reducedArray[i].length; j++) {
 				// for each finger in the timestep
-				var thisFinger = fingersOverTime[i][j];
+				var thisFinger = reducedArray[i][j];
 
 				if(i < rangeActive[thisFinger.clusterID].earliest) {
 					// change the earliest timestep
@@ -833,8 +845,8 @@ function drawParticles(fileNum) {
 			}
 		}
 
-		for(var i = start; i <= end; i++){
-			for(var j = 0; j < numClusters; j++) {
+		for(var i = 0; i < reducedArray.length; i++){
+			for(var j = 0; j < numClustersReduced; j++) {
 				// add the finger to the list of previous
 				if(nextArray[i][j] !== -1) {
 					if(arrGetIndOfVal(prevIDs[nextArray[i][j]].values, j) === -1){
@@ -848,7 +860,7 @@ function drawParticles(fileNum) {
 		// Arrange values in each prevIDs index by the end time of the index
 		// with the sameID in the middle, earlier clusters closer to the middle
 		// later clusters to the sides
-		for(var i = 0; i < numClusters; i++) {
+		for(var i = 0; i < numClustersReduced; i++) {
 			prevIDs[i].values.sort(function(a,b) {
 				return rangeActive[b].latest - rangeActive[a].latest;
 			});
@@ -887,11 +899,11 @@ function drawParticles(fileNum) {
 		}
 		// construct map [0, ... , numClusters] -> [(more balanced graph)]
 		var mapArr = [];
-		for(var i = 0; i < fingersOverTime[end].length; i++){
-			mapArr = mapArr.concat(constructGraphMapArr(fingersOverTime[end][i].clusterID, prevIDs));
+		for(var i = 0; i < reducedArray[reducedArray.length-1].length; i++){
+			mapArr = mapArr.concat(constructGraphMapArr(reducedArray[reducedArray.length-1][i].clusterID, prevIDs));
 		}
 
-		for(var i = 0; i < numClusters; i++){
+		for(var i = 0; i < numClustersReduced; i++){
 			indexMap[i] = -1;
 		}
 
@@ -902,28 +914,30 @@ function drawParticles(fileNum) {
 			}
 		}
 
-		for(var i = start; i <= end; i++){
+		for(var i = 0; i < reducedArray.length; i++){
 
-			for(var j = 0; j < numClusters; j++) {
-				if(nextArray[i][j] != -1) {
+			for(var j = 0; j < numClustersReduced; j++) {
+				if((nextArray[i][j] != -1) &&
+				(i !== reducedArray.length-1) &&
+				indexMap[nextArray[i][j]]) {
 					myElementG.append("line")
 						.attr("class", "fingerTransition")
-						.attr("x1", (xSpacing * (i-start)) + xSpacing/2)
-						.attr("x2", (xSpacing * (i+1-start)) + xSpacing/2)
-						.attr("y1", (height - (ySpacing + (ySpacing*indexMap[j]))))
-						.attr("y2", (height - (ySpacing + (ySpacing*indexMap[nextArray[i][j]]))))
+						.attr("x1", (xSpacing * (i)) + xSpacing/2)
+						.attr("x2", (xSpacing * (i+1)) + xSpacing/2)
+						.attr("y1", (height - (3*ySpacing/2 + (ySpacing*indexMap[j]))))
+						.attr("y2", (height - (3*ySpacing/2 + (ySpacing*indexMap[nextArray[i][j]]))))
 						.style("stroke", "white")
 						.style("stroke-width", lineThickness(concArray[i][j]));
 				}
 			}
 
-			for(var j = 0; j < numClusters; j++) {
+			for(var j = 0; j < numClustersReduced; j++) {
 
 				myElementG.append("circle")
 					.datum({timestep: i, id: j, conc: concArray[i][j].toFixed(2), includes: includedArray[i][j]})
 					.attr("class", "fingerPoint")
-					.attr("cy", (height - (ySpacing + (ySpacing*indexMap[j]))))
-					.attr("cx", (xSpacing * (i-start)) + xSpacing/2)
+					.attr("cy", (height - (3*ySpacing/2 + (ySpacing*indexMap[j]))))
+					.attr("cx", (xSpacing * (i)) + xSpacing/2)
 					.attr("r", concArray[i][j] === 0 ? 0 : fingerSize(sizeArray[i][j]))
 					.style("fill", fingerColor(concArray[i][j]))
 					.style("stroke", "white")
