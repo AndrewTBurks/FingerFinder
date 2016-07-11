@@ -16,8 +16,8 @@ var numFiles = 121;
 var startFile = 0;
 var endFile = 80;
 
-var graphStartFile = 30,
-		graphEndFile = 50;
+var graphStartFile = 70,
+		graphEndFile = 80;
 
 var data = [];
 var clusterData = [];
@@ -637,6 +637,7 @@ function drawParticles(fileNum) {
 
 		var zoomCenter = false;
 
+		// update name to show timesteps in graph
 		d3.select("#fingerGraphWrapper").select("p")
 			.text("Viscous Fingers Size/Concentration Over Time (t: " + start + " to " + end + ")");
 
@@ -765,10 +766,10 @@ function drawParticles(fileNum) {
 
 		// aggregate concentrations if more than one cluster is considered
 		// to have the same index
-		var concArray = new Array(numFiles);
-		var sizeArray = new Array(numFiles);
-		var includedArray = new Array(numFiles);
-		var nextArray = new Array(numFiles);
+		var concArray = new Array(end-start+1);
+		var sizeArray = new Array(end-start+1);
+		var includedArray = new Array(end-start+1);
+		var nextArray = new Array(end-start+1);
 
 		// initialize includedArray to be full of empty arrays
 		for(var i = 0; i < numFiles; i++){
@@ -779,9 +780,9 @@ function drawParticles(fileNum) {
 		}
 
 		for(var i = 0; i < reducedArray.length; i++){
-			concArray[i] = new Array(numClustersReduced).fill(0);
-			sizeArray[i] = new Array(numClustersReduced).fill(0);
-			nextArray[i] = new Array(numClustersReduced).fill(-1);
+			concArray[i] = new Array(numClusters).fill(0);
+			sizeArray[i] = new Array(numClusters).fill(0);
+			nextArray[i] = new Array(numClusters).fill(-1);
 
 			for(var j = 0; j < reducedArray[i].length; j++) {
 				var thisFinger = reducedArray[i][j];
@@ -802,7 +803,7 @@ function drawParticles(fileNum) {
 		}
 
 		maxConcAllTimesteps = new Array(numClustersReduced).fill(0);
-		indexMap = new Array(numClustersReduced);
+		indexMap = new Array(numClusters);
 
 		// make mapping from ID to height to "sort"
 		for(var i = 0; i < numClustersReduced; i++){
@@ -850,7 +851,7 @@ function drawParticles(fileNum) {
 		}
 
 		for(var i = 0; i < reducedArray.length; i++){
-			for(var j = 0; j < numClustersReduced; j++) {
+			for(var j = 0; j < numClusters; j++) {
 				// add the finger to the list of previous
 				if(nextArray[i][j] !== -1) {
 					if(arrGetIndOfVal(prevIDs[nextArray[i][j]].values, j) === -1){
@@ -864,7 +865,7 @@ function drawParticles(fileNum) {
 		// Arrange values in each prevIDs index by the end time of the index
 		// with the sameID in the middle, earlier clusters closer to the middle
 		// later clusters to the sides
-		for(var i = 0; i < numClustersReduced; i++) {
+		for(var i = 0; i < numClusters; i++) {
 			prevIDs[i].values.sort(function(a,b) {
 				return rangeActive[b].latest - rangeActive[a].latest;
 			});
@@ -907,7 +908,7 @@ function drawParticles(fileNum) {
 			mapArr = mapArr.concat(constructGraphMapArr(reducedArray[reducedArray.length-1][i].clusterID, prevIDs));
 		}
 
-		for(var i = 0; i < numClustersReduced; i++){
+		for(var i = 0; i < numClusters; i++){
 			indexMap[i] = -1;
 		}
 
@@ -918,12 +919,15 @@ function drawParticles(fileNum) {
 			}
 		}
 
+		console.log(indexMap);
+
 		for(var i = 0; i < reducedArray.length; i++){
 
-			for(var j = 0; j < numClustersReduced; j++) {
+			for(var j = 0; j < numClusters; j++) {
 				if((nextArray[i][j] != -1) &&
-				(i !== reducedArray.length-1) &&
-				indexMap[nextArray[i][j]]) {
+				(i !== reducedArray.length-1)
+				// && indexMap[nextArray[i][j]]
+				) {
 					myElementG.append("line")
 						.attr("class", "fingerTransition")
 						.attr("x1", (xSpacing * (i)) + xSpacing/2)
@@ -935,7 +939,7 @@ function drawParticles(fileNum) {
 				}
 			}
 
-			for(var j = 0; j < numClustersReduced; j++) {
+			for(var j = 0; j < numClusters; j++) {
 
 				myElementG.append("circle")
 					.datum({timestep: i+start, id: j, conc: concArray[i][j].toFixed(2), includes: includedArray[i][j]})
