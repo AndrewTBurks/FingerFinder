@@ -1325,10 +1325,12 @@ function fingerGraphBrush() {
 
 	var x = d3.scale.linear()
 	.domain([startFile, endFile])
-	.range([width*.02, width*.98]);
+	.range([0, width]);
 
 	var xAxis = d3.svg.axis().scale(x).orient("bottom")
-	.ticks(20);
+	.ticks(5)
+	.tickPadding(10)
+	.tickSize(-height);
 
 	var brush = d3.svg.brush()
 	.x(x)
@@ -1343,8 +1345,11 @@ function fingerGraphBrush() {
 
 	context.append("g")
 	.attr("class", "x axis")
-	.attr("transform", "translate(0, " + height/2 + ")")
-	.call(xAxis);
+	.attr("transform", "translate(0, " + (height) + ")")
+	.call(xAxis)
+	.selectAll("text")
+	.attr("y", -16)
+	.attr("x", -12);
 
 	context.append("g")
 	.attr("class", "x brush")

@@ -330,12 +330,12 @@ div.tooltip {
 .axis path,
 .axis line {
   fill: none;
-  stroke: #000;
-  shape-rendering: crispEdges;
+  stroke: #e0e0e0;
 }
 
 .brush .extent {
   stroke: #fff;
-  fill-opacity: .125;
-  shape-rendering: crispEdges;
+  /*stroke-width: 2px;*/
+  fill: #fff;
+  fill-opacity: .4;
 }
