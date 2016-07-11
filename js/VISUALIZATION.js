@@ -1330,10 +1330,11 @@ function fingerGraphBrush() {
 	var xAxis = d3.svg.axis().scale(x).orient("bottom")
 	.tickValues([1, 20, 40, 60, 80, 100, 120])
 	.tickPadding(10)
-	.tickSize(-(height/2));
+	.tickSize(-(height/5));
 
 	var brush = d3.svg.brush()
 	.x(x)
+	.extent([graphStartFile, graphEndFile])
 	.on("brush", brushed)
 	.on("brushend", brushended);
 
@@ -1346,19 +1347,19 @@ function fingerGraphBrush() {
 
 	context.append("g")
 	.attr("class", "x axis")
-	.attr("transform", "translate(0, " + (height-20) + ")")
+	.attr("transform", "translate(0, " + (height) + ")")
 	.call(xAxis)
 	.selectAll("text")
-	.attr("y", 4)
+	.attr("y", -(height/2 - 10))
 	.attr("x", 0);
 
 	context.append("g")
 	.attr("class", "x axis")
-	.attr("transform", "translate(0, " + (height-20) + ")")
+	.attr("transform", "translate(0, " + (height) + ")")
 	.call(d3.svg.axis()
 		.scale(x)
 		.orient("bottom")
-		.tickSize(-height/2)
+		.tickSize(-height/5)
 		.tickFormat(function() {return null;}));
 
 
@@ -1366,7 +1367,7 @@ function fingerGraphBrush() {
 	.attr("class", "x brush")
 	.call(brush)
 	.selectAll("rect")
-	.attr("y", 30)
+	.attr("y", 50)
 	.attr("height", height/2);
 
 	function brushed() {
@@ -1392,6 +1393,9 @@ function fingerGraphBrush() {
 		.transition()
 		.call(brush.extent([begin, end]))
 		.call(brush.event);
+
+
+		drawFingerGraph(begin, end);
 	}
 
 }
