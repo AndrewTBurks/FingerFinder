@@ -637,6 +637,8 @@ function drawParticles(fileNum) {
 
 		var zoomCenter = false;
 
+		d3.select("#fingerGraphWrapper").select("p")
+			.text("Viscous Fingers Size/Concentration Over Time (t: " + start + " to " + end + ")");
 
 		var myDiv = d3.select("#fingerGraph");
 		// no idea how to size this stuff
@@ -1007,6 +1009,8 @@ function drawParticles(fileNum) {
 			zoom.translate([0,0]);
 			zoom.scale([1]);
 		}
+
+		updateFingerGraphFileLine();
 
 	}
 
