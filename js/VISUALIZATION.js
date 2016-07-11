@@ -61,7 +61,7 @@ var colorSplit = colorScheme[colorSchemeChoice].split(","); // change the number
 
 var scene = new THREE.Scene();
 var camera = new THREE.PerspectiveCamera( 75, WIDTH/HEIGHT, 0.1, 1000 );
-var renderer = new THREE.WebGLRenderer();
+var renderer = new THREE.WebGLRenderer({antialias: true});
 renderer.setClearColor(new THREE.Color("#050505")); // scene background color
 renderer.setSize(WIDTH, HEIGHT); // scene size
 var container = document.getElementById('cylinder'); // to add the scene to the correct div
