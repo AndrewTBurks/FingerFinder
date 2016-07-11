@@ -16,8 +16,8 @@ var numFiles = 121;
 var startFile = 0;
 var endFile = 80;
 
-var graphStartFile = 70,
-		graphEndFile = 80;
+var graphStartFile = 60,
+		graphEndFile = 70;
 
 var data = [];
 var clusterData = [];
@@ -688,14 +688,14 @@ function drawParticles(fileNum) {
 			}
 		}
 
-		console.log(IDs);
+		// console.log(IDs);
 		var numClustersReduced = IDs.length;
 
-		console.log(reducedArray);
-		console.log(numClustersReduced);
+		// console.log(reducedArray);
+		// console.log(numClustersReduced);
 
 		xSpacing = (width/(end - start + 1));
-		var ySpacing = Math.floor(height/(numClustersReduced + 3));
+		var ySpacing = Math.floor(height/(numClustersReduced + 1));
 
 		var maxFingerConc = d3.max(reducedArray, function(el) {
 			return d3.max(el, function(el2) {
@@ -721,8 +721,8 @@ function drawParticles(fileNum) {
 			})
 		});
 
-		console.log(maxFingerConc, minFingerConc);
-		console.log(maxFingerSize, minFingerSize);
+		// console.log(maxFingerConc, minFingerConc);
+		// console.log(maxFingerSize, minFingerSize);
 
 		fingerSize.domain([minFingerSize, maxFingerSize]);
 		fingerSize.range([2,d3.min([xSpacing/2, ySpacing/2])-1]);
@@ -732,7 +732,8 @@ function drawParticles(fileNum) {
 		fingerColor.domain([minFingerConc, maxFingerConc]);
 
 		lineThickness.domain([minFingerConc, maxFingerConc]);
-		lineThickness.range([1,d3.min([xSpacing/2, ySpacing/2])-4]);
+		// lineThickness.range([1,d3.min([xSpacing/2, ySpacing/2])-4]);
+		lineThickness.range([1, 1]);
 
 		// draw background
 		myElementG.append("rect")
@@ -762,7 +763,7 @@ function drawParticles(fileNum) {
 
 		updateFingerGraphFileLine();
 
-		console.log(xSpacing);
+		// console.log(xSpacing);
 
 		// aggregate concentrations if more than one cluster is considered
 		// to have the same index
@@ -830,12 +831,12 @@ function drawParticles(fileNum) {
 
 		// find ranges
 		// and all IDs which lead into each ID
-		for(var i = 0; i < reducedArray.length; i++)
+		for(var i = 0; i < fingersOverTime.length; i++)
 		{
 			// for each timestep
-			for(var j = 0; j < reducedArray[i].length; j++) {
+			for(var j = 0; j < fingersOverTime[i].length; j++) {
 				// for each finger in the timestep
-				var thisFinger = reducedArray[i][j];
+				var thisFinger = fingersOverTime[i][j];
 
 				if(i < rangeActive[thisFinger.clusterID].earliest) {
 					// change the earliest timestep
@@ -908,18 +909,25 @@ function drawParticles(fileNum) {
 			mapArr = mapArr.concat(constructGraphMapArr(reducedArray[reducedArray.length-1][i].clusterID, prevIDs));
 		}
 
+		var mapArrClean = []; // same as mapArr with no duplicates
+		for(var i = 0; i < mapArr.length; i++) {
+			if(mapArrClean.indexOf(mapArr[i]) === -1) {
+				mapArrClean.push(mapArr[i]);
+			}
+		}
+
 		for(var i = 0; i < numClusters; i++){
 			indexMap[i] = -1;
 		}
 
 		// create array to do mapping
-		for(var i = 0; i < mapArr.length; i++){
-			if(indexMap[mapArr[i]] === -1) {
-				indexMap[mapArr[i]] = i;
+		for(var i = 0; i < mapArrClean.length; i++){
+			if(indexMap[mapArrClean[i]] === -1) {
+				indexMap[mapArrClean[i]] = i;
 			}
 		}
 
-		console.log(indexMap);
+		// console.log(indexMap);
 
 		for(var i = 0; i < reducedArray.length; i++){
 
