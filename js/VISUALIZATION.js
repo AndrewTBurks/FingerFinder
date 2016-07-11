@@ -14,7 +14,7 @@ var folderPath = "clean.44/";
 var numFiles = 121;
 // Range of file data available
 var startFile = 1;
-var endFile = 80;
+var endFile = 120;
 
 var graphStartFile = 70,
 		graphEndFile = 80;
@@ -1320,21 +1320,22 @@ function sliderMove() {
 }
 
 function fingerGraphBrush() {
-	var width = 494;
+	var width = 500;
 	var height = 100;
 
 	var x = d3.scale.linear()
 	.domain([startFile, endFile])
-	.range([0, width]);
+	.range([30, (width-30)]);
 
 	var xAxis = d3.svg.axis().scale(x).orient("bottom")
-	.ticks(5)
+	.tickValues([1, 20, 40, 60, 80, 100, 120])
 	.tickPadding(10)
-	.tickSize(-height);
+	.tickSize(-(height/2));
 
 	var brush = d3.svg.brush()
 	.x(x)
-	.on("brush", brushed);
+	.on("brush", brushed)
+	.on("brushend", brushended);
 
 	var svg = d3.select("#graphBrush").append("svg")
 	.attr("width", width)
@@ -1345,21 +1346,52 @@ function fingerGraphBrush() {
 
 	context.append("g")
 	.attr("class", "x axis")
-	.attr("transform", "translate(0, " + (height) + ")")
+	.attr("transform", "translate(0, " + (height-20) + ")")
 	.call(xAxis)
 	.selectAll("text")
-	.attr("y", -16)
-	.attr("x", -12);
+	.attr("y", 4)
+	.attr("x", 0);
+
+	context.append("g")
+	.attr("class", "x axis")
+	.attr("transform", "translate(0, " + (height-20) + ")")
+	.call(d3.svg.axis()
+		.scale(x)
+		.orient("bottom")
+		.tickSize(-height/2)
+		.tickFormat(function() {return null;}));
+
 
 	context.append("g")
 	.attr("class", "x brush")
 	.call(brush)
 	.selectAll("rect")
-	.attr("y", -6)
-	.attr("height", height + 7);
+	.attr("y", 30)
+	.attr("height", height/2);
 
 	function brushed() {
-		x.domain(brush.extent());
+		// x.domain(brush.extent());
+	}
+
+	function brushended() {
+		if (!d3.event.sourceEvent) {
+			return;
+		}
+
+		var begin = Math.round((brush.extent()[0])/10)*10,
+		end = Math.round((brush.extent()[1])/10)*10;
+		console.log(begin);
+		brush.extent([begin, end]);
+
+		d3.select(this)
+		.transition()
+		.duration(0)
+		.call(brush.event);
+
+		d3.select(this)
+		.transition()
+		.call(brush.extent([begin, end]))
+		.call(brush.event);
 	}
 
 }

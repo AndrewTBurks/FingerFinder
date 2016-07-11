@@ -236,7 +236,7 @@ form {
   max-width: 500px;
   position: absolute;
   bottom: 0;
-  border: solid 3px #e0e0e0;
+  /*border-top: solid 1px #e0e0e0;*/
 }
 
 #slice {
@@ -299,13 +299,6 @@ form {
   cursor: ew-resize !important;
 }
 
-.graphBrush .extent {
-  fill-opacity: .1;
-  fill: white;
-  stroke: #fff;
-  /*shape-rendering: crispEdges;*/
-}
-
 .hidden {
   display: none;
 }
@@ -331,6 +324,7 @@ div.tooltip {
 .axis line {
   fill: none;
   stroke: #e0e0e0;
+  stroke-width: 2px;
 }
 
 .brush .extent {
