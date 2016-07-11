@@ -1421,7 +1421,7 @@ function populateDropdown() {
 	var timeArray = [];
 	d3.csv(folderPath + "timesteps.csv")
 	.row(function(d) {
-		timeArray.push(d.time);
+		timeArray.push(((Number(d.time)).toFixed(2)).toString());
 	})
 	.get(function(error, rows) {
 		var select = document.getElementById("timeDropdown");
@@ -1430,7 +1430,7 @@ function populateDropdown() {
 		for(i = startFile; i <= endFile; i++) {
 			var opt = i.toString();
 			var el = document.createElement("option");
-			el.textContent = opt + " (" + timeArray[i] + ")";
+			el.textContent = ("000" + opt).substr(-3) + " (" + timeArray[i] + ")";
 			el.value = opt;
 			select.appendChild(el);
 		}
