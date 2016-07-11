@@ -1320,53 +1320,43 @@ function sliderMove() {
 }
 
 function fingerGraphBrush() {
+	var width = 494;
+	var height = 100;
 
-	// var width = 494;
-	// var height = 80;
-	//
-	// var x= d3.scale.linear()
-	// .domain([startFile, endFile])
-	// .range([0, width]);
-	//
-	// var xAxis = d3.svg.axis()
-	// .scale(x)
-	// .orient("bottom")
-	// .ticks(10)
-	// .tickPadding(0);
-	//
-	// var brush = d3.svg.brush()
-	// .x(x)
-	// .extent([0, 0], [width, height])
-	// .on("brush", brushed);
-	//
-	// var svgBrush = d3.select("#graphBrush").append("svg")
-	// .attr("width", width)
-	// .attr("height", height);
-	//
-	// svgBrush.append("g")
-  //   .attr("class", "axis axis--grid")
-  //   .attr("transform", "translate(0," + height + ")")
-  //   .call(d3.svg.axis()
-	// 			.scale(x)
-  //       .ticks(20)
-  //       .tickSize(-height)
-  //       .tickFormat(function() { return null; }));
-	//
-	// svgBrush.append("g")
-	// .attr("class", "axis axis--x")
-	// .attr("transform", "translate(0, " + height / 2 + ")")
-	// .call(xAxis)
-	// .attr("text-anchor", null);
-	// // .selectAll("text")
-	// // .attr("x", 6);
-	//
-	// svgBrush.append("g")
-	// .attr("class", "brush")
-	// .call(brush);
-	//
-	// function brushed() {
-	// 	x.domain(brush.extent());
-	// }
+	var x = d3.scale.linear()
+	.domain([startFile, endFile])
+	.range([width*.02, width*.98]);
+
+	var xAxis = d3.svg.axis().scale(x).orient("bottom")
+	.ticks(20);
+
+	var brush = d3.svg.brush()
+	.x(x)
+	.on("brush", brushed);
+
+	var svg = d3.select("#graphBrush").append("svg")
+	.attr("width", width)
+	.attr("height", height);
+
+	var context = svg.append("g")
+	.attr("class", "context");
+
+	context.append("g")
+	.attr("class", "x axis")
+	.attr("transform", "translate(0, " + height/2 + ")")
+	.call(xAxis);
+
+	context.append("g")
+	.attr("class", "x brush")
+	.call(brush)
+	.selectAll("rect")
+	.attr("y", -6)
+	.attr("height", height + 7);
+
+	function brushed() {
+		x.domain(brush.extent());
+	}
+
 }
 
 // mouse and keyboard control funtions

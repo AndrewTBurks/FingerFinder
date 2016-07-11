@@ -322,16 +322,20 @@ div.tooltip {
   /*font-family: sans-serif;*/
 }
 
-.axis--grid .domain {
-  fill: #ddd;
-  stroke: none;
+.area {
+  fill: steelblue;
+  clip-path: url(#clip);
 }
 
-.axis--x .domain,
-.axis--grid .tick line {
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+.brush .extent {
   stroke: #fff;
-}
-
-.axis--grid .tick--minor line {
-  stroke-opacity: .5;
+  fill-opacity: .125;
+  shape-rendering: crispEdges;
 }
