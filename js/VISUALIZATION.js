@@ -85,6 +85,7 @@ mouseWheelZoom();
 sliderMove();
 menuListener();
 populateDropdown();
+fingerGraphBrush();
 
 /**
 * Used to choose which file will be load into the visualization.
@@ -644,7 +645,7 @@ function drawParticles(fileNum) {
 		var myDiv = d3.select("#fingerGraph");
 		// no idea how to size this stuff
 		var width = 494;
-		var height = 799;
+		var height = 680;
 
 		// horribly inefficient, need to fix badly
 		d3.selectAll(".fingerPoint").remove();
@@ -1316,6 +1317,56 @@ function sliderMove() {
 		sliceGroup.position.setY(value);
 	}
 
+}
+
+function fingerGraphBrush() {
+
+	// var width = 494;
+	// var height = 80;
+	//
+	// var x= d3.scale.linear()
+	// .domain([startFile, endFile])
+	// .range([0, width]);
+	//
+	// var xAxis = d3.svg.axis()
+	// .scale(x)
+	// .orient("bottom")
+	// .ticks(10)
+	// .tickPadding(0);
+	//
+	// var brush = d3.svg.brush()
+	// .x(x)
+	// .extent([0, 0], [width, height])
+	// .on("brush", brushed);
+	//
+	// var svgBrush = d3.select("#graphBrush").append("svg")
+	// .attr("width", width)
+	// .attr("height", height);
+	//
+	// svgBrush.append("g")
+  //   .attr("class", "axis axis--grid")
+  //   .attr("transform", "translate(0," + height + ")")
+  //   .call(d3.svg.axis()
+	// 			.scale(x)
+  //       .ticks(20)
+  //       .tickSize(-height)
+  //       .tickFormat(function() { return null; }));
+	//
+	// svgBrush.append("g")
+	// .attr("class", "axis axis--x")
+	// .attr("transform", "translate(0, " + height / 2 + ")")
+	// .call(xAxis)
+	// .attr("text-anchor", null);
+	// // .selectAll("text")
+	// // .attr("x", 6);
+	//
+	// svgBrush.append("g")
+	// .attr("class", "brush")
+	// .call(brush);
+	//
+	// function brushed() {
+	// 	x.domain(brush.extent());
+	// }
 }
 
 // mouse and keyboard control funtions

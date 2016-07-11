@@ -231,6 +231,14 @@ form {
   /*margin: auto;*/
 }
 
+#graphBrush {
+  width: 100%;
+  max-width: 500px;
+  position: absolute;
+  bottom: 0;
+  border: solid 3px #e0e0e0;
+}
+
 #slice {
   max-width: 500px;
   max-height: 606px;
@@ -312,4 +320,18 @@ div.tooltip {
   position: absolute;
   min-width: 100px;
   /*font-family: sans-serif;*/
+}
+
+.axis--grid .domain {
+  fill: #ddd;
+  stroke: none;
+}
+
+.axis--x .domain,
+.axis--grid .tick line {
+  stroke: #fff;
+}
+
+.axis--grid .tick--minor line {
+  stroke-opacity: .5;
 }
