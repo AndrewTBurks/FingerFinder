@@ -13,11 +13,11 @@ var WIDTH_SLICE = 380;
 var folderPath = "clean.44/";
 var numFiles = 121;
 // Range of file data available
-var startFile = 0;
+var startFile = 1;
 var endFile = 80;
 
-var graphStartFile = 60,
-		graphEndFile = 70;
+var graphStartFile = 70,
+		graphEndFile = 80;
 
 var data = [];
 var clusterData = [];
@@ -607,7 +607,7 @@ function drawParticles(fileNum) {
 	// file reading
 	// read 1 file
 
-	readFileNumCSV(filePick);
+
 	// readFileNumJSON(filePick);
 
 	d3.json(folderPath + "allClusterCenters.json", function(err, json) {
@@ -1418,16 +1418,25 @@ function keyboardListener() {
 }
 
 function populateDropdown() {
-	var select = document.getElementById("timeDropdown");
-	// var first = 23, last = 45;
-	var i;
-	for(i = startFile; i <= endFile; i++) {
-		var opt = i.toString();
-		var el = document.createElement("option");
-		el.textContent = opt;
-		el.value = opt;
-		select.appendChild(el);
-	}
+	var timeArray = [];
+	d3.csv(folderPath + "timesteps.csv")
+	.row(function(d) {
+		timeArray.push(d.time);
+	})
+	.get(function(error, rows) {
+		var select = document.getElementById("timeDropdown");
+		// var first = 23, last = 45;
+		var i;
+		for(i = startFile; i <= endFile; i++) {
+			var opt = i.toString();
+			var el = document.createElement("option");
+			el.textContent = opt + " (" + timeArray[i] + ")";
+			el.value = opt;
+			select.appendChild(el);
+		}
+		filePick = startFile;
+		readFileNumCSV(filePick);
+	});
 }
 
 /**

@@ -177,8 +177,8 @@ form {
   padding: 0;
   margin-bottom: 2px;
   padding-bottom: 2px;
-} #menu select {
-  width: 60px;
+} #menu select, option {
+  width: __;
 } #menu input {
   margin: 0;
   padding: 0;
@@ -189,6 +189,10 @@ form {
   /*text-align: center;*/
   padding-left: 5px;
 }
+
+/*#timeDropdown {
+  width: 150px;
+}*/
 
 #legend {
   max-width: 456px;
