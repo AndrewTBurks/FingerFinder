@@ -16,8 +16,8 @@ var numFiles = 121;
 var startFile = 1;
 var endFile = 120;
 
-var graphStartFile = 70,
-		graphEndFile = 80;
+var graphStartFile = 10,
+		graphEndFile = 40;
 
 var data = [];
 var clusterData = [];
@@ -583,6 +583,26 @@ function drawParticles(fileNum) {
 
 	}
 
+	function highlightViscousFinger(timestep, clusterIndices) {
+		console.log("Highlighting", timestep, clusterIndices);
+		// desaturate all points
+		for(var p = 0; p < data.length; p++) {
+			particleSystem.geometry.colors[p] = new THREE.Color("#" + color(Number(data[p].concentration)));
+
+			var oldHSL = particleSystem.geometry.colors[p].getHSL();
+			particleSystem.geometry.colors[p].setHSL(oldHSL.h, .05, oldHSL.l);
+		}
+
+		for(var i = 0; i < clusterIndices.length; i++) {
+			var thisCluster = clusterData[timestep][clusterIndices[i]];
+			for(var j = 0; j < thisCluster.length; j++) {
+				particleSystem.geometry.colors[thisCluster[j]] = new THREE.Color("#" + color(Number(data[thisCluster[j]].concentration)));
+			}
+		}
+
+		particleSystem.geometry.colorsNeedUpdate = true;
+	}
+
 	/**
 	* Recolors the heatmaps according to the option selected.
 	*/
@@ -689,7 +709,7 @@ function drawParticles(fileNum) {
 			}
 		}
 
-		// console.log(IDs);
+		console.log("Number of IDs", IDs.length);
 		var numClustersReduced = IDs.length;
 
 		// console.log(reducedArray);
@@ -803,6 +823,8 @@ function drawParticles(fileNum) {
 				}
 			}
 		}
+
+		console.log(includedArray);
 
 		maxConcAllTimesteps = new Array(numClustersReduced).fill(0);
 		indexMap = new Array(numClusters);
@@ -959,6 +981,11 @@ function drawParticles(fileNum) {
 					.style("fill", fingerColor(concArray[i][j]))
 					.style("stroke", "white")
 					.style("stroke-width", 0.5)
+					.on('click', function(d) {
+						if(filePick === d.timestep) { // if the current file shown is the same as this point
+							highlightViscousFinger(d.timestep, d.includes);
+						}
+					})
 					.on('mousemove', function(d) {
 						var matrix = this.getScreenCTM()
         			.translate(+ this.getAttribute("cx"), + this.getAttribute("cy"));
@@ -1038,30 +1065,6 @@ function drawParticles(fileNum) {
 		return -1;
 	}
 
-	/*
-	// arr MUST BE IN THE SAME FORMAT AS prevIDs FROM drawFingerGraph()
-	// IN THE FORM [[],[],...] WHERE THE INNER ARRAYS HAVE VALUES WHICH
-	// CORRESPOND TO THE OTHER IDs CONNECTED AT ANY POINT TO THE ID AT THAT
-	// INDEX, ALSO CONTAINING ITS OWN ID.
-	function getSubtreeWidths(arr) {
-		var totalWidth;
-		for(var i = 0; i < arr.length; i++) {
-			if(arr[i].subSize === -1) {
-				// if the subtree width is not yet known
-				getSubtreeWidthsREC(arr, i);
-			}
-		}
-	}
-
-	// RECURSIVE HELPER METHOD - used since graph isn't rooted
-	function getSubtreeWidthsREC(arr, index) {
-		var totalWidth = 1; // starts with self
-		for(var i = 0; i < arr[index].values.length; i++) {
-
-		}
-	}
-	USING OTHER METHOD */
-
 	// USE FOR EACH NODE IN THE LAST TIMESTEP, THEN CONCATENATE IN A NICE ORDER
 	function constructGraphMapArr(index, prevIDs) {
 		// console.log("construchGraphMapArr(", index); //debug
@@ -1070,11 +1073,11 @@ function drawParticles(fileNum) {
 		var nextArr = [];
 		var insertInto = 0; // 0-previous, 1-next
 
-		if(prevIDs[index].values.length === 1){ // base case, has no prev besides itself
+		if(prevIDs[index].values.length === 1) { // base case, has no prev besides itself
 			// console.log("Index:",index,"Returning:",[index]); // debug
 			return [index];
 		}
-		else if(prevIDs[index].fullSubArr.length != 0){ // if already calculated (shouldnt ever be though)
+		else if(prevIDs[index].fullSubArr.length > 0) { // if already calculated (shouldnt ever be though)
 			// console.log("Index:",index,"Returning:",prevIDs[index].fullSubArr); // debug
 			return prevIDs[index].fullSubArr;
 		}
