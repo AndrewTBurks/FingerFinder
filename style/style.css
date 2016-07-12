@@ -27,7 +27,7 @@ h1 {
 }
 
 #canvas {
-  width: 456px;
+  width: 450px;
   height: 25px;
   /*border: solid 3px #e0e0e0;*/
   position: relative;
@@ -195,7 +195,7 @@ form {
 }*/
 
 #legend {
-  max-width: 456px;
+  max-width: 450px;
   /*display: inline-block;
   vertical-align: bottom;*/
   position: absolute;
