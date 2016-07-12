@@ -22,6 +22,7 @@ var graphStartFile = 10,
 var data = [];
 var clusterData = [];
 var fingersOverTime;
+var currSelectedNode = {timestep: -1, ID: -1};
 
 var keyboard = new THREEx.KeyboardState();
 var sliceWidth;
@@ -585,6 +586,7 @@ function drawParticles(fileNum) {
 
 	function highlightViscousFinger(timestep, clusterIndices) {
 		// desaturate all points
+		console.log("Highlighting");
 		for(var p = 0; p < data.length; p++) {
 			particleSystem.geometry.colors[p] = new THREE.Color("#" + color(Number(data[p].concentration)));
 
@@ -978,9 +980,26 @@ function drawParticles(fileNum) {
 					.style("fill", fingerColor(concArray[i][j]))
 					.style("stroke", "white")
 					.style("stroke-width", 0.5)
-					.on('click', function(d) {
+					.on('mouseup', function(d) {
 						if(filePick === d.timestep) { // if the current file shown is the same as this point
-							highlightViscousFinger(d.timestep, d.includes);
+							if(currSelectedNode.timestep != d.timestep || currSelectedNode.ID != d.id) {
+								// highlight new node
+								highlightViscousFinger(d.timestep, d.includes);
+								currSelectedNode.timestep = d.timestep;
+								currSelectedNode.ID = d.id;
+								d3.select(this)
+									.style("stroke-width", 3)
+									.style("stroke", colorSplit[colorSplit.length-1]);
+							}
+							else {
+								// put back to normal colors
+								recolor3DModel();
+								currSelectedNode.timestep = -1;
+								currSelectedNode.ID = -1;
+								d3.select(this)
+									.style("stroke-width", 0.5)
+									.style("stroke", "white");
+							}
 						}
 					})
 					.on('mousemove', function(d) {
