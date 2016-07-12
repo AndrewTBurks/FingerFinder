@@ -231,6 +231,11 @@ form {
   /*margin: auto;*/
 }
 
+#graphBrushWrapper {
+  width: 100%;
+  max-width: 500px;
+}
+
 #graphBrush {
   width: 100%;
   max-width: 500px;
@@ -331,5 +336,5 @@ div.tooltip {
   stroke: #fff;
   /*stroke-width: 2px;*/
   fill: #fff;
-  fill-opacity: .4;
+  fill-opacity: .25;
 }

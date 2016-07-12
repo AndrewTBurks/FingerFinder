@@ -645,7 +645,7 @@ function drawParticles(fileNum) {
 		var myDiv = d3.select("#fingerGraph");
 		// no idea how to size this stuff
 		var width = 494;
-		var height = 680;
+		var height = 700;
 
 		// horribly inefficient, need to fix badly
 		d3.selectAll(".fingerPoint").remove();
@@ -1324,11 +1324,11 @@ function fingerGraphBrush() {
 	var height = 100;
 
 	var x = d3.scale.linear()
-	.domain([startFile, endFile])
+	.domain([0, endFile])
 	.range([30, (width-30)]);
 
 	var xAxis = d3.svg.axis().scale(x).orient("bottom")
-	.tickValues([1, 20, 40, 60, 80, 100, 120])
+	.tickValues([0, 20, 40, 60, 80, 100, 120])
 	.tickPadding(10)
 	.tickSize(-(height/5));
 
@@ -1371,7 +1371,11 @@ function fingerGraphBrush() {
 	.attr("height", height/2);
 
 	function brushed() {
-		// x.domain(brush.extent());
+		var size = d3.event.target.extent()
+		if ((size[1] - size[0]) > 30) {
+			d3.event.target.extent([size[0], size[0] + 30]);
+			d3.event.target(d3.select(this));
+		}
 	}
 
 	function brushended() {
@@ -1394,8 +1398,10 @@ function fingerGraphBrush() {
 		.call(brush.extent([begin, end]))
 		.call(brush.event);
 
+		graphStartFile = begin;
+		graphEndFile = end;
 
-		drawFingerGraph(begin, end);
+		drawFingerGraph(graphStartFile, graphEndFile);
 	}
 
 }
