@@ -584,7 +584,6 @@ function drawParticles(fileNum) {
 	}
 
 	function highlightViscousFinger(timestep, clusterIndices) {
-		console.log("Highlighting", timestep, clusterIndices);
 		// desaturate all points
 		for(var p = 0; p < data.length; p++) {
 			particleSystem.geometry.colors[p] = new THREE.Color("#" + color(Number(data[p].concentration)));
@@ -823,8 +822,6 @@ function drawParticles(fileNum) {
 				}
 			}
 		}
-
-		console.log(includedArray);
 
 		maxConcAllTimesteps = new Array(numClustersReduced).fill(0);
 		indexMap = new Array(numClusters);
