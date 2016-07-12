@@ -987,6 +987,9 @@ function drawParticles(fileNum) {
 								highlightViscousFinger(d.timestep, d.includes);
 								currSelectedNode.timestep = d.timestep;
 								currSelectedNode.ID = d.id;
+								d3.selectAll("circle")
+									.style("stroke-width", 0.5)
+									.style("stroke", "white");
 								d3.select(this)
 									.style("stroke-width", 3)
 									.style("stroke", colorSplit[colorSplit.length-1]);
