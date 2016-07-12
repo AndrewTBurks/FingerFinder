@@ -29,7 +29,7 @@ h1 {
 #canvas {
   width: 456px;
   height: 25px;
-  border: solid 3px #e0e0e0;
+  /*border: solid 3px #e0e0e0;*/
   position: relative;
   display: inline-block;
   vertical-align: bottom;
@@ -165,9 +165,9 @@ form {
 #menu {
   background-color: #e0e0e0;
   width: 225px;
-  height: 824px;
+  height: 804.5px;
   border: solid #e0e0e0 3px;
-  border-radius: 1px;
+  /*border-radius: 1px;*/
   padding-top: 0;
   margin-top: 0;
   position: absolute;
@@ -213,8 +213,8 @@ form {
 #cylinder {
   max-width: 500px;
   max-height: 1000px;
-  border: solid #e0e0e0 3px;
-  border-radius: 1px;
+  /*border: solid #e0e0e0 3px;*/
+  /*border-radius: 1px;*/
   display: inline-block;
   vertical-align: top;
   margin: auto;
@@ -224,8 +224,8 @@ form {
   width: 100%;
   max-width: 500px;
   max-height: 1000px;
-  border: solid #e0e0e0 3px;
-  border-radius: 1px;
+  /*border: solid #e0e0e0 3px;*/
+  /*border-radius: 1px;*/
   display: inline-block;
   vertical-align: top;
   /*margin: auto;*/
@@ -247,8 +247,8 @@ form {
 #slice {
   max-width: 500px;
   max-height: 606px;
-  border: solid #e0e0e0 3px;
-  border-radius: 1px;
+  /*border: solid #e0e0e0 3px;*/
+  /*border-radius: 1px;*/
   position: relative;
   display: inline-block;
   vertical-align: top;
@@ -257,8 +257,8 @@ form {
 #slice2 {
   max-width: 500px;
   max-height: 606px;
-  border: solid #e0e0e0 3px;
-  border-radius: 1px;
+  /*border: solid #e0e0e0 3px;*/
+  /*border-radius: 1px;*/
   /*display: inline-block;*/
   /*display: table-cell;*/
   position: absolute;
