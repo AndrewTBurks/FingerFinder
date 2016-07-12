@@ -1064,21 +1064,17 @@ function drawParticles(fileNum) {
 
 	// USE FOR EACH NODE IN THE LAST TIMESTEP, THEN CONCATENATE IN A NICE ORDER
 	function constructGraphMapArr(index, prevIDs) {
-		// console.log("construchGraphMapArr(", index); //debug
 
 		var previousArr = [];
 		var nextArr = [];
 		var insertInto = 0; // 0-previous, 1-next
 
 		if(prevIDs[index].values.length === 1) { // base case, has no prev besides itself
-			// console.log("Index:",index,"Returning:",[index]); // debug
 			return [index];
 		}
-		else if(prevIDs[index].fullSubArr.length > 0) { // if already calculated (shouldnt ever be though)
-			// console.log("Index:",index,"Returning:",prevIDs[index].fullSubArr); // debug
-			return prevIDs[index].fullSubArr;
-		}
-		else {
+		else if(prevIDs[index].fullSubArr.length === 0) { // the array is not calculated yet
+
+			// loop through and calculate array
 			for(var i = 0; i < prevIDs[index].values.length; i++) {
 				if(prevIDs[index].values[i] === index) {
 					insertInto = 1;
@@ -1093,9 +1089,12 @@ function drawParticles(fileNum) {
 				}
 			}
 			prevIDs[index].fullSubArr = previousArr.concat([index], nextArr);
-			// console.log("Index:",index,"Returning:",prevIDs[index].fullSubArr); // debug
-			return prevIDs[index].fullSubArr;
+
 		}
+
+		// return that SubArr
+		return prevIDs[index].fullSubArr;
+
 	}
 
 	function updateFingerGraphFileLine() {
