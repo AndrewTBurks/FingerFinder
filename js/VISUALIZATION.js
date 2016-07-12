@@ -22,7 +22,7 @@ var graphStartFile = 10,
 var data = [];
 var clusterData = [];
 var fingersOverTime;
-var currSelectedNode = {timestep: -1, ID: -1};
+var currSelectedNode = {timestep: -1, ID: -1, includes: []};
 
 var keyboard = new THREEx.KeyboardState();
 var sliceWidth;
@@ -584,24 +584,26 @@ function drawParticles(fileNum) {
 
 	}
 
-	function highlightViscousFinger(timestep, clusterIndices) {
+	function highlightViscousFinger() {
 		// desaturate all points
-		console.log("Highlighting");
-		for(var p = 0; p < data.length; p++) {
-			particleSystem.geometry.colors[p] = new THREE.Color("#" + color(Number(data[p].concentration)));
+		if(currSelectedNode.timestep != -1){
+			console.log("Highlighting");
+			for(var p = 0; p < data.length; p++) {
+				particleSystem.geometry.colors[p] = new THREE.Color("#" + color(Number(data[p].concentration)));
 
-			var oldHSL = particleSystem.geometry.colors[p].getHSL();
-			particleSystem.geometry.colors[p].setHSL(oldHSL.h, .05, oldHSL.l);
-		}
-
-		for(var i = 0; i < clusterIndices.length; i++) {
-			var thisCluster = clusterData[timestep][clusterIndices[i]];
-			for(var j = 0; j < thisCluster.length; j++) {
-				particleSystem.geometry.colors[thisCluster[j]] = new THREE.Color("#" + color(Number(data[thisCluster[j]].concentration)));
+				var oldHSL = particleSystem.geometry.colors[p].getHSL();
+				particleSystem.geometry.colors[p].setHSL(oldHSL.h, .05, oldHSL.l);
 			}
-		}
 
-		particleSystem.geometry.colorsNeedUpdate = true;
+			for(var i = 0; i < currSelectedNode.includes.length; i++) {
+				var thisCluster = clusterData[currSelectedNode.timestep][currSelectedNode.includes[i]];
+				for(var j = 0; j < thisCluster.length; j++) {
+					particleSystem.geometry.colors[thisCluster[j]] = new THREE.Color("#" + color(Number(data[thisCluster[j]].concentration)));
+				}
+			}
+
+			particleSystem.geometry.colorsNeedUpdate = true;
+		}
 	}
 
 	/**
@@ -981,12 +983,36 @@ function drawParticles(fileNum) {
 					.style("stroke", "white")
 					.style("stroke-width", 0.5)
 					.on('mouseup', function(d) {
-						if(filePick === d.timestep) { // if the current file shown is the same as this point
+
+						if(filePick != d.timestep){
+							readFileNumCSV(d.timestep);
+							// updateFingerGraphFileLine();
+							filePick = d.timestep;
+
 							if(currSelectedNode.timestep != d.timestep || currSelectedNode.ID != d.id) {
 								// highlight new node
-								highlightViscousFinger(d.timestep, d.includes);
 								currSelectedNode.timestep = d.timestep;
 								currSelectedNode.ID = d.id;
+								currSelectedNode.includes = d.includes;
+
+								// highlightViscousFinger();
+								d3.selectAll("circle")
+									.style("stroke-width", 0.5)
+									.style("stroke", "white");
+								d3.select(this)
+									.style("stroke-width", 3)
+									.style("stroke", colorSplit[colorSplit.length-1]);
+							}
+
+						}
+						else {
+							if(currSelectedNode.timestep != d.timestep || currSelectedNode.ID != d.id) {
+								// highlight new node
+								currSelectedNode.timestep = d.timestep;
+								currSelectedNode.ID = d.id;
+								currSelectedNode.includes = d.includes;
+
+								highlightViscousFinger();
 								d3.selectAll("circle")
 									.style("stroke-width", 0.5)
 									.style("stroke", "white");
@@ -999,11 +1025,17 @@ function drawParticles(fileNum) {
 								recolor3DModel();
 								currSelectedNode.timestep = -1;
 								currSelectedNode.ID = -1;
+								currSelectedNode.includes = [];
 								d3.select(this)
 									.style("stroke-width", 0.5)
 									.style("stroke", "white");
 							}
 						}
+
+
+
+
+
 					})
 					.on('mousemove', function(d) {
 						var matrix = this.getScreenCTM()
@@ -1199,6 +1231,8 @@ function drawParticles(fileNum) {
 
 	drawParticles(n);
 	render();
+	updateFingerGraphFileLine();
+	highlightViscousFinger();
 	console.log("done");
 });
 
