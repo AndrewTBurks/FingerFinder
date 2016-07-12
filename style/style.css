@@ -325,7 +325,11 @@ div.tooltip {
   clip-path: url(#clip);
 }
 
-.axis path,
+.axis path {
+  fill: none;
+  stroke: #e0e0e0;
+  stroke-width: 3px;
+  }
 .axis line {
   fill: none;
   stroke: #e0e0e0;
