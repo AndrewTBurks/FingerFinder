@@ -985,9 +985,12 @@ function drawParticles(fileNum) {
 					.on('mouseup', function(d) {
 
 						if(filePick != d.timestep){
+
 							readFileNumCSV(d.timestep);
 							// updateFingerGraphFileLine();
 							filePick = d.timestep;
+							var dropdown = document.getElementById("timeDropdown");
+							dropdown.value = filePick.toString();
 
 							if(currSelectedNode.timestep != d.timestep || currSelectedNode.ID != d.id) {
 								// highlight new node
