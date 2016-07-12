@@ -1328,6 +1328,7 @@ function fingerGraphBrush() {
 	.range([30, (width-30)]);
 
 	var xAxis = d3.svg.axis().scale(x).orient("bottom")
+	// .tickValues([0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120])
 	.tickValues([0, 20, 40, 60, 80, 100, 120])
 	.tickPadding(10)
 	.tickSize(-(height/5));
@@ -1359,7 +1360,18 @@ function fingerGraphBrush() {
 	.call(d3.svg.axis()
 		.scale(x)
 		.orient("bottom")
+		// .ticks(20)
 		.tickSize(-height/5)
+		.tickFormat(function() {return null;}));
+
+	context.append("g")
+	.attr("class", "x axis")
+	.attr("transform", "translate(0, " + (height) + ")")
+	.call(d3.svg.axis()
+		.scale(x)
+		.orient("bottom")
+		.ticks(20)
+		.tickSize(-height/10)
 		.tickFormat(function() {return null;}));
 
 
@@ -1371,9 +1383,15 @@ function fingerGraphBrush() {
 	.attr("height", height/2);
 
 	function brushed() {
+		var xMouse = x.invert(d3.mouse(this)[0]);
 		var size = d3.event.target.extent()
 		if ((size[1] - size[0]) > 30) {
-			d3.event.target.extent([size[0], size[0] + 30]);
+			if (xMouse > size[0] + 10) {
+				d3.event.target.extent([size[1] - 30, size[1]]);
+			}
+			if (xMouse < size[1] - 10) {
+				d3.event.target.extent([size[0], size[0] + 30]);
+			}
 			d3.event.target(d3.select(this));
 		}
 	}
@@ -1383,8 +1401,8 @@ function fingerGraphBrush() {
 			return;
 		}
 
-		var begin = Math.round((brush.extent()[0])/10)*10,
-		end = Math.round((brush.extent()[1])/10)*10;
+		var begin = Math.round((brush.extent()[0])/5)*5,
+		end = Math.round((brush.extent()[1])/5)*5;
 		console.log(begin);
 		brush.extent([begin, end]);
 
