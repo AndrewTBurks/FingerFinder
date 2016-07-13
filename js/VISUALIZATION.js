@@ -17,7 +17,7 @@ var startFile = 1;
 var endFile = 120;
 
 var graphStartFile = 10,
-		graphEndFile = 40;
+		graphEndFile = 30;
 
 var data = [];
 var clusterData = [];
