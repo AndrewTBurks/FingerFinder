@@ -634,11 +634,14 @@ function drawParticles(fileNum) {
 
 
 	// readFileNumJSON(filePick);
+loadFingerGraph();
 
+function loadFingerGraph() {
 	d3.json(folderPath + "allClusterCenters.json", function(err, json) {
 		fingersOverTime = json;
 		drawFingerGraph(graphStartFile, graphEndFile);
 	});
+}
 
 	var fingerSize = d3.scale.linear()
 	.range([2, 10])
@@ -1622,7 +1625,7 @@ function menuListener() {
 		runPick = this.value;
 		folderPath = "clean.44/" + "run" + runPick + "/";
 		readFileNumCSV(filePick);
-		drawFingerGraph(graphStartFile, graphEndFile);
+		loadFingerGraph();
 	});
 	d3.selectAll('input[name="colorScheme"]').on("change", function() {
 		colorSchemeChoice = Number(this.value);
