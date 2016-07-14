@@ -10,7 +10,6 @@
 var WIDTH = 450,
 HEIGHT = 632;
 var WIDTH_SLICE = 380;
-var folderPath = "clean.44/";
 var numFiles = 121;
 // Range of file data available
 var startFile = 1;
@@ -85,7 +84,6 @@ createColorLegend();
 mouseWheelZoom();
 sliderMove();
 menuListener();
-populateDropdown();
 fingerGraphBrush();
 
 /**
@@ -93,7 +91,9 @@ fingerGraphBrush();
 * @type {number}
 */
 var filePick = Number(d3.select('select[name="time"]').node().value);
-var runPick = Number(d3.select('select[name="run"]').node().value);
+var runPick = d3.select('select[name="run"]').node().value;
+var folderPath = "clean.44/" + "run" + runPick + "/";
+populateDropdown();
 
 var tooltip = d3.select("body")
 	.append("div")
@@ -1617,6 +1617,12 @@ function menuListener() {
 		readFileNumCSV(filePick);
 		// readFileNumJSON(filePick);
 		updateFingerGraphFileLine();
+	});
+	d3.selectAll('select[name="run"]').on("change", function() {
+		runPick = this.value;
+		folderPath = "clean.44/" + "run" + runPick + "/";
+		readFileNumCSV(filePick);
+		drawFingerGraph(graphStartFile, graphEndFile);
 	});
 	d3.selectAll('input[name="colorScheme"]').on("change", function() {
 		colorSchemeChoice = Number(this.value);
