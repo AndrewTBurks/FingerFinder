@@ -93,6 +93,7 @@ fingerGraphBrush();
 * @type {number}
 */
 var filePick = Number(d3.select('select[name="time"]').node().value);
+var runPick = Number(d3.select('select[name="run"]').node().value);
 
 var tooltip = d3.select("body")
 	.append("div")
