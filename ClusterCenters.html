@@ -140,17 +140,6 @@ function clusterTimeline() {
         // linear distance between points
         thisDistance = thisPoint.distanceTo(otherPoint);
 
-        // simply calculating min distance
-        /*
-        // if the distance between clusters is smaller than the closest so far
-        if((thisDistance < closestDistance)
-        && (+(thisCluster.concTotal - otherCluster.concTotal) < 10000)) {
-          // set as the new closest cluster
-          closestCluster = clusterCenters[i+1][k].clusterID;
-          closestDistance = thisDistance;
-        }
-        */
-
         // using weights and then finding max
         thisWeight = 0;
         thisWeight += thisDistance < distanceTolerance ? 2*(distanceTolerance-thisDistance)/distanceTolerance : 0;
