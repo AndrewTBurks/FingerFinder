@@ -33,6 +33,9 @@ var sliced = [];
 var sliceAccumulated = [];
 var colorSchemeChoice = 3;
 
+var numRuns = 2;
+var runSummaryData = new Array(numRuns);
+
 /**
 * <p>Used to select the coloring mode for the 3D cylinder view.</p>
 * <p>0 for Normal, 1 for desaturate outside of slice, 2 for highlight slice, 3 for highlight fingers.</p>
@@ -769,17 +772,6 @@ function loadFingerGraph() {
 		.attr("height", "100%")
 		.style("fill", "#0F0F0F");
 
-		// draw horizontal lines
-
-		// for(var i = 0; i < numClusters; i++){
-		// 	myElementG.append("line")
-		// 		.attr("x1", 0)
-		// 		.attr("x2", width)
-		// 		.attr("y1", ySpacing/2 + ySpacing*i)
-		// 		.attr("y2", ySpacing/2 + ySpacing*i)
-		// 		.style("stroke", "white");
-		// }
-
 		// vertical line for which file is currently selected
 		myElementG.append("line")
 		.attr("class", "fingerFileIndicator")
@@ -790,8 +782,6 @@ function loadFingerGraph() {
 		.style("stroke-opacity", .1);
 
 		updateFingerGraphFileLine();
-
-		// console.log(xSpacing);
 
 		// aggregate concentrations if more than one cluster is considered
 		// to have the same index
@@ -1175,6 +1165,54 @@ function loadFingerGraph() {
 				.attr("x2", (xSpacing * (filePick-graphStartFile)) + xSpacing/2);
 		}
 
+	}
+
+	getRunSummary(1);
+	getRunSummary(2);
+
+	function getRunSummary(runNum) {
+		var clusterCentersFile = "clean.44/run" + ('00' + runNum).substr(-2) + "/allClusterCenters.json";
+
+		var thisClusterCenters;
+
+		d3.json(clusterCentersFile, function(error, json){
+			if(error) alert(error);
+
+			thisClusterCenters = json;
+
+			var timestepMergeFactors = new Array(120).fill(0);
+			var timestepNumClusters = new Array(120).fill(0);
+
+			// for each timestep
+			for(var i = 1; i <= 120; i++) {
+				// timestepMergeFactors[i] = thisClusterCenters[i-1].length === thisClusterCenters[i].length ?
+				// 	1 : thisClusterCenters[i-1].length/thisClusterCenters[i].length;
+
+				timestepMergeFactors[i] = thisClusterCenters[i-1].length > thisClusterCenters[i].length ?
+					thisClusterCenters[i-1].length - thisClusterCenters[i].length : 0;
+
+				timestepNumClusters[i] = thisClusterCenters[i].length;
+
+			}
+
+			var numClusters = d3.max(thisClusterCenters, function(el) {
+				return d3.max(el, function(el2) {
+					return el2.clusterID;
+				})
+			}) + 1;
+
+			var thisRunData = {
+				run: runNum,
+				totalClusters: numClusters,
+				avgClusters: d3.mean(timestepNumClusters),
+				mergeFactor: d3.mean(timestepMergeFactors)
+			};
+			console.log(thisRunData);
+
+			runSummaryData[runNum-1] = thisRunData;
+
+
+		});
 	}
 
 	var mean, stddev, maxConc;
@@ -1636,5 +1674,4 @@ function menuListener() {
 		// .range(colorSplit);
 		recolorAll();
 	});
-
 }
