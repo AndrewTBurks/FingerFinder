@@ -1182,17 +1182,40 @@ function loadFingerGraph() {
 
 			var timestepMergeFactors = new Array(120).fill(0);
 			var timestepNumClusters = new Array(120).fill(0);
+			var timestepAvgFingerConc = new Array(120).fill(0);
+			var timestepAvgPointConc = new Array(120).fill(0);
+			var timestepAvgFingerDensity = new Array(120).fill(0);
 
 			// for each timestep
 			for(var i = 1; i <= 120; i++) {
 				// timestepMergeFactors[i] = thisClusterCenters[i-1].length === thisClusterCenters[i].length ?
 				// 	1 : thisClusterCenters[i-1].length/thisClusterCenters[i].length;
 
+				// merge factors
 				timestepMergeFactors[i] = thisClusterCenters[i-1].length > thisClusterCenters[i].length ?
 					thisClusterCenters[i-1].length - thisClusterCenters[i].length : 0;
 
+				// number of clusters
 				timestepNumClusters[i] = thisClusterCenters[i].length;
 
+				// average finger concentration, finger point concentration and density
+				var totalTimestepConc = 0;
+				var totalTimestepNumPoints = 0;
+				var totalTimestepDensity = 0;
+				for(var j = 0; j < thisClusterCenters[i].length; j++) {
+					totalTimestepConc += thisClusterCenters[i][j].concTotal;
+					totalTimestepNumPoints += thisClusterCenters[i][j].size;
+					totalTimestepDensity += thisClusterCenters[i][j].concTotal/
+						((thisClusterCenters[i][j].xMax-thisClusterCenters[i][j].xMin) *
+							(thisClusterCenters[i][j].yMax-thisClusterCenters[i][j].yMin) *
+							(thisClusterCenters[i][j].zMax-thisClusterCenters[i][j].zMin));
+
+				}
+				timestepAvgFingerConc[i] = totalTimestepConc/thisClusterCenters[i].length;
+				timestepAvgPointConc[i] = totalTimestepConc/totalTimestepNumPoints;
+				timestepAvgFingerDensity[i] = totalTimestepDensity/thisClusterCenters[i].length;
+
+				// average finger point concentration
 			}
 
 			var numClusters = d3.max(thisClusterCenters, function(el) {
@@ -1205,7 +1228,10 @@ function loadFingerGraph() {
 				run: runNum,
 				totalClusters: numClusters,
 				avgClusters: d3.mean(timestepNumClusters),
-				mergeFactor: d3.mean(timestepMergeFactors)
+				mergeFactor: d3.mean(timestepMergeFactors),
+				avgFingerConc: d3.mean(timestepAvgFingerConc),
+				avgFingerPointConc: d3.mean(timestepAvgPointConc),
+				avgFingerDensity: d3.mean(timestepAvgFingerDensity)
 			};
 			console.log(thisRunData);
 
@@ -1213,6 +1239,44 @@ function loadFingerGraph() {
 
 
 		});
+	}
+
+	drawPairplots();
+
+	function drawPairplots() {
+		var myDiv = d3.select("#pairplots");
+
+		var mySVG = myDiv.append("svg")
+			.attr("width", "100%")
+			.attr("height", "100%");
+
+		mySVG.append("rect")
+			.attr("width", "100%")
+			.attr("height", "100%")
+			.style("stroke", "black")
+			.style("stroke-width", 5)
+			.style("fill-opacity", 0);
+
+		var numVars = 6;
+		var width = 804;
+		var height = 804;
+
+		var plotSpacing = 10;
+		var beginningSpacing = 40;
+		var plotDim = ((width-beginningSpacing)-((numVars+1) * plotSpacing))/numVars;
+
+		for(var i = 0; i < numVars; i++) {
+			for(var j = 0; j < numVars; j++) {
+				mySVG.append("rect")
+					.attr("height", plotDim)
+					.attr("width", plotDim)
+					.attr("x", (beginningSpacing + (i*plotDim) + ((i+1)*plotSpacing)))
+					.attr("y", (beginningSpacing + (j*plotDim) + ((j+1)*plotSpacing)))
+					.style("fill", "lightblue");
+			}
+		}
+
+
 	}
 
 	var mean, stddev, maxConc;
