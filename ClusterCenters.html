@@ -16,8 +16,6 @@ var clusterCenters = new Array(121).fill([]); // data for clusters in each times
 var distanceTolerance = 1;
 var edgeTolerance = 0;
 
-
-
 var mean, stddev, maxConc;
 
 var start = 0;
@@ -64,7 +62,7 @@ function clusterTimeline() {
       {
         // for each cluster in the previous timestep
         otherCluster = clusterCenters[i-1][k];
-        distanceTolerance = d3.max([otherCluster.xMax-otherCluster.xMin, otherCluster.yMax-otherCluster.ymin, otherCluster.zMax-otherCluster.zMin])/2;
+        distanceTolerance = d3.max([thisCluster.xMax-thisCluster.xMin, thisCluster.yMax-thisCluster.ymin, thisCluster.zMax-thisCluster.zMin]);
 
 
         otherPoint = new THREE.Vector3(otherCluster.cx+(otherCluster.vx/2),
@@ -99,6 +97,59 @@ function clusterTimeline() {
   } // END for(var i = 0...
 
 
+  /* === clusterID adaptation === */
+  // // assign clusterID
+  // for(var i = start; i < end; i++) {
+  //   // for each timestep aside from the start
+  //
+  //   for(var j = 0; j < clusterCenters[i].length; j++)
+  //   {
+  //     // for each cluster in this timestep
+  //     thisCluster = clusterCenters[i][j];
+  //
+  //
+  //     thisPoint = new THREE.Vector3(thisCluster.cx+(thisCluster.vx/2),
+  //                                   thisCluster.cy+(thisCluster.vy/2),
+  //                                   thisCluster.cz+(thisCluster.vz/2));
+  //
+  //     // set distanceTolerance based on the max of the extent dimensions/2
+  //
+  //
+  //     closestCluster = -1;
+  //     closestDistance = 20;
+  //     // find the closest cluster in the previous timestep
+  //     for(var k = 0; k < clusterCenters[i+1].length; k++)
+  //     {
+  //       // for each cluster in the previous timestep
+  //       otherCluster = clusterCenters[i+1][k];
+  //       distanceTolerance = d3.max([otherCluster.xMax-otherCluster.xMin, otherCluster.yMax-otherCluster.ymin, otherCluster.zMax-otherCluster.zMin])/2;
+  //
+  //
+  //       otherPoint = new THREE.Vector3(otherCluster.cx-(otherCluster.vx/2),
+  //                                     otherCluster.cy-(otherCluster.vy/2),
+  //                                     otherCluster.cz-(otherCluster.vz/2));
+  //       // linear distance between points
+  //       thisDistance = thisPoint.distanceTo(otherPoint);
+  //
+  //
+  //       // if the distance between clusters is smaller than the closest so far
+  //       // if((thisDistance < closestDistance) && (thisDistance < distanceTolerance)) {
+  //       if((thisDistance < closestDistance)){
+  //         // set as the new closest cluster
+  //         closestCluster = clusterCenters[i+1][k].clusterID;
+  //         closestDistance = thisDistance;
+  //       }
+  //
+  //     } // END for(var k = 0; ...
+  //
+  //     clusterCenters[i][j].nextID = closestCluster;
+  //
+  //
+  //   } // END for(var j = 0...
+  //
+  // } // END for(var i = 0...
+
+  /* === OLD NEXT CLUSTER CODE === */
   // use some metric to assign a weight to each cluster in timestep i+1
   // both distance and difference in concentration
   var maxWeight;
@@ -121,16 +172,14 @@ function clusterTimeline() {
 
 
       closestCluster = -1;
-      closestDistance = 20;
       maxWeight = 0;
-
 
       // find the closest cluster in the previous timestep
       for(var k = 0; k < clusterCenters[i+1].length; k++)
       {
         // for each cluster in the previous timestep
         otherCluster = clusterCenters[i+1][k];
-        distanceTolerance = d3.max([thisCluster.xMax-thisCluster.xMin, thisCluster.yMax-thisCluster.ymin, thisCluster.zMax-thisCluster.zMin]);
+        distanceTolerance = d3.max([otherCluster.xMax-otherCluster.xMin, otherCluster.yMax-otherCluster.ymin, otherCluster.zMax-otherCluster.zMin])/2;
 
 
         otherPoint = new THREE.Vector3(otherCluster.cx-(otherCluster.vx/2),
@@ -142,12 +191,13 @@ function clusterTimeline() {
 
         // using weights and then finding max
         thisWeight = 0;
-        thisWeight += thisDistance < distanceTolerance ? 2*(distanceTolerance-thisDistance)/distanceTolerance : 0;
+        thisWeight += thisDistance < distanceTolerance ? 10/thisDistance : 0;
         thisWeight += thisCluster.concTotal < otherCluster.concTotal ? 0.1 : 0;
+        thisWeight += thisCluster.clusterID === otherCluster.clusterID ? 0.5 : 0;
 
         if(thisWeight > maxWeight) {
           maxWeight = thisWeight;
-          closestCluster = clusterCenters[i+1][k].clusterID;
+          closestCluster = otherCluster.clusterID;
           // closestCluster = k;
         }
 
