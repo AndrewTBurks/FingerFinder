@@ -1261,8 +1261,8 @@ function loadFingerGraph() {
 			var width = 804;
 			var height = 804;
 
-			var plotSpacing = 10;
-			var beginningSpacing = 40;
+			var plotSpacing = 8;
+			var beginningSpacing = 30;
 			var plotDim = ((width-beginningSpacing)-((numVars+1) * plotSpacing))/numVars;
 
 			for(var i = 0; i < numVars; i++) {
@@ -1289,7 +1289,7 @@ function loadFingerGraph() {
 						.attr("width", plotDim)
 						.attr("x", (beginningSpacing + (i*plotDim) + ((i+1)*plotSpacing)))
 						.attr("y", (beginningSpacing + (j*plotDim) + ((j+1)*plotSpacing)))
-						.style("fill", "lightblue");
+						.style("fill", "#7FA2AD");
 				}
 			}
 
