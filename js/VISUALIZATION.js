@@ -1294,6 +1294,12 @@ function loadFingerGraph() {
 				}
 			}
 
+
+
+			for(var i = 0; i < runSummaryData.length; i++) {
+
+			}
+
 		} // END if(myDiv)
 	}
 
