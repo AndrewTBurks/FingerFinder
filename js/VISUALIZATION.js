@@ -1251,13 +1251,14 @@ function loadFingerGraph() {
 				.attr("width", "100%")
 				.attr("height", "100%");
 
-			mySVG.append("rect")
-				.attr("width", "100%")
-				.attr("height", "100%")
-				.style("stroke", "black")
-				.style("stroke-width", 5);
+			// mySVG.append("rect")
+			// 	.attr("width", "100%")
+			// 	.attr("height", "100%")
+			// 	.style("stroke", "black")
+			// 	.style("stroke-width", 5);
 
 			var numVars = 6;
+			var varNames = ["Total Fingers", "Avg Fingers", "Avg Finger Conc.", "Avg Point Conc.", "Avg Finger Density", "Merge Factor"];
 			var width = 804;
 			var height = 804;
 
@@ -1268,18 +1269,18 @@ function loadFingerGraph() {
 			for(var i = 0; i < numVars; i++) {
 				mySVG.append("text")
 					.attr("class", "variableLabel")
-					.attr("text-align", "center")
-					.text(i)
+					.text(varNames[i])
 					.style("fill", "white")
+					.style("text-anchor", "middle")
 					.attr("x", beginningSpacing + plotSpacing + plotDim/2 + i*(plotDim+plotSpacing))
 					.attr("y", beginningSpacing - 5);
 
 				mySVG.append("text")
 					.attr("class", "variableLabel")
-					.attr("text-align", "center")
-					.text(i)
+					.text(varNames[i])
 					.style("fill", "white")
 					.style("writing-mode", "vertical-rl")
+					.style("text-anchor", "middle")
 					.attr("y", beginningSpacing + plotSpacing + plotDim/2 + i*(plotDim+plotSpacing))
 					.attr("x", beginningSpacing/2);
 
@@ -1289,7 +1290,7 @@ function loadFingerGraph() {
 						.attr("width", plotDim)
 						.attr("x", (beginningSpacing + (i*plotDim) + ((i+1)*plotSpacing)))
 						.attr("y", (beginningSpacing + (j*plotDim) + ((j+1)*plotSpacing)))
-						.style("fill", "#7FA2AD");
+						.style("fill", "#0F0F0F");
 				}
 			}
 
