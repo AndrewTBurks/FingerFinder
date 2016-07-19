@@ -1246,37 +1246,38 @@ function loadFingerGraph() {
 	function drawPairplots() {
 		var myDiv = d3.select("#pairplots");
 
-		var mySVG = myDiv.append("svg")
-			.attr("width", "100%")
-			.attr("height", "100%");
+		if(myDiv) {
+			var mySVG = myDiv.append("svg")
+				.attr("width", "100%")
+				.attr("height", "100%");
 
-		mySVG.append("rect")
-			.attr("width", "100%")
-			.attr("height", "100%")
-			.style("stroke", "black")
-			.style("stroke-width", 5)
-			.style("fill-opacity", 0);
+			mySVG.append("rect")
+				.attr("width", "100%")
+				.attr("height", "100%")
+				.style("stroke", "black")
+				.style("stroke-width", 5)
+				.style("fill-opacity", 0);
 
-		var numVars = 6;
-		var width = 804;
-		var height = 804;
+			var numVars = 6;
+			var width = 804;
+			var height = 804;
 
-		var plotSpacing = 10;
-		var beginningSpacing = 40;
-		var plotDim = ((width-beginningSpacing)-((numVars+1) * plotSpacing))/numVars;
+			var plotSpacing = 10;
+			var beginningSpacing = 40;
+			var plotDim = ((width-beginningSpacing)-((numVars+1) * plotSpacing))/numVars;
 
-		for(var i = 0; i < numVars; i++) {
-			for(var j = 0; j < numVars; j++) {
-				mySVG.append("rect")
-					.attr("height", plotDim)
-					.attr("width", plotDim)
-					.attr("x", (beginningSpacing + (i*plotDim) + ((i+1)*plotSpacing)))
-					.attr("y", (beginningSpacing + (j*plotDim) + ((j+1)*plotSpacing)))
-					.style("fill", "lightblue");
+			for(var i = 0; i < numVars; i++) {
+				for(var j = 0; j < numVars; j++) {
+					mySVG.append("rect")
+						.attr("height", plotDim)
+						.attr("width", plotDim)
+						.attr("x", (beginningSpacing + (i*plotDim) + ((i+1)*plotSpacing)))
+						.attr("y", (beginningSpacing + (j*plotDim) + ((j+1)*plotSpacing)))
+						.style("fill", "lightblue");
+				}
 			}
-		}
 
-
+		} // END if(myDiv)
 	}
 
 	var mean, stddev, maxConc;
