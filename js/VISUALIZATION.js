@@ -1255,8 +1255,7 @@ function loadFingerGraph() {
 				.attr("width", "100%")
 				.attr("height", "100%")
 				.style("stroke", "black")
-				.style("stroke-width", 5)
-				.style("fill-opacity", 0);
+				.style("stroke-width", 5);
 
 			var numVars = 6;
 			var width = 804;
@@ -1267,6 +1266,23 @@ function loadFingerGraph() {
 			var plotDim = ((width-beginningSpacing)-((numVars+1) * plotSpacing))/numVars;
 
 			for(var i = 0; i < numVars; i++) {
+				mySVG.append("text")
+					.attr("class", "variableLabel")
+					.attr("text-align", "center")
+					.text(i)
+					.style("fill", "white")
+					.attr("x", beginningSpacing + plotSpacing + plotDim/2 + i*(plotDim+plotSpacing))
+					.attr("y", beginningSpacing - 5);
+
+				mySVG.append("text")
+					.attr("class", "variableLabel")
+					.attr("text-align", "center")
+					.text(i)
+					.style("fill", "white")
+					.style("writing-mode", "vertical-rl")
+					.attr("y", beginningSpacing + plotSpacing + plotDim/2 + i*(plotDim+plotSpacing))
+					.attr("x", beginningSpacing/2);
+
 				for(var j = 0; j < numVars; j++) {
 					mySVG.append("rect")
 						.attr("height", plotDim)
