@@ -1270,6 +1270,29 @@ function loadFingerGraph() {
 			var plotDim = ((width-beginningSpacing)-((numVars+1) * plotSpacing))/numVars;
 
 
+			mySVG.append("rect")
+				.attr("class", "rowHighlight")
+				.attr("y", 0)
+				.attr("x", 0)
+				.attr("width", (plotSpacing + plotDim) * numVars)
+				.attr("height", plotDim + plotSpacing)
+				.style("fill-opacity", 0)
+				.style("stroke", "#" + colorSplit[colorSplit.length-1])
+				.style("stroke-width", 2)
+				.style("stroke-opacity", 0);
+
+			// vertical
+			mySVG.append("rect")
+				.attr("class", "colHighlight")
+				.attr("y", 0)
+				.attr("x", 0)
+				.attr("width", plotDim + plotSpacing)
+				.attr("height", (plotSpacing + plotDim) * numVars)
+				.style("fill-opacity", 0)
+				.style("stroke", "#" + colorSplit[colorSplit.length-1])
+				.style("stroke-width", 2)
+				.style("stroke-opacity", 0);
+
 			for(var i = 0; i < numVars; i++) {
 				mySVG.append("text")
 					.attr("class", "variableLabel")
@@ -1428,6 +1451,19 @@ function loadFingerGraph() {
 								d3.selectAll("#run" + id + "Circle").style("fill", "#" + colorSplit[colorSplit.length-1]);
 
 								d3.select(this).style("fill", "white").style("stroke", "#" + colorSplit[colorSplit.length-1]).style("stroke-width", 2);
+
+								// horizontal
+								d3.select(".rowHighlight")
+									.attr("y", beginningSpacing + (plotSpacing/2) + d.row * (plotSpacing + plotDim))
+									.attr("x", beginningSpacing + (plotSpacing/2))
+									.style("stroke-opacity", 1);
+
+								// vertical
+								d3.select(".colHighlight")
+									.attr("y", beginningSpacing + (plotSpacing/2))
+									.attr("x", beginningSpacing + (plotSpacing/2) + d.col * (plotSpacing + plotDim))
+									.style("stroke-opacity", 1);
+
 								console.log(d);
 							});
 					}
