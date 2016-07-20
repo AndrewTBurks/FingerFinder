@@ -1168,7 +1168,6 @@ function loadFingerGraph() {
 	}
 
 	getRunSummary(1);
-	getRunSummary(2);
 
 	function getRunSummary(runNum) {
 		var clusterCentersFile = "clean.44/run" + ('00' + runNum).substr(-2) + "/allClusterCenters.json";
@@ -1237,11 +1236,15 @@ function loadFingerGraph() {
 
 			runSummaryData[runNum-1] = thisRunData;
 
+			if(runNum < numRuns) {
+				getRunSummary(runNum+1);
+			}
+			else {
+				drawPairplots();
+			}
 
 		});
 	}
-
-	drawPairplots();
 
 	function drawPairplots() {
 		var myDiv = d3.select("#pairplots");
@@ -1265,6 +1268,7 @@ function loadFingerGraph() {
 			var plotSpacing = 8;
 			var beginningSpacing = 30;
 			var plotDim = ((width-beginningSpacing)-((numVars+1) * plotSpacing))/numVars;
+
 
 			for(var i = 0; i < numVars; i++) {
 				mySVG.append("text")
@@ -1295,6 +1299,7 @@ function loadFingerGraph() {
 			}
 
 			var min, max;
+			var circleRadius = 5;
 			// get ranges of values for each variable
 
 			// ======================================
@@ -1308,7 +1313,7 @@ function loadFingerGraph() {
 
 			var totalFingerScale = d3.scale.linear()
 				.domain([min, max])
-				.range([0, plotDim]);
+				.range([circleRadius, plotDim-circleRadius]);
 
 			// ======================================
 			// average number of fingers per timestep
@@ -1321,7 +1326,7 @@ function loadFingerGraph() {
 
 			var avgFingerScale = d3.scale.linear()
 				.domain([min, max])
-				.range([0, plotDim]);
+				.range([circleRadius, plotDim-circleRadius]);
 
 			// =========================================
 			// average finger concentration per timestep
@@ -1334,7 +1339,7 @@ function loadFingerGraph() {
 
 			var avgFingerConcScale = d3.scale.linear()
 				.domain([min, max])
-				.range([0, plotDim]);
+				.range([circleRadius, plotDim-circleRadius]);
 
 			// =========================================
 			// average finger point concentration per timestep
@@ -1347,7 +1352,7 @@ function loadFingerGraph() {
 
 			var avgFingerPointConcScale = d3.scale.linear()
 				.domain([min, max])
-				.range([0, plotDim]);
+				.range([circleRadius, plotDim-circleRadius]);
 
 			// =========================================
 			// average finger density per timestep
@@ -1360,7 +1365,7 @@ function loadFingerGraph() {
 
 			var avgFingerDensityScale = d3.scale.linear()
 				.domain([min, max])
-				.range([0, plotDim]);
+				.range([circleRadius, plotDim-circleRadius]);
 
 			// =========================================
 			// average finger density per timestep
@@ -1373,7 +1378,7 @@ function loadFingerGraph() {
 
 			var mergeFactorScale = d3.scale.linear()
 				.domain([min, max])
-				.range([0, plotDim]);
+				.range([circleRadius, plotDim-circleRadius]);
 
 			// plot each run variable onto graph at each location
 			for(var i = 0; i < runSummaryData.length; i++) {
@@ -1390,15 +1395,22 @@ function loadFingerGraph() {
 				graphOffsets[4] = avgFingerDensityScale(runSummaryData[i].avgFingerDensity);
 				graphOffsets[5] = mergeFactorScale(runSummaryData[i].mergeFactor);
 
+				console.log(graphOffsets);
+
 				for(var j = 0; j < numVars; j++) {
 					// for each of numVars variables (horizontal)
 					for(var k = 0; k < numVars; k++) {
 						// for each of numVars variables (vertical)
 						mySVG.append("circle")
 							.datum(i+1)
+							.attr("class", "runCircle")
 							.attr("r", 3)
-							.attr("x", beginningSpacing + plotSpacing + (j*(plotSpacing + plotDim)) + graphOffsets[j])
-							.attr("y", beginningSpacing + ((k+1)*(plotSpacing + plotDim)) - graphOffsets[j]);
+							.attr("cx", beginningSpacing + plotSpacing + (j*(plotSpacing + plotDim)) + graphOffsets[j])
+							.attr("cy", beginningSpacing + ((k+1)*(plotSpacing + plotDim)) - graphOffsets[j])
+							.style("fill", "white")
+							.on("click", function(d){
+								console.log("Run: " + d);
+							});
 					}
 				}
 
