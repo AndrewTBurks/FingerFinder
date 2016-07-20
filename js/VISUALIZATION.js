@@ -1299,7 +1299,7 @@ function loadFingerGraph() {
 			}
 
 			var min, max;
-			var circleRadius = 5;
+			var circleRadius = 6;
 			// get ranges of values for each variable
 
 			// ======================================
@@ -1387,6 +1387,7 @@ function loadFingerGraph() {
 				// 6 values in same order as varNames
 				// "Total Fingers", "Avg Fingers", "Avg Finger Conc.", "Avg Point Conc.", "Avg Finger Density", "Merge Factor"
 				var graphOffsets = new Array(6);
+				var statValues = new Array(6);
 
 				graphOffsets[0] = totalFingerScale(runSummaryData[i].totalClusters);
 				graphOffsets[1] = avgFingerScale(runSummaryData[i].avgClusters);
@@ -1395,21 +1396,33 @@ function loadFingerGraph() {
 				graphOffsets[4] = avgFingerDensityScale(runSummaryData[i].avgFingerDensity);
 				graphOffsets[5] = mergeFactorScale(runSummaryData[i].mergeFactor);
 
-				console.log(graphOffsets);
+				statValues[0] = runSummaryData[i].totalClusters;
+				statValues[1] = runSummaryData[i].avgClusters;
+				statValues[2] = runSummaryData[i].avgFingerConc;
+				statValues[3] = runSummaryData[i].avgFingerPointConc;
+				statValues[4] = runSummaryData[i].avgFingerDensity;
+				statValues[5] = runSummaryData[i].mergeFactor;
 
 				for(var j = 0; j < numVars; j++) {
 					// for each of numVars variables (horizontal)
 					for(var k = 0; k < numVars; k++) {
 						// for each of numVars variables (vertical)
 						mySVG.append("circle")
-							.datum(i+1)
+							.datum({
+								run: ('00' + (i+1)).substr(-2),
+								col: j,
+								columnVal: statValues[j],
+								row: k,
+								rowVal: statValues[k]
+							})
 							.attr("class", "runCircle")
-							.attr("r", 3)
+							.attr("id", ("run" + ('00' + (i+1)).substr(-2) + "Circle"))
+							.attr("r", circleRadius)
 							.attr("cx", beginningSpacing + plotSpacing + (j*(plotSpacing + plotDim)) + graphOffsets[j])
-							.attr("cy", beginningSpacing + ((k+1)*(plotSpacing + plotDim)) - graphOffsets[j])
+							.attr("cy", beginningSpacing + ((k+1)*(plotSpacing + plotDim)) - graphOffsets[k])
 							.style("fill", "white")
 							.on("click", function(d){
-								console.log("Run: " + d);
+								console.log(d);
 							});
 					}
 				}
