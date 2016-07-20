@@ -1436,7 +1436,8 @@ function loadFingerGraph() {
 								col: j,
 								columnVal: statValues[j],
 								row: k,
-								rowVal: statValues[k]
+								rowVal: statValues[k],
+								summary: runSummaryData[i]
 							})
 							.attr("class", "runCircle")
 							.attr("id", ("run" + ('00' + (i+1)).substr(-2) + "Circle"))
