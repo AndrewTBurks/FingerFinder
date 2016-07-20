@@ -1278,7 +1278,7 @@ function loadFingerGraph() {
 				.attr("height", plotDim + plotSpacing)
 				.style("fill-opacity", 0)
 				.style("stroke", "#" + colorSplit[colorSplit.length-1])
-				.style("stroke-width", 2)
+				.style("stroke-width", 1)
 				.style("stroke-opacity", 0);
 
 			// vertical
@@ -1290,7 +1290,7 @@ function loadFingerGraph() {
 				.attr("height", (plotSpacing + plotDim) * numVars)
 				.style("fill-opacity", 0)
 				.style("stroke", "#" + colorSplit[colorSplit.length-1])
-				.style("stroke-width", 2)
+				.style("stroke-width", 1)
 				.style("stroke-opacity", 0);
 
 			for(var i = 0; i < numVars; i++) {
@@ -1457,13 +1457,13 @@ function loadFingerGraph() {
 								d3.select(".rowHighlight")
 									.attr("y", beginningSpacing + (plotSpacing/2) + d.row * (plotSpacing + plotDim))
 									.attr("x", beginningSpacing + (plotSpacing/2))
-									.style("stroke-opacity", 1);
+									.style("stroke-opacity", 0.5);
 
 								// vertical
 								d3.select(".colHighlight")
 									.attr("y", beginningSpacing + (plotSpacing/2))
 									.attr("x", beginningSpacing + (plotSpacing/2) + d.col * (plotSpacing + plotDim))
-									.style("stroke-opacity", 1);
+									.style("stroke-opacity", 0.5);
 
 								console.log(d);
 							});
