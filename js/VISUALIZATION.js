@@ -33,7 +33,7 @@ var sliced = [];
 var sliceAccumulated = [];
 var colorSchemeChoice = 3;
 
-var numRuns = 2;
+var numRuns = 5;
 var runSummaryData = new Array(numRuns);
 
 /**
@@ -1299,7 +1299,7 @@ function loadFingerGraph() {
 			}
 
 			var min, max;
-			var circleRadius = 6;
+			var circleRadius = 5;
 			// get ranges of values for each variable
 
 			// ======================================
@@ -1420,12 +1420,14 @@ function loadFingerGraph() {
 							.attr("r", circleRadius)
 							.attr("cx", beginningSpacing + plotSpacing + (j*(plotSpacing + plotDim)) + graphOffsets[j])
 							.attr("cy", beginningSpacing + ((k+1)*(plotSpacing + plotDim)) - graphOffsets[k])
-							.style("fill", "white")
+							.style("fill", "#" + colorSplit[0])
 							.on("click", function(d){
-								d3.selectAll(".runCircle").style("fill", "white");
+								d3.selectAll(".runCircle").style("fill", "#" + colorSplit[0]).style("stroke", "");
 
 								var id = d.run;
-								d3.selectAll("#run" + id + "Circle").style("fill", "yellow");
+								d3.selectAll("#run" + id + "Circle").style("fill", "#" + colorSplit[colorSplit.length-1]);
+
+								d3.select(this).style("fill", "white").style("stroke", "#" + colorSplit[colorSplit.length-1]).style("stroke-width", 2);
 								console.log(d);
 							});
 					}
