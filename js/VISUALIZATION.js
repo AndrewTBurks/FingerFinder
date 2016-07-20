@@ -1294,13 +1294,113 @@ function loadFingerGraph() {
 				}
 			}
 
+			var min, max;
 			// get ranges of values for each variable
+
+			// ======================================
+			// total number of fingers
+			min = d3.min(runSummaryData, function(el) {
+				return el.totalClusters;
+			});
+			max = d3.max(runSummaryData, function(el) {
+				return el.totalClusters;
+			});
+
+			var totalFingerScale = d3.scale.linear()
+				.domain([min, max])
+				.range([0, plotDim]);
+
+			// ======================================
+			// average number of fingers per timestep
+			min = d3.min(runSummaryData, function(el) {
+				return el.avgClusters;
+			});
+			max = d3.max(runSummaryData, function(el) {
+				return el.avgClusters;
+			});
+
+			var avgFingerScale = d3.scale.linear()
+				.domain([min, max])
+				.range([0, plotDim]);
+
+			// =========================================
+			// average finger concentration per timestep
+			min = d3.min(runSummaryData, function(el) {
+				return el.avgFingerConc;
+			});
+			max = d3.max(runSummaryData, function(el) {
+				return el.avgFingerConc;
+			});
+
+			var avgFingerConcScale = d3.scale.linear()
+				.domain([min, max])
+				.range([0, plotDim]);
+
+			// =========================================
+			// average finger point concentration per timestep
+			min = d3.min(runSummaryData, function(el) {
+				return el.avgFingerPointConc;
+			});
+			max = d3.max(runSummaryData, function(el) {
+				return el.avgFingerPointConc;
+			});
+
+			var avgFingerPointConcScale = d3.scale.linear()
+				.domain([min, max])
+				.range([0, plotDim]);
+
+			// =========================================
+			// average finger density per timestep
+			min = d3.min(runSummaryData, function(el) {
+				return el.avgFingerDensity;
+			});
+			max = d3.max(runSummaryData, function(el) {
+				return el.avgFingerDensity;
+			});
+
+			var avgFingerDensityScale = d3.scale.linear()
+				.domain([min, max])
+				.range([0, plotDim]);
+
+			// =========================================
+			// average finger density per timestep
+			min = d3.min(runSummaryData, function(el) {
+				return el.mergeFactor;
+			});
+			max = d3.max(runSummaryData, function(el) {
+				return el.mergeFactor;
+			});
+
+			var mergeFactorScale = d3.scale.linear()
+				.domain([min, max])
+				.range([0, plotDim]);
 
 			// plot each run variable onto graph at each location
 			for(var i = 0; i < runSummaryData.length; i++) {
 				// for each run
 
-				
+				// 6 values in same order as varNames
+				// "Total Fingers", "Avg Fingers", "Avg Finger Conc.", "Avg Point Conc.", "Avg Finger Density", "Merge Factor"
+				var graphOffsets = new Array(6);
+
+				graphOffsets[0] = totalFingerScale(runSummaryData[i].totalClusters);
+				graphOffsets[1] = avgFingerScale(runSummaryData[i].avgClusters);
+				graphOffsets[2] = avgFingerConcScale(runSummaryData[i].avgFingerConc);
+				graphOffsets[3] = avgFingerPointConcScale(runSummaryData[i].avgFingerPointConc);
+				graphOffsets[4] = avgFingerDensityScale(runSummaryData[i].avgFingerDensity);
+				graphOffsets[5] = mergeFactorScale(runSummaryData[i].mergeFactor);
+
+				for(var j = 0; j < numVars; j++) {
+					// for each of numVars variables (horizontal)
+					for(var k = 0; k < numVars; k++) {
+						// for each of numVars variables (vertical)
+						mySVG.append("circle")
+							.datum(i+1)
+							.attr("r", 3)
+							.attr("x", beginningSpacing + plotSpacing + (j*(plotSpacing + plotDim)) + graphOffsets[j])
+							.attr("y", beginningSpacing + ((k+1)*(plotSpacing + plotDim)) - graphOffsets[j]);
+					}
+				}
 
 			}
 
