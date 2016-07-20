@@ -1422,6 +1422,10 @@ function loadFingerGraph() {
 							.attr("cy", beginningSpacing + ((k+1)*(plotSpacing + plotDim)) - graphOffsets[k])
 							.style("fill", "white")
 							.on("click", function(d){
+								d3.selectAll(".runCircle").style("fill", "white");
+
+								var id = d.run;
+								d3.selectAll("#run" + id + "Circle").style("fill", "yellow");
 								console.log(d);
 							});
 					}
