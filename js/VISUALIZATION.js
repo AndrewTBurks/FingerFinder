@@ -1294,9 +1294,13 @@ function loadFingerGraph() {
 				}
 			}
 
+			// get ranges of values for each variable
 
-
+			// plot each run variable onto graph at each location
 			for(var i = 0; i < runSummaryData.length; i++) {
+				// for each run
+
+				
 
 			}
 
