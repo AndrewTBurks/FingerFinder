@@ -33,7 +33,7 @@ var sliced = [];
 var sliceAccumulated = [];
 var colorSchemeChoice = 3;
 
-var numRuns = 5;
+var numRuns = 6;
 var runSummaryData = new Array(numRuns);
 
 /**
