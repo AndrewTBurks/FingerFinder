@@ -1579,6 +1579,14 @@ function loadFingerGraph() {
 								yLabels.transition().delay(150).style("visibility", "visible");
 
 								d3.selectAll(".temporaryLabel").remove();
+
+								if(runHighlighted) {
+									d3.select(".colHighlight").transition().duration(300)
+										.style("stroke-opacity", 0.5);
+
+									d3.select(".rowHighlight").transition().duration(300)
+										.style("stroke-opacity", 0.5);
+								}
 							}
 						});
 				}
@@ -1727,6 +1735,29 @@ function loadFingerGraph() {
 			}
 
 		} // END if(myDiv)
+
+		d3.selectAll('select[name="run"]').on("change", function() {
+			runPick = this.value;
+			folderPath = "clean.44/" + "run" + runPick + "/";
+			readFileNumCSV(filePick);
+			loadFingerGraph();
+
+			// update colors of all circles
+			// set all back to normal color
+			d3.selectAll(".runCircle")
+				.style("fill", "#" + colorSplit[0])
+				.style("stroke", "white")
+				.style("stroke-width", 0.5);
+
+			// set all in run group to be highlighted in secondary color
+			for(var i = 0; i < runGroupHighlighted.length; i++) {
+				d3.selectAll("#run" + ('00' + runGroupHighlighted[i].num).substr(-2) + "Circle")
+					.style("fill", "#" + colorSplit[Math.round(colorSplit.length/2)]);
+			}
+
+			// thicker stroke on current run
+			d3.selectAll("#run" + runPick + "Circle").style("stroke-width", 1.5);
+		});
 	}
 
 	var mean, stddev, maxConc;
@@ -2187,12 +2218,13 @@ function menuListener() {
 		// readFileNumJSON(filePick);
 		updateFingerGraphFileLine();
 	});
-	d3.selectAll('select[name="run"]').on("change", function() {
-		runPick = this.value;
-		folderPath = "clean.44/" + "run" + runPick + "/";
-		readFileNumCSV(filePick);
-		loadFingerGraph();
-	});
+	// moved to drawPairplots so the stroke of circles will correctly update
+	// d3.selectAll('select[name="run"]').on("change", function() {
+	// 	runPick = this.value;
+	// 	folderPath = "clean.44/" + "run" + runPick + "/";
+	// 	readFileNumCSV(filePick);
+	// 	loadFingerGraph();
+	// });
 	d3.selectAll('input[name="colorScheme"]').on("change", function() {
 		colorSchemeChoice = Number(this.value);
 		colorSplit = colorScheme[colorSchemeChoice].split(",");
