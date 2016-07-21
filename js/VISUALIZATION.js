@@ -1646,6 +1646,19 @@ function loadFingerGraph() {
 								d3.select(".colHighlight")
 									.style("stroke-opacity", 0);
 
+							})
+							.on('mousemove', function(d) {
+								var matrix = this.getScreenCTM()
+		        			.translate(+ this.getAttribute("cx"), + this.getAttribute("cy"));
+								tooltip.classed("hidden", false)
+									.html("Run: " + d.run + "<br>" +
+										varNames[d.col] + ": " + (d.columnVal).toFixed(2) + "<br>" +
+										varNames[d.row] + ": " + (d.rowVal).toFixed(2))
+									.style("left", (window.pageXOffset + matrix.e + 15) + "px")
+					        .style("top", (window.pageYOffset + matrix.f - 80) + "px");
+							})
+							.on('mouseout', function() {
+								tooltip.classed("hidden", true);
 							});
 					}
 				}
