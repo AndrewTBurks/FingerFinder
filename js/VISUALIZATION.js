@@ -1278,6 +1278,96 @@ function loadFingerGraph() {
 			var isZoomed = false;
 			var runHighlighted = null;
 
+			/* === CREATE SCALES === */
+
+			var scales = new Array(numVars);
+
+			var min, max;
+			var circleRadius = 5;
+			// get ranges of values for each variable
+
+			// ======================================
+			// total number of fingers
+			min = d3.min(runSummaryData, function(el) {
+				return el.totalClusters;
+			});
+			max = d3.max(runSummaryData, function(el) {
+				return el.totalClusters;
+			});
+
+			scales[0] = d3.scale.linear()
+				.domain([min, max])
+				.range([circleRadius, plotDim-circleRadius]);
+
+			// ======================================
+			// average number of fingers per timestep
+			min = d3.min(runSummaryData, function(el) {
+				return el.avgClusters;
+			});
+			max = d3.max(runSummaryData, function(el) {
+				return el.avgClusters;
+			});
+
+			scales[1] = d3.scale.linear()
+				.domain([min, max])
+				.range([circleRadius, plotDim-circleRadius]);
+
+			// =========================================
+			// average finger concentration per timestep
+			min = d3.min(runSummaryData, function(el) {
+				return el.avgFingerConc;
+			});
+			max = d3.max(runSummaryData, function(el) {
+				return el.avgFingerConc;
+			});
+
+			scales[2] = d3.scale.linear()
+				.domain([min, max])
+				.range([circleRadius, plotDim-circleRadius]);
+
+			// =========================================
+			// average finger point concentration per timestep
+			min = d3.min(runSummaryData, function(el) {
+				return el.avgFingerPointConc;
+			});
+			max = d3.max(runSummaryData, function(el) {
+				return el.avgFingerPointConc;
+			});
+
+			scales[3] = d3.scale.linear()
+				.domain([min, max])
+				.range([circleRadius, plotDim-circleRadius]);
+
+			// =========================================
+			// average finger density per timestep
+			min = d3.min(runSummaryData, function(el) {
+				return el.avgFingerDensity;
+			});
+			max = d3.max(runSummaryData, function(el) {
+				return el.avgFingerDensity;
+			});
+
+			scales[4] = d3.scale.linear()
+				.domain([min, max])
+				.range([circleRadius, plotDim-circleRadius]);
+
+			// =========================================
+			// average finger density per timestep
+			min = d3.min(runSummaryData, function(el) {
+				return el.mergeFactor;
+			});
+			max = d3.max(runSummaryData, function(el) {
+				return el.mergeFactor;
+			});
+
+			scales[5] = d3.scale.linear()
+				.domain([min, max])
+				.range([circleRadius, plotDim-circleRadius]);
+
+			/* === SCALES CREATED === */
+
+
+
 			plots.append("rect")
 				.attr("class", "rowHighlight")
 				.attr("y", 0)
@@ -1329,7 +1419,7 @@ function loadFingerGraph() {
 						.style("fill", "#0F0F0F")
 						.on("mouseup", function(d) {
 							// only zooms if the mouseup is caused by left click
-							if(d3.event.button === 0) {
+							if(d3.event.button === 0 && !isZoomed) {
 								isZoomed = true;
 
 								console.log("zoom into plot:", d);
@@ -1354,9 +1444,9 @@ function loadFingerGraph() {
 									.text(varNames[d[0]])
 									.style("fill", "white")
 									.style("text-anchor", "middle")
-									.style("font-size", 20)
+									.style("font-size", 26)
 									.attr("x", beginningSpacing + (width-beginningSpacing)/2)
-									.attr("y", beginningSpacing/2 + 10);
+									.attr("y", height - 13);
 
 								// vertical label
 								mySVG.append("text")
@@ -1365,9 +1455,55 @@ function loadFingerGraph() {
 									.style("fill", "white")
 									.style("writing-mode", "vertical-rl")
 									.style("text-anchor", "middle")
+									.style("font-size", 26)
+									.attr("x", beginningSpacing/2 + 13)
+									.attr("y", beginningSpacing + (height-beginningSpacing)/2);
+
+								// add scale labels
+								// horizontal scale
+								var xDomain = scales[d[0]].domain();
+
+								mySVG.append("text")
+									.attr("class", "temporaryLabel")
+									.text(xDomain[0].toFixed(2))
+									.style("fill", "white")
+									.style("text-anchor", "begin")
+									.style("font-size", 20)
+									.attr("x", beginningSpacing + 2*plotSpacing)
+									.attr("y", height - 10);
+
+								mySVG.append("text")
+									.attr("class", "temporaryLabel")
+									.text(xDomain[1].toFixed(2))
+									.style("fill", "white")
+									.style("text-anchor", "end")
+									.style("font-size", 20)
+									.attr("x", width - 2*plotSpacing)
+									.attr("y", height - 10);
+
+								// vertical scale
+
+								var yDomain = scales[d[1]].domain();
+
+								mySVG.append("text")
+									.attr("class", "temporaryLabel")
+									.text(yDomain[1].toFixed(2))
+									.style("fill", "white")
+									.style("writing-mode", "vertical-rl")
+									.style("text-anchor", "begin")
 									.style("font-size", 20)
 									.attr("x", beginningSpacing/2 + 10)
-									.attr("y", beginningSpacing + (height-beginningSpacing)/2);
+									.attr("y", beginningSpacing + 2*plotSpacing);
+
+								mySVG.append("text")
+									.attr("class", "temporaryLabel")
+									.text(yDomain[0].toFixed(2))
+									.style("fill", "white")
+									.style("writing-mode", "vertical-rl")
+									.style("text-anchor", "end")
+									.style("font-size", 20)
+									.attr("x", beginningSpacing/2 + 10)
+									.attr("y", width - 2*plotSpacing);
 
 								// hide the highlighting rectangles
 								d3.select(".colHighlight").transition().duration(300)
@@ -1379,103 +1515,22 @@ function loadFingerGraph() {
 						})
 						.on("contextmenu", function(d) { // "right click"
 							d3.event.preventDefault();
-							isZoomed = false;
+							if(isZoomed) {
+								isZoomed = false;
 
-							console.log("zoom out of plot: ", d);
-							// zoom out of plots
-							plots.transition().duration(300)
-								.attr("transform", "scale(1) translate(0,0)");
-							// set labels to be visible again, remove temporary labels
-							xLabels.transition().delay(150).style("visibility", "visible");
-							yLabels.transition().delay(150).style("visibility", "visible");
+								console.log("zoom out of plot: ", d);
+								// zoom out of plots
+								plots.transition().duration(300)
+									.attr("transform", "scale(1) translate(0,0)");
+								// set labels to be visible again, remove temporary labels
+								xLabels.transition().delay(150).style("visibility", "visible");
+								yLabels.transition().delay(150).style("visibility", "visible");
 
-							d3.selectAll(".temporaryLabel").remove();
-
+								d3.selectAll(".temporaryLabel").remove();
+							}
 						});
 				}
 			}
-
-			var min, max;
-			var circleRadius = 5;
-			// get ranges of values for each variable
-
-			// ======================================
-			// total number of fingers
-			min = d3.min(runSummaryData, function(el) {
-				return el.totalClusters;
-			});
-			max = d3.max(runSummaryData, function(el) {
-				return el.totalClusters;
-			});
-
-			var totalFingerScale = d3.scale.linear()
-				.domain([min, max])
-				.range([circleRadius, plotDim-circleRadius]);
-
-			// ======================================
-			// average number of fingers per timestep
-			min = d3.min(runSummaryData, function(el) {
-				return el.avgClusters;
-			});
-			max = d3.max(runSummaryData, function(el) {
-				return el.avgClusters;
-			});
-
-			var avgFingerScale = d3.scale.linear()
-				.domain([min, max])
-				.range([circleRadius, plotDim-circleRadius]);
-
-			// =========================================
-			// average finger concentration per timestep
-			min = d3.min(runSummaryData, function(el) {
-				return el.avgFingerConc;
-			});
-			max = d3.max(runSummaryData, function(el) {
-				return el.avgFingerConc;
-			});
-
-			var avgFingerConcScale = d3.scale.linear()
-				.domain([min, max])
-				.range([circleRadius, plotDim-circleRadius]);
-
-			// =========================================
-			// average finger point concentration per timestep
-			min = d3.min(runSummaryData, function(el) {
-				return el.avgFingerPointConc;
-			});
-			max = d3.max(runSummaryData, function(el) {
-				return el.avgFingerPointConc;
-			});
-
-			var avgFingerPointConcScale = d3.scale.linear()
-				.domain([min, max])
-				.range([circleRadius, plotDim-circleRadius]);
-
-			// =========================================
-			// average finger density per timestep
-			min = d3.min(runSummaryData, function(el) {
-				return el.avgFingerDensity;
-			});
-			max = d3.max(runSummaryData, function(el) {
-				return el.avgFingerDensity;
-			});
-
-			var avgFingerDensityScale = d3.scale.linear()
-				.domain([min, max])
-				.range([circleRadius, plotDim-circleRadius]);
-
-			// =========================================
-			// average finger density per timestep
-			min = d3.min(runSummaryData, function(el) {
-				return el.mergeFactor;
-			});
-			max = d3.max(runSummaryData, function(el) {
-				return el.mergeFactor;
-			});
-
-			var mergeFactorScale = d3.scale.linear()
-				.domain([min, max])
-				.range([circleRadius, plotDim-circleRadius]);
 
 			// plot each run variable onto graph at each location
 			for(var i = 0; i < runSummaryData.length; i++) {
@@ -1486,12 +1541,12 @@ function loadFingerGraph() {
 				var graphOffsets = new Array(6);
 				var statValues = new Array(6);
 
-				graphOffsets[0] = totalFingerScale(runSummaryData[i].totalClusters);
-				graphOffsets[1] = avgFingerScale(runSummaryData[i].avgClusters);
-				graphOffsets[2] = avgFingerConcScale(runSummaryData[i].avgFingerConc);
-				graphOffsets[3] = avgFingerPointConcScale(runSummaryData[i].avgFingerPointConc);
-				graphOffsets[4] = avgFingerDensityScale(runSummaryData[i].avgFingerDensity);
-				graphOffsets[5] = mergeFactorScale(runSummaryData[i].mergeFactor);
+				graphOffsets[0] = scales[0](runSummaryData[i].totalClusters);
+				graphOffsets[1] = scales[1](runSummaryData[i].avgClusters);
+				graphOffsets[2] = scales[2](runSummaryData[i].avgFingerConc);
+				graphOffsets[3] = scales[3](runSummaryData[i].avgFingerPointConc);
+				graphOffsets[4] = scales[4](runSummaryData[i].avgFingerDensity);
+				graphOffsets[5] = scales[5](runSummaryData[i].mergeFactor);
 
 				statValues[0] = runSummaryData[i].totalClusters;
 				statValues[1] = runSummaryData[i].avgClusters;
@@ -1519,6 +1574,8 @@ function loadFingerGraph() {
 							.attr("cx", beginningSpacing + plotSpacing + (j*(plotSpacing + plotDim)) + graphOffsets[j])
 							.attr("cy", beginningSpacing + ((k+1)*(plotSpacing + plotDim)) - graphOffsets[k])
 							.style("fill", "#" + colorSplit[0])
+							.style("stroke", "white")
+							.style("stroke-width", 0.5)
 							.on("click", function(d){
 								if(d3.event.button === 0) { // left click
 									if(runHighlighted && (d.summary.run === runHighlighted.num)) {
@@ -1528,7 +1585,10 @@ function loadFingerGraph() {
 
 									runHighlighted = {num: d.summary.run, x: d.col, y: d.row};
 
-									d3.selectAll(".runCircle").style("fill", "#" + colorSplit[0]).style("stroke", "");
+									d3.selectAll(".runCircle")
+										.style("fill", "#" + colorSplit[0])
+										.style("stroke", "white")
+										.style("stroke-width", 0.5);
 
 									var id = d.run;
 									d3.selectAll("#run" + id + "Circle").style("fill", "#" + colorSplit[colorSplit.length-1]);
@@ -1558,7 +1618,10 @@ function loadFingerGraph() {
 								runHighlighted = null;
 
 								// recolor normally
-								d3.selectAll(".runCircle").style("fill", "#" + colorSplit[0]).style("stroke", "");
+								d3.selectAll(".runCircle")
+									.style("fill", "#" + colorSplit[0])
+									.style("stroke", "white")
+									.style("stroke-width", 0.5);
 
 								// horizontal
 								d3.select(".rowHighlight")
