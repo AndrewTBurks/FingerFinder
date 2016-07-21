@@ -1406,27 +1406,19 @@ function loadFingerGraph() {
 				xLabels.append("text")
 					.attr("class", "variableLabel")
 					.text(varNames[i])
-					.datum(i)
-					.on('mousemove', function(d) {
-						var matrix = this.getScreenCTM()
-							.translate(+ this.getAttribute("cx"), + this.getAttribute("cy"));
-						tooltip.classed("hidden", false)
-							.html(varDescriptions[d])
-							.style("left", (window.pageXOffset + matrix.e + 15) + "px")
-							.style("top", (window.pageYOffset + matrix.f - 80) + "px");
-					})
-					.on('mouseout', function() {
-						tooltip.classed("hidden", true);
-					})
-					.style("fill", "white")
+					.style("fill", "#5BBDDE")
+					.style("text-decoration", "underline")
 					.style("text-anchor", "middle")
 					.attr("x", beginningSpacing + plotSpacing + plotDim/2 + i*(plotDim+plotSpacing))
 					.attr("y", beginningSpacing - 5);
 
-				yLabels.append("text")
-					.attr("class", "variableLabel")
-					.text(varNames[i])
+				xLabels.append("rect")
 					.datum(i)
+					.attr("x", beginningSpacing + 3*plotSpacing/4 + i*(plotDim+plotSpacing))
+					.attr("y", plotSpacing/4)
+					.attr("width", plotDim + plotSpacing/2)
+					.attr("height", beginningSpacing + plotSpacing/2)
+					.style("fill-opacity", 0)
 					.on('mousemove', function(d) {
 						var matrix = this.getScreenCTM()
 							.translate(+ this.getAttribute("cx"), + this.getAttribute("cy"));
@@ -1437,12 +1429,36 @@ function loadFingerGraph() {
 					})
 					.on('mouseout', function() {
 						tooltip.classed("hidden", true);
-					})
-					.style("fill", "white")
+					});
+
+				yLabels.append("text")
+					.attr("class", "variableLabel")
+					.text(varNames[i])
+					.style("fill", "#5BBDDE")
+					.style("text-decoration", "underline")
 					.style("writing-mode", "vertical-rl")
 					.style("text-anchor", "middle")
 					.attr("y", beginningSpacing + plotSpacing + plotDim/2 + i*(plotDim+plotSpacing))
 					.attr("x", beginningSpacing - 5);
+
+				yLabels.append("rect")
+					.datum(i)
+					.attr("x", plotSpacing/4)
+					.attr("y", beginningSpacing + 3*plotSpacing/4 + i*(plotDim+plotSpacing))
+					.attr("width", beginningSpacing + plotSpacing/2)
+					.attr("height", plotDim + plotSpacing/2)
+					.style("fill-opacity", 0)
+					.on('mousemove', function(d) {
+						var matrix = this.getScreenCTM()
+							.translate(+ this.getAttribute("cx"), + this.getAttribute("cy"));
+						tooltip.classed("hidden", false)
+							.html(varDescriptions[d])
+							.style("left", (window.pageXOffset + matrix.e + 15) + "px")
+							.style("top", (window.pageYOffset + matrix.f - 80) + "px");
+					})
+					.on('mouseout', function() {
+						tooltip.classed("hidden", true);
+					});
 
 				for(var j = 0; j < numVars; j++) {
 					plots.append("rect")
