@@ -94,6 +94,7 @@ fingerGraphBrush();
 * @type {number}
 */
 var filePick = Number(d3.select('select[name="time"]').node().value);
+populateRunDropdown();
 var runPick = d3.select('select[name="run"]').node().value;
 var folderPath = "clean.44/" + "run" + runPick + "/";
 populateDropdown();
@@ -1421,11 +1422,11 @@ function loadFingerGraph() {
 					.style("fill-opacity", 0)
 					.on('mousemove', function(d) {
 						var matrix = this.getScreenCTM()
-							.translate(+ this.getAttribute("cx"), + this.getAttribute("cy"));
+							.translate(+ this.getAttribute("x"), + this.getAttribute("y"));
 						tooltip.classed("hidden", false)
 							.html(varDescriptions[d])
-							.style("left", (window.pageXOffset + matrix.e + 15) + "px")
-							.style("top", (window.pageYOffset + matrix.f - 80) + "px");
+							.style("left", (window.pageXOffset + matrix.e + (plotDim/2)) + "px")
+							.style("top", (window.pageYOffset + matrix.f - 40) + "px");
 					})
 					.on('mouseout', function() {
 						tooltip.classed("hidden", true);
@@ -1450,11 +1451,11 @@ function loadFingerGraph() {
 					.style("fill-opacity", 0)
 					.on('mousemove', function(d) {
 						var matrix = this.getScreenCTM()
-							.translate(+ this.getAttribute("cx"), + this.getAttribute("cy"));
+							.translate(+ this.getAttribute("x"), + this.getAttribute("y"));
 						tooltip.classed("hidden", false)
 							.html(varDescriptions[d])
-							.style("left", (window.pageXOffset + matrix.e + 15) + "px")
-							.style("top", (window.pageYOffset + matrix.f - 80) + "px");
+							.style("left", (window.pageXOffset + matrix.e + (beginningSpacing/2)) + "px")
+							.style("top", (window.pageYOffset + matrix.f - 30) + "px");
 					})
 					.on('mouseout', function() {
 						tooltip.classed("hidden", true);
@@ -2149,6 +2150,20 @@ function populateDropdown() {
 		filePick = startFile;
 		readFileNumCSV(filePick);
 	});
+}
+
+function populateRunDropdown() {
+	var timeArray = [];
+		var select = document.getElementById("runDropdown");
+		// var first = 23, last = 45;
+		var i;
+		for(i = 1; i <= numRuns; i++) {
+			var opt = ("00" + i).substr(-2);
+			var el = document.createElement("option");
+			el.textContent = opt;
+			el.value = opt;
+			select.appendChild(el);
+		}
 }
 
 /**
