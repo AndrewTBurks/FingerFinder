@@ -1627,10 +1627,10 @@ function loadFingerGraph() {
 							.attr("cy", beginningSpacing + ((k+1)*(plotSpacing + plotDim)) - graphOffsets[k])
 							.style("fill", "#" + colorSplit[0])
 							.style("stroke", "white")
-							.style("stroke-width", 0.5)
+							.style("stroke-width", ('00' + (i+1)).substr(-2) === runPick ? 1.5 : 0.5)
 							.on("click", function(d){
 								if(d3.event.button === 0) { // left click
-									if(runHighlighted && (d.summary.run === runHighlighted.num)) {
+									if(runHighlighted && (d.summary.run === runHighlighted.num) && (d.run != runPick)) {
 										// load the run here
 										runPick = d.run;
 										var dropdown = document.getElementById("runDropdown");
@@ -1652,6 +1652,7 @@ function loadFingerGraph() {
 										.style("stroke", "white")
 										.style("stroke-width", 0.5);
 
+
 									// set all in run group to be highlighted in secondary color
 									for(var i = 0; i < runGroupHighlighted.length; i++) {
 										d3.selectAll("#run" + ('00' + runGroupHighlighted[i].num).substr(-2) + "Circle")
@@ -1661,6 +1662,9 @@ function loadFingerGraph() {
 									// highlight new run
 									var id = d.run;
 									d3.selectAll("#run" + id + "Circle").style("fill", "#" + colorSplit[colorSplit.length-1]);
+
+									// thicker stroke on current run
+									d3.selectAll("#run" + runPick + "Circle").style("stroke-width", 1.5);
 
 									d3.select(this).style("fill", "white").style("stroke", "#" + colorSplit[colorSplit.length-1]).style("stroke-width", 2);
 
@@ -1691,6 +1695,9 @@ function loadFingerGraph() {
 									.style("fill", "#" + colorSplit[0])
 									.style("stroke", "white")
 									.style("stroke-width", 0.5);
+
+								// thicker stroke on current run
+								d3.selectAll("#run" + runPick + "Circle").style("stroke-width", 1.5);
 
 								// horizontal
 								d3.select(".rowHighlight")
