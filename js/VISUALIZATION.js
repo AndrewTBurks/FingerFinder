@@ -1268,6 +1268,15 @@ function loadFingerGraph() {
 
 			var numVars = 6;
 			var varNames = ["Total Fingers", "Avg Fingers", "Avg Finger Conc.", "Avg Point Conc.", "Avg Finger Density", "Merge Factor"];
+			var varDescriptions = [
+				"Total number of unique fingers over the entire run.",
+				"Number of fingers in each timestep, averaged over the entire run.",
+				"Average concentration of fingers in each timestep, averaged over the entire run.",
+				"Average concentraion of points in viscous fingers in each timestep, averaged over the entire run.",
+				"Average finger density (finger concentration / finger volume) in each timestep, averaged over the entire run.",
+				"Number of merges (not including fingers which disappear) in each timestep, averaged over the entire run.",
+			];
+
 			var width = 804;
 			var height = 804;
 
