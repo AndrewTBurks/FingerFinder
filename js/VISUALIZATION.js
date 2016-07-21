@@ -1268,7 +1268,7 @@ function loadFingerGraph() {
 			var plotDim = ((width-beginningSpacing)-((numVars+1) * plotSpacing))/numVars;
 
 			var isZoomed = false;
-			var runHighlighted = false;
+			var runHighlighted = null;
 
 			plots.append("rect")
 				.attr("class", "rowHighlight")
@@ -1512,30 +1512,54 @@ function loadFingerGraph() {
 							.attr("cy", beginningSpacing + ((k+1)*(plotSpacing + plotDim)) - graphOffsets[k])
 							.style("fill", "#" + colorSplit[0])
 							.on("click", function(d){
-								runHighlighted = true;
+								if(d3.event.button === 0) { // left click
+									if(runHighlighted && (d.summary.run === runHighlighted.num)) {
+										// load the run
+										console.log("Loading: run" + d.run);
+									}
 
+									runHighlighted = {num: d.summary.run, x: d.col, y: d.row};
+
+									d3.selectAll(".runCircle").style("fill", "#" + colorSplit[0]).style("stroke", "");
+
+									var id = d.run;
+									d3.selectAll("#run" + id + "Circle").style("fill", "#" + colorSplit[colorSplit.length-1]);
+
+									d3.select(this).style("fill", "white").style("stroke", "#" + colorSplit[colorSplit.length-1]).style("stroke-width", 2);
+
+									if(!isZoomed) {
+										// horizontal
+										d3.select(".rowHighlight")
+											.attr("y", beginningSpacing + (plotSpacing/2) + d.row * (plotSpacing + plotDim))
+											.attr("x", beginningSpacing + (plotSpacing/2))
+											.style("stroke-opacity", 0.5);
+
+										// vertical
+										d3.select(".colHighlight")
+											.attr("y", beginningSpacing + (plotSpacing/2))
+											.attr("x", beginningSpacing + (plotSpacing/2) + d.col * (plotSpacing + plotDim))
+											.style("stroke-opacity", 0.5);
+									}
+
+									console.log(d);
+								}
+							})
+							.on("contextmenu", function(d) {
+								d3.event.preventDefault();
+								// no run is highlighted
+								runHighlighted = null;
+
+								// recolor normally
 								d3.selectAll(".runCircle").style("fill", "#" + colorSplit[0]).style("stroke", "");
 
-								var id = d.run;
-								d3.selectAll("#run" + id + "Circle").style("fill", "#" + colorSplit[colorSplit.length-1]);
+								// horizontal
+								d3.select(".rowHighlight")
+									.style("stroke-opacity", 0);
 
-								d3.select(this).style("fill", "white").style("stroke", "#" + colorSplit[colorSplit.length-1]).style("stroke-width", 2);
+								// vertical
+								d3.select(".colHighlight")
+									.style("stroke-opacity", 0);
 
-								if(!isZoomed) {
-									// horizontal
-									d3.select(".rowHighlight")
-										.attr("y", beginningSpacing + (plotSpacing/2) + d.row * (plotSpacing + plotDim))
-										.attr("x", beginningSpacing + (plotSpacing/2))
-										.style("stroke-opacity", 0.5);
-
-									// vertical
-									d3.select(".colHighlight")
-										.attr("y", beginningSpacing + (plotSpacing/2))
-										.attr("x", beginningSpacing + (plotSpacing/2) + d.col * (plotSpacing + plotDim))
-										.style("stroke-opacity", 0.5);
-								}
-
-								console.log(d);
 							});
 					}
 				}
