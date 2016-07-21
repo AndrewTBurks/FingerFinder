@@ -1277,6 +1277,7 @@ function loadFingerGraph() {
 
 			var isZoomed = false;
 			var runHighlighted = null;
+			var runGroupHighlighted = [];
 
 			/* === CREATE SCALES === */
 
@@ -1284,6 +1285,7 @@ function loadFingerGraph() {
 
 			var min, max;
 			var circleRadius = 5;
+			var circleStrokeWidth = 0.5;
 			// get ranges of values for each variable
 
 			// ======================================
@@ -1297,7 +1299,7 @@ function loadFingerGraph() {
 
 			scales[0] = d3.scale.linear()
 				.domain([min, max])
-				.range([circleRadius, plotDim-circleRadius]);
+				.range([circleRadius + circleStrokeWidth, plotDim-(circleRadius + circleStrokeWidth)]);
 
 			// ======================================
 			// average number of fingers per timestep
@@ -1310,7 +1312,7 @@ function loadFingerGraph() {
 
 			scales[1] = d3.scale.linear()
 				.domain([min, max])
-				.range([circleRadius, plotDim-circleRadius]);
+				.range([circleRadius + circleStrokeWidth, plotDim-(circleRadius + circleStrokeWidth)]);
 
 			// =========================================
 			// average finger concentration per timestep
@@ -1323,7 +1325,7 @@ function loadFingerGraph() {
 
 			scales[2] = d3.scale.linear()
 				.domain([min, max])
-				.range([circleRadius, plotDim-circleRadius]);
+				.range([circleRadius + circleStrokeWidth, plotDim-(circleRadius + circleStrokeWidth)]);
 
 			// =========================================
 			// average finger point concentration per timestep
@@ -1336,7 +1338,7 @@ function loadFingerGraph() {
 
 			scales[3] = d3.scale.linear()
 				.domain([min, max])
-				.range([circleRadius, plotDim-circleRadius]);
+				.range([circleRadius + circleStrokeWidth, plotDim-(circleRadius + circleStrokeWidth)]);
 
 			// =========================================
 			// average finger density per timestep
@@ -1349,7 +1351,7 @@ function loadFingerGraph() {
 
 			scales[4] = d3.scale.linear()
 				.domain([min, max])
-				.range([circleRadius, plotDim-circleRadius]);
+				.range([circleRadius + circleStrokeWidth, plotDim-(circleRadius + circleStrokeWidth)]);
 
 			// =========================================
 			// average finger density per timestep
@@ -1362,7 +1364,7 @@ function loadFingerGraph() {
 
 			scales[5] = d3.scale.linear()
 				.domain([min, max])
-				.range([circleRadius, plotDim-circleRadius]);
+				.range([circleRadius + circleStrokeWidth, plotDim-(circleRadius + circleStrokeWidth)]);
 
 			/* === SCALES CREATED === */
 
@@ -1579,17 +1581,29 @@ function loadFingerGraph() {
 							.on("click", function(d){
 								if(d3.event.button === 0) { // left click
 									if(runHighlighted && (d.summary.run === runHighlighted.num)) {
-										// load the run
+										// load the run here
+
+
 										console.log("Loading: run" + d.run);
 									}
 
 									runHighlighted = {num: d.summary.run, x: d.col, y: d.row};
 
+									runGroupHighlighted.push(runHighlighted);
+
+									// set all back to normal color
 									d3.selectAll(".runCircle")
 										.style("fill", "#" + colorSplit[0])
 										.style("stroke", "white")
 										.style("stroke-width", 0.5);
 
+									// set all in run group to be highlighted in secondary color
+									for(var i = 0; i < runGroupHighlighted.length; i++) {
+										d3.selectAll("#run" + ('00' + runGroupHighlighted[i].num).substr(-2) + "Circle")
+											.style("fill", "#" + colorSplit[Math.round(colorSplit.length/2)]);
+									}
+
+									// highlight new run
 									var id = d.run;
 									d3.selectAll("#run" + id + "Circle").style("fill", "#" + colorSplit[colorSplit.length-1]);
 
@@ -1616,6 +1630,7 @@ function loadFingerGraph() {
 								d3.event.preventDefault();
 								// no run is highlighted
 								runHighlighted = null;
+								runGroupHighlighted = [];
 
 								// recolor normally
 								d3.selectAll(".runCircle")
