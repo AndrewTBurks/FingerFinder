@@ -1267,7 +1267,7 @@ function loadFingerGraph() {
 			var yLabels = mySVG.append("g");
 
 			var numVars = 6;
-			var varNames = ["Total Fingers", "Avg Fingers", "Avg Finger Conc.", "Avg Point Conc.", "Avg Finger Density", "Merge Factor"];
+			var varNames = ["Total Fingers", "Avg Fingers", "Avg Finger Conc.", "Avg Point Conc.", "Avg Finger Dens.", "Merge Factor"];
 			var varDescriptions = [
 				"Total number of unique fingers over the entire run.",
 				"Number of fingers in each timestep, averaged over the entire run.",
