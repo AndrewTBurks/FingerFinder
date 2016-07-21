@@ -33,7 +33,7 @@ var sliced = [];
 var sliceAccumulated = [];
 var colorSchemeChoice = 3;
 
-var numRuns = 6;
+var numRuns = 8;
 var runSummaryData = new Array(numRuns);
 
 /**
@@ -1186,13 +1186,11 @@ function loadFingerGraph() {
 			var timestepAvgFingerDensity = new Array(120).fill(0);
 
 			// for each timestep
-			for(var i = 1; i <= 120; i++) {
-				// timestepMergeFactors[i] = thisClusterCenters[i-1].length === thisClusterCenters[i].length ?
-				// 	1 : thisClusterCenters[i-1].length/thisClusterCenters[i].length;
+			for(var i = 0; i <= 120; i++) {
 
 				// merge factors
-				timestepMergeFactors[i] = thisClusterCenters[i-1].length > thisClusterCenters[i].length ?
-					thisClusterCenters[i-1].length - thisClusterCenters[i].length : 0;
+				// timestepMergeFactors[i] = thisClusterCenters[i-1].length > thisClusterCenters[i].length ?
+				// 	thisClusterCenters[i-1].length - thisClusterCenters[i].length : 0;
 
 				// number of clusters
 				timestepNumClusters[i] = thisClusterCenters[i].length;
@@ -1201,6 +1199,9 @@ function loadFingerGraph() {
 				var totalTimestepConc = 0;
 				var totalTimestepNumPoints = 0;
 				var totalTimestepDensity = 0;
+
+				// merge factors (new method)
+				timestepMergeFactors[i] = 0
 				for(var j = 0; j < thisClusterCenters[i].length; j++) {
 					totalTimestepConc += thisClusterCenters[i][j].concTotal;
 					totalTimestepNumPoints += thisClusterCenters[i][j].size;
@@ -1208,6 +1209,13 @@ function loadFingerGraph() {
 						((thisClusterCenters[i][j].xMax-thisClusterCenters[i][j].xMin) *
 							(thisClusterCenters[i][j].yMax-thisClusterCenters[i][j].yMin) *
 							(thisClusterCenters[i][j].zMax-thisClusterCenters[i][j].zMin));
+
+					if((thisClusterCenters[i][j].nextID != -1)
+					 		&& (thisClusterCenters[i][j].clusterID != thisClusterCenters[i][j].nextID))
+					{
+						// if this cluster doesnt disappear and also doesn't stay the same ID
+						timestepMergeFactors[i]++;
+					}
 
 				}
 				timestepAvgFingerConc[i] = totalTimestepConc/thisClusterCenters[i].length;
