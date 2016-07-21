@@ -1593,7 +1593,12 @@ function loadFingerGraph() {
 								if(d3.event.button === 0) { // left click
 									if(runHighlighted && (d.summary.run === runHighlighted.num)) {
 										// load the run here
-
+										runPick = d.run;
+										var dropdown = document.getElementById("runDropdown");
+										dropdown.value = runPick;
+										folderPath = "clean.44/" + "run" + runPick + "/";
+										readFileNumCSV(filePick);
+										loadFingerGraph();
 
 										console.log("Loading: run" + d.run);
 									}
@@ -1633,7 +1638,6 @@ function loadFingerGraph() {
 											.attr("x", beginningSpacing + (plotSpacing/2) + d.col * (plotSpacing + plotDim))
 											.style("stroke-opacity", 0.5);
 									}
-
 									console.log(d);
 								}
 							})
