@@ -1254,11 +1254,9 @@ function loadFingerGraph() {
 				.attr("width", "100%")
 				.attr("height", "100%");
 
-			// mySVG.append("rect")
-			// 	.attr("width", "100%")
-			// 	.attr("height", "100%")
-			// 	.style("stroke", "black")
-			// 	.style("stroke-width", 5);
+			var plots = mySVG.append("g");
+			var xLabels = mySVG.append("g");
+			var yLabels = mySVG.append("g");
 
 			var numVars = 6;
 			var varNames = ["Total Fingers", "Avg Fingers", "Avg Finger Conc.", "Avg Point Conc.", "Avg Finger Density", "Merge Factor"];
@@ -1269,8 +1267,10 @@ function loadFingerGraph() {
 			var beginningSpacing = 30;
 			var plotDim = ((width-beginningSpacing)-((numVars+1) * plotSpacing))/numVars;
 
+			var isZoomed = false;
+			var runHighlighted = false;
 
-			mySVG.append("rect")
+			plots.append("rect")
 				.attr("class", "rowHighlight")
 				.attr("y", 0)
 				.attr("x", 0)
@@ -1282,7 +1282,7 @@ function loadFingerGraph() {
 				.style("stroke-opacity", 0);
 
 			// vertical
-			mySVG.append("rect")
+			plots.append("rect")
 				.attr("class", "colHighlight")
 				.attr("y", 0)
 				.attr("x", 0)
@@ -1294,7 +1294,7 @@ function loadFingerGraph() {
 				.style("stroke-opacity", 0);
 
 			for(var i = 0; i < numVars; i++) {
-				mySVG.append("text")
+				xLabels.append("text")
 					.attr("class", "variableLabel")
 					.text(varNames[i])
 					.style("fill", "white")
@@ -1302,22 +1302,88 @@ function loadFingerGraph() {
 					.attr("x", beginningSpacing + plotSpacing + plotDim/2 + i*(plotDim+plotSpacing))
 					.attr("y", beginningSpacing - 5);
 
-				mySVG.append("text")
+				yLabels.append("text")
 					.attr("class", "variableLabel")
 					.text(varNames[i])
 					.style("fill", "white")
 					.style("writing-mode", "vertical-rl")
 					.style("text-anchor", "middle")
 					.attr("y", beginningSpacing + plotSpacing + plotDim/2 + i*(plotDim+plotSpacing))
-					.attr("x", beginningSpacing/2);
+					.attr("x", beginningSpacing - 5);
 
 				for(var j = 0; j < numVars; j++) {
-					mySVG.append("rect")
+					plots.append("rect")
+						.datum([i, j])
 						.attr("height", plotDim)
 						.attr("width", plotDim)
 						.attr("x", (beginningSpacing + (i*plotDim) + ((i+1)*plotSpacing)))
 						.attr("y", (beginningSpacing + (j*plotDim) + ((j+1)*plotSpacing)))
-						.style("fill", "#0F0F0F");
+						.style("fill", "#0F0F0F")
+						.on("mouseup", function(d) {
+							// only zooms if the mouseup is caused by left click
+							if(d3.event.button === 0) {
+								isZoomed = true;
+
+								console.log("zoom into plot:", d);
+								var xTranslate, yTranslate, scale;
+
+								// zoom into the selected plot
+								xTranslate = -1 * (beginningSpacing + (d[0] * (plotSpacing + plotDim)));
+								yTranslate = -1 * (beginningSpacing + (d[1] * (plotSpacing + plotDim)));
+								scale = (numVars * (plotSpacing + plotDim)) / (plotDim + plotSpacing);
+
+								plots.transition().duration(300)
+									.attr("transform", "scale(" + scale + ") translate(" + xTranslate + "," + yTranslate + ")");
+
+								// hide the main axis labels
+								xLabels.style("visibility", "hidden");
+								yLabels.style("visibility", "hidden");
+
+								// create temporary labels for selected variables
+								// horizontal label
+								mySVG.append("text")
+									.attr("class", "temporaryLabel")
+									.text(varNames[d[0]])
+									.style("fill", "white")
+									.style("text-anchor", "middle")
+									.style("font-size", 20)
+									.attr("x", beginningSpacing + (width-beginningSpacing)/2)
+									.attr("y", beginningSpacing/2 + 10);
+
+								// vertical label
+								mySVG.append("text")
+									.attr("class", "temporaryLabel")
+									.text(varNames[d[1]])
+									.style("fill", "white")
+									.style("writing-mode", "vertical-rl")
+									.style("text-anchor", "middle")
+									.style("font-size", 20)
+									.attr("x", beginningSpacing/2 + 10)
+									.attr("y", beginningSpacing + (height-beginningSpacing)/2);
+
+								// hide the highlighting rectangles
+								d3.select(".colHighlight").transition().duration(300)
+									.style("stroke-opacity", 0);
+
+								d3.select(".rowHighlight").transition().duration(300)
+									.style("stroke-opacity", 0);
+							}
+						})
+						.on("contextmenu", function(d) { // "right click"
+							d3.event.preventDefault();
+							isZoomed = false;
+
+							console.log("zoom out of plot: ", d);
+							// zoom out of plots
+							plots.transition().duration(300)
+								.attr("transform", "scale(1) translate(0,0)");
+							// set labels to be visible again, remove temporary labels
+							xLabels.transition().delay(150).style("visibility", "visible");
+							yLabels.transition().delay(150).style("visibility", "visible");
+
+							d3.selectAll(".temporaryLabel").remove();
+
+						});
 				}
 			}
 
@@ -1430,7 +1496,7 @@ function loadFingerGraph() {
 					// for each of numVars variables (horizontal)
 					for(var k = 0; k < numVars; k++) {
 						// for each of numVars variables (vertical)
-						mySVG.append("circle")
+						plots.append("circle")
 							.datum({
 								run: ('00' + (i+1)).substr(-2),
 								col: j,
@@ -1446,6 +1512,8 @@ function loadFingerGraph() {
 							.attr("cy", beginningSpacing + ((k+1)*(plotSpacing + plotDim)) - graphOffsets[k])
 							.style("fill", "#" + colorSplit[0])
 							.on("click", function(d){
+								runHighlighted = true;
+
 								d3.selectAll(".runCircle").style("fill", "#" + colorSplit[0]).style("stroke", "");
 
 								var id = d.run;
@@ -1453,17 +1521,19 @@ function loadFingerGraph() {
 
 								d3.select(this).style("fill", "white").style("stroke", "#" + colorSplit[colorSplit.length-1]).style("stroke-width", 2);
 
-								// horizontal
-								d3.select(".rowHighlight")
-									.attr("y", beginningSpacing + (plotSpacing/2) + d.row * (plotSpacing + plotDim))
-									.attr("x", beginningSpacing + (plotSpacing/2))
-									.style("stroke-opacity", 0.5);
+								if(!isZoomed) {
+									// horizontal
+									d3.select(".rowHighlight")
+										.attr("y", beginningSpacing + (plotSpacing/2) + d.row * (plotSpacing + plotDim))
+										.attr("x", beginningSpacing + (plotSpacing/2))
+										.style("stroke-opacity", 0.5);
 
-								// vertical
-								d3.select(".colHighlight")
-									.attr("y", beginningSpacing + (plotSpacing/2))
-									.attr("x", beginningSpacing + (plotSpacing/2) + d.col * (plotSpacing + plotDim))
-									.style("stroke-opacity", 0.5);
+									// vertical
+									d3.select(".colHighlight")
+										.attr("y", beginningSpacing + (plotSpacing/2))
+										.attr("x", beginningSpacing + (plotSpacing/2) + d.col * (plotSpacing + plotDim))
+										.style("stroke-opacity", 0.5);
+								}
 
 								console.log(d);
 							});
