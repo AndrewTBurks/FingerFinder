@@ -1407,6 +1407,17 @@ function loadFingerGraph() {
 					.attr("class", "variableLabel")
 					.text(varNames[i])
 					.datum(i)
+					.on('mousemove', function(d) {
+						var matrix = this.getScreenCTM()
+							.translate(+ this.getAttribute("cx"), + this.getAttribute("cy"));
+						tooltip.classed("hidden", false)
+							.html(varDescriptions[d])
+							.style("left", (window.pageXOffset + matrix.e + 15) + "px")
+							.style("top", (window.pageYOffset + matrix.f - 80) + "px");
+					})
+					.on('mouseout', function() {
+						tooltip.classed("hidden", true);
+					})
 					.style("fill", "white")
 					.style("text-anchor", "middle")
 					.attr("x", beginningSpacing + plotSpacing + plotDim/2 + i*(plotDim+plotSpacing))
@@ -1416,6 +1427,17 @@ function loadFingerGraph() {
 					.attr("class", "variableLabel")
 					.text(varNames[i])
 					.datum(i)
+					.on('mousemove', function(d) {
+						var matrix = this.getScreenCTM()
+							.translate(+ this.getAttribute("cx"), + this.getAttribute("cy"));
+						tooltip.classed("hidden", false)
+							.html(varDescriptions[d])
+							.style("left", (window.pageXOffset + matrix.e + 15) + "px")
+							.style("top", (window.pageYOffset + matrix.f - 80) + "px");
+					})
+					.on('mouseout', function() {
+						tooltip.classed("hidden", true);
+					})
 					.style("fill", "white")
 					.style("writing-mode", "vertical-rl")
 					.style("text-anchor", "middle")
