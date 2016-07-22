@@ -1496,7 +1496,7 @@ function loadFingerGraph() {
 					.style("text-decoration", "underline")
 					.style("writing-mode", "vertical-rl")
 					.style("text-anchor", "middle")
-					.attr("y", beginningSpacing + plotSpacing + plotDim/2 + i*(plotDim+plotSpacing))
+					.attr("y", beginningSpacing + plotSpacing*2 + plotDim/2 + i*(plotDim+plotSpacing))
 					.attr("x", beginningSpacing - 5);
 
 				yLabels.append("rect")
