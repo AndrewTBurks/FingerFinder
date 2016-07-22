@@ -646,6 +646,10 @@ function drawParticles(fileNum) {
 		});
 	}
 
+	/**
+	* Recolors the pairplots according to the option selected. function
+	* defined within {@link drawPairplots}
+	*/
 	var recolorPairplots;
 
 	// file reading
@@ -1270,6 +1274,9 @@ function loadFingerGraph() {
 		});
 	}
 
+	/**
+	 * Function to draw the run metrics pairplots.
+	 */
 	function drawPairplots() {
 		var myDiv = d3.select("#pairplots");
 
