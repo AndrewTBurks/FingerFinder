@@ -648,7 +648,7 @@ function drawParticles(fileNum) {
 
 	/**
 	* Recolors the pairplots according to the option selected. function
-	* defined within {@link drawPairplots}
+	* defined within {@link vis.js.html#line1784}
 	*/
 	var recolorPairplots;
 
