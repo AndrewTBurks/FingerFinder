@@ -203,7 +203,7 @@ function createColorLegend() {
 
 function createSliceColorLegend() {
 
-	// d3.select("#canvas").remove();
+	d3.select("#sliceCanvas").remove();
 
 	var canvas = d3.select("#legendSlice").append("canvas")
 	.attr("id", "sliceCanvas")
