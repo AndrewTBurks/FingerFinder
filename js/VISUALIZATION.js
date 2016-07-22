@@ -1546,8 +1546,8 @@ function loadFingerGraph() {
 								xLabels.transition().duration(150).style("opacity", 0);
 								yLabels.transition().duration(150).style("opacity", 0);
 
-								xLabels.style("visibility", "hidden");
-								yLabels.style("visibility", "hidden");
+								xLabels.transition().delay(150).style("visibility", "hidden");
+								yLabels.transition().delay(150).style("visibility", "hidden");
 
 
 								// create temporary labels for selected variables
