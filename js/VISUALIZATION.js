@@ -1546,6 +1546,9 @@ function loadFingerGraph() {
 								xLabels.transition().duration(150).style("opacity", 0);
 								yLabels.transition().duration(150).style("opacity", 0);
 
+								xLabels.style("visibility", "hidden");
+								yLabels.style("visibility", "hidden");
+
 
 								// create temporary labels for selected variables
 								// horizontal label
@@ -1638,6 +1641,9 @@ function loadFingerGraph() {
 								plots.transition().duration(300).ease("expIn")
 									.attr("transform", "scale(1) translate(0,0)");
 								// set labels to be visible again, remove temporary labels
+
+								xLabels.style("visibility", "visible");
+								yLabels.style("visibility", "visible");
 								xLabels.transition().duration(150).delay(150).style("opacity", 1);
 								yLabels.transition().duration(150).delay(150).style("opacity", 1);
 
