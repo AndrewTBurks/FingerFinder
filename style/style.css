@@ -348,7 +348,7 @@ div.tooltip {
 .axis path {
   fill: none;
   stroke: #e0e0e0;
-  stroke-width: 3px;
+  stroke-width: 4px;
   }
 .axis line {
   fill: none;

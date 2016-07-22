@@ -599,6 +599,7 @@ function drawParticles(fileNum) {
 		}
 		particleSystem.geometry.colorsNeedUpdate = true;
 
+		highlightViscousFinger();
 	}
 
 	function highlightViscousFinger() {
@@ -1787,12 +1788,22 @@ function loadFingerGraph() {
 					.style("fill", "#" + colorSplit[Math.round(colorSplit.length/2)]);
 			}
 
-			d3.selectAll("#run" + ("00" + runHighlighted.num).substr(-2) + "Circle")
-				.style("fill", "#" + colorSplit[colorSplit.length-1]);
-
+			if(runHighlighted) {
+				d3.selectAll("#run" + ("00" + runHighlighted.num).substr(-2) + "Circle")
+					.style("fill", "#" + colorSplit[colorSplit.length-1]);
+			}
 			// thicker stroke on current run
 			d3.selectAll("#run" + runPick + "Circle").style("stroke-width", 1.5);
 			console.log(runHighlighted);
+
+			console
+
+			if (colorSchemeChoice == 0 || colorSchemeChoice == 1) {
+				plots.selectAll("rect").style("fill", "#454545");
+			}
+			if (colorSchemeChoice == 2 || colorSchemeChoice == 3) {
+				plots.selectAll("rect").style("fill", "#050505");
+			}
 
 		};
 	}
