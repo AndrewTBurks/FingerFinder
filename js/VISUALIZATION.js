@@ -432,8 +432,10 @@ function drawParticles(fileNum) {
 		var minConcSlice = d3.min(sliceAccumulated, function(e) { return d3.max(e, function(e){ return e.conc;}); });
 		var meanConcSlice = d3.mean(sliceAccumulated, function(e) { return d3.mean(e, function(e){ return e.conc;}); });
 
-		d3.select("#sliceScaleMin").text(meanConcSlice.toFixed(2));
-		d3.select("#sliceScaleMax").text(maxConcSlice.toFixed(2));
+		var colorDomain = color.domain();
+
+		d3.select("#sliceScaleMin").text("< " + (colorDomain[0]*3).toFixed(2));
+		d3.select("#sliceScaleMax").text("> " + (colorDomain[1]*3).toFixed(2));
 
 		var maxVelSlice = d3.max(sliceAccumulated, function(e) {
 			return d3.max(e, function(e) {
@@ -441,7 +443,9 @@ function drawParticles(fileNum) {
 			});
 		});
 
-		colorSlice.domain([meanConcSlice, maxConcSlice]);
+
+
+		colorSlice.domain([colorDomain[0]*3, colorDomain[1]*3]);
 
 		d3.selectAll(".slicePixel").remove();
 		d3.selectAll(".sliceLine").remove();
@@ -1534,12 +1538,13 @@ function loadFingerGraph() {
 								yTranslate = -1 * (beginningSpacing + (d[1] * (plotSpacing + plotDim)));
 								scale = (numVars * (plotSpacing + plotDim)) / (plotDim + plotSpacing);
 
-								plots.transition().duration(300)
+								plots.transition().duration(300).ease("expOut")
 									.attr("transform", "scale(" + scale + ") translate(" + xTranslate + "," + yTranslate + ")");
 
 								// hide the main axis labels
-								xLabels.style("visibility", "hidden");
-								yLabels.style("visibility", "hidden");
+								xLabels.transition().duration(150).style("opacity", 0);
+								yLabels.transition().duration(150).style("opacity", 0);
+
 
 								// create temporary labels for selected variables
 								// horizontal label
@@ -1609,6 +1614,11 @@ function loadFingerGraph() {
 									.attr("x", beginningSpacing/2 + 10)
 									.attr("y", width - 2*plotSpacing);
 
+								d3.selectAll(".temporaryLabel").style("opacity", 0);
+
+								d3.selectAll(".temporaryLabel").transition().duration(150).delay(150)
+									.style("opacity", 1);
+
 								// hide the highlighting rectangles
 								d3.select(".colHighlight").transition().duration(300)
 									.style("stroke-opacity", 0);
@@ -1624,20 +1634,25 @@ function loadFingerGraph() {
 
 								console.log("zoom out of plot: ", d);
 								// zoom out of plots
-								plots.transition().duration(300)
+								plots.transition().duration(300).ease("expIn")
 									.attr("transform", "scale(1) translate(0,0)");
 								// set labels to be visible again, remove temporary labels
-								xLabels.transition().delay(150).style("visibility", "visible");
-								yLabels.transition().delay(150).style("visibility", "visible");
+								xLabels.transition().duration(150).delay(150).style("opacity", 1);
+								yLabels.transition().duration(150).delay(150).style("opacity", 1);
 
-								d3.selectAll(".temporaryLabel").remove();
+								d3.selectAll(".temporaryLabel").transition().duration(150).style("opacity", 0);
+								d3.selectAll(".temporaryLabel").transition().delay(150).remove();
 
 								if(runHighlighted) {
 									d3.select(".colHighlight").transition().duration(300)
-										.style("stroke-opacity", 0.5);
+										.style("stroke-opacity", 0.5)
+										.attr("x", beginningSpacing + (plotSpacing/2) + runHighlighted.x * (plotSpacing + plotDim));
 
 									d3.select(".rowHighlight").transition().duration(300)
-										.style("stroke-opacity", 0.5);
+										.style("stroke-opacity", 0.5)
+										.attr("y", beginningSpacing + (plotSpacing/2) + runHighlighted.y * (plotSpacing + plotDim));
+
+
 								}
 							}
 						});
