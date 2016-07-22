@@ -542,6 +542,7 @@ function drawParticles(fileNum) {
 		recolorHeatMaps();
 		recolorFingerGraph();
 		createColorLegend();
+		recolorPairplots();
 	}
 
 
@@ -632,6 +633,8 @@ function drawParticles(fileNum) {
 			return fingerColor(d.conc);
 		});
 	}
+
+	var recolorPairplots;
 
 	// file reading
 	// read 1 file
@@ -1758,6 +1761,30 @@ function loadFingerGraph() {
 			// thicker stroke on current run
 			d3.selectAll("#run" + runPick + "Circle").style("stroke-width", 1.5);
 		});
+
+		recolorPairplots = function() {
+			// set all back to normal color
+			d3.selectAll(".runCircle")
+				.style("fill", "#" + colorSplit[0])
+				.style("stroke", "white")
+				.style("stroke-width", 0.5);
+
+
+			// set all in run group to be highlighted in secondary color
+			for(var i = 0; i < runGroupHighlighted.length; i++) {
+				d3.selectAll("#run" + ('00' + runGroupHighlighted[i].num).substr(-2) + "Circle")
+					.style("fill", "#" + colorSplit[Math.round(colorSplit.length/2)]);
+			}
+
+			// highlight new run
+			var id = d.run;
+			d3.selectAll("#run" + id + "Circle").style("fill", "#" + colorSplit[colorSplit.length-1]);
+
+			// thicker stroke on current run
+			d3.selectAll("#run" + runPick + "Circle").style("stroke-width", 1.5);
+
+			d3.select(this).style("fill", "white").style("stroke", "#" + colorSplit[colorSplit.length-1]).style("stroke-width", 2);
+		};
 	}
 
 	var mean, stddev, maxConc;
