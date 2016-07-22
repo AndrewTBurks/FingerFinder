@@ -6,9 +6,20 @@
 * @author Cassiano Sugiyama
 */
 
+// var App = App || {};
+//
+// (funciton() {
+//
+// 	App.WIDTH = 450;
+// 	App.myFunc = function() {
+//
+// 	};
+//
+// })();
+
 // constants for width and height of the scene
 var WIDTH = 450,
-HEIGHT = 632;
+	HEIGHT = 632;
 var WIDTH_SLICE = 380;
 var numFiles = 121;
 // Range of file data available
@@ -1776,14 +1787,13 @@ function loadFingerGraph() {
 					.style("fill", "#" + colorSplit[Math.round(colorSplit.length/2)]);
 			}
 
-			// highlight new run
-			var id = d.run;
-			d3.selectAll("#run" + id + "Circle").style("fill", "#" + colorSplit[colorSplit.length-1]);
+			d3.selectAll("#run" + ("00" + runHighlighted.num).substr(-2) + "Circle")
+				.style("fill", "#" + colorSplit[colorSplit.length-1]);
 
 			// thicker stroke on current run
 			d3.selectAll("#run" + runPick + "Circle").style("stroke-width", 1.5);
+			console.log(runHighlighted);
 
-			d3.select(this).style("fill", "white").style("stroke", "#" + colorSplit[colorSplit.length-1]).style("stroke-width", 2);
 		};
 	}
 
