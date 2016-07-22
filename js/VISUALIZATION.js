@@ -1791,6 +1791,8 @@ function loadFingerGraph() {
 
 							})
 							.on('mousemove', function(d) {
+								sel = d3.select(this);
+								sel.moveToFront();
 								var matrix = this.getScreenCTM()
 		        			.translate(+ this.getAttribute("cx"), + this.getAttribute("cy"));
 								tooltip.classed("hidden", false)
@@ -2342,3 +2344,9 @@ function menuListener() {
 		recolorAll();
 	});
 }
+
+d3.selection.prototype.moveToFront = function() {
+  return this.each(function(){
+    this.parentNode.appendChild(this);
+  });
+};
