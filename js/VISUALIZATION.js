@@ -1073,10 +1073,11 @@ function loadFingerGraph() {
 							}
 							else {
 								// put back to normal colors
-								recolor3DModel();
 								currSelectedNode.timestep = -1;
 								currSelectedNode.ID = -1;
 								currSelectedNode.includes = [];
+								recolor3DModel();
+
 								d3.select(this)
 									.style("stroke-width", 0.5)
 									.style("stroke", "white");
