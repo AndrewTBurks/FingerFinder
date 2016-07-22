@@ -431,6 +431,9 @@ function drawParticles(fileNum) {
 		var maxConcSlice = d3.max(sliceAccumulated, function(e) { return d3.max(e, function(e){ return e.conc;}); });
 		var minConcSlice = d3.min(sliceAccumulated, function(e) { return d3.max(e, function(e){ return e.conc;}); });
 
+		d3.select("#sliceScaleMin").text(minConcSlice.toFixed(2));
+		d3.select("#sliceScaleMax").text(maxConcSlice.toFixed(2));
+
 		var maxVelSlice = d3.max(sliceAccumulated, function(e) {
 			return d3.max(e, function(e) {
 				return e.vel.length();
