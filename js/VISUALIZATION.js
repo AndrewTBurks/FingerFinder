@@ -430,6 +430,7 @@ function drawParticles(fileNum) {
 
 		var maxConcSlice = d3.max(sliceAccumulated, function(e) { return d3.max(e, function(e){ return e.conc;}); });
 		var minConcSlice = d3.min(sliceAccumulated, function(e) { return d3.max(e, function(e){ return e.conc;}); });
+		var meanConcSlice = d3.mean(sliceAccumulated, function(e) { return d3.mean(e, function(e){ return e.conc;}); });
 
 		d3.select("#sliceScaleMin").text(minConcSlice.toFixed(2));
 		d3.select("#sliceScaleMax").text(maxConcSlice.toFixed(2));
@@ -440,7 +441,7 @@ function drawParticles(fileNum) {
 			});
 		});
 
-		colorSlice.domain([0, maxConcSlice]);
+		colorSlice.domain([meanConcSlice, maxConcSlice]);
 
 		d3.selectAll(".slicePixel").remove();
 		d3.selectAll(".sliceLine").remove();
@@ -467,7 +468,7 @@ function drawParticles(fileNum) {
 				.attr("height", gridWidth)
 				.attr("x", (sliceAccumulated[i][j].x*gridWidth))
 				.attr("y", (sliceAccumulated[i][j].y*gridWidth))
-				.style("fill", d3.rgb("#" + color(sliceAccumulated[i][j].conc/3)));
+				.style("fill", d3.rgb("#" + colorSlice(sliceAccumulated[i][j].conc)));
 
 
 				svg2.append("rect")
@@ -477,7 +478,7 @@ function drawParticles(fileNum) {
 				.attr("height", gridWidth)
 				.attr("x", (sliceAccumulated[i][j].x*gridWidth))
 				.attr("y", (sliceAccumulated[i][j].y*gridWidth))
-				.style("fill", d3.rgb("#" + color(sliceAccumulated[i][j].conc/3)))
+				.style("fill", d3.rgb("#" + colorSlice(sliceAccumulated[i][j].conc)))
 				.style("fill-opacity", 0.3);
 
 			}
@@ -521,7 +522,7 @@ function drawParticles(fileNum) {
 				" L " + (xStart+dXEndLine) + " " + (yStart+dYEndLine) +
 				" L " + xEnd + " " + yEnd + " Z")
 				.attr('stroke-linecap', 'round')
-				.style("fill", d3.rgb("#" + color(sliceAccumulated[i][j].conc/3)));
+				.style("fill", d3.rgb("#" + colorSlice(sliceAccumulated[i][j].conc)));
 			}
 		}
 		sliceArrow1.remove();
