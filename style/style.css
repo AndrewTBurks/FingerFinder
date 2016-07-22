@@ -35,6 +35,15 @@ h1 {
   vertical-align: bottom;
 }
 
+#sliceCanvas {
+  width: 338px;
+  height: 25px;
+  /*border: solid 3px #e0e0e0;*/
+  position: relative;
+  display: inline-block;
+  vertical-align: bottom;
+}
+
 
 p.subtitle {
   color: #e0e0e0;
@@ -216,6 +225,14 @@ form {
   bottom: 0;
 }
 
+#legendSlice {
+  max-width: 450px;
+  /*display: inline-block;
+  vertical-align: bottom;*/
+  position: absolute;
+  bottom: 0;
+}
+
 #sliderDiv {
   max-width: 500px;
   /*cursor: default !important;*/
@@ -265,8 +282,8 @@ form {
 }
 
 #slice {
-  max-width: 500px;
-  max-height: 606px;
+  max-width: 340px;
+  max-height: 340px;
   /*border: solid #e0e0e0 3px;*/
   /*border-radius: 1px;*/
   position: relative;
@@ -275,15 +292,15 @@ form {
 }
 
 #slice2 {
-  max-width: 500px;
-  max-height: 606px;
+  max-width: 340px;
+  max-height: 340px;
   /*border: solid #e0e0e0 3px;*/
   /*border-radius: 1px;*/
-  /*display: inline-block;*/
+  display: inline-block;
   /*display: table-cell;*/
-  position: absolute;
+  position: relative;
   /*vertical-align: bottom;*/
-  bottom: 0;
+  /*bottom: 0;*/
 
 }
 

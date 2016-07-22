@@ -20,7 +20,7 @@
 // constants for width and height of the scene
 var WIDTH = 450,
 	HEIGHT = 632;
-var WIDTH_SLICE = 380;
+var WIDTH_SLICE = 338;
 var numFiles = 121;
 // Range of file data available
 var startFile = 1;
@@ -95,6 +95,7 @@ var controls = new THREE.TrackballControls(camera, renderer.domElement);
 mouseDragRotate();
 drawSlice();
 createColorLegend();
+createSliceColorLegend();
 mouseWheelZoom();
 sliderMove();
 menuListener();
@@ -199,6 +200,30 @@ function createColorLegend() {
 
 	context.putImageData(image, 0, 0);
 }
+
+function createSliceColorLegend() {
+
+	// d3.select("#canvas").remove();
+
+	var canvas = d3.select("#legendSlice").append("canvas")
+	.attr("id", "sliceCanvas")
+	.attr("width", WIDTH_SLICE)
+	.attr("height", 1);
+
+	var context = canvas.node().getContext("2d");
+	var image = context.createImageData(WIDTH_SLICE, 1);
+
+	for (var i=0, j=-1, c; i<WIDTH_SLICE; ++i) {
+		c = colorSplit[Math.floor(i/WIDTH_SLICE * colorSplit.length)];
+		image.data[++j] = +("0x" + c.slice(0, 2));
+		image.data[++j] = +("0x" + c.slice(2, 4));
+		image.data[++j] = +("0x" + c.slice(4, 6));
+		image.data[++j] = 255;
+	}
+
+	context.putImageData(image, 0, 0);
+}
+
 
 // set up slice vis
 // set up slice vis
@@ -553,6 +578,7 @@ function drawParticles(fileNum) {
 		recolorHeatMaps();
 		recolorFingerGraph();
 		createColorLegend();
+		createSliceColorLegend();
 		recolorPairplots();
 	}
 
