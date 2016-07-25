@@ -1643,10 +1643,11 @@ function loadFingerGraph() {
 					.text(varNames[i])
 					.style("fill", "#5BBDDE")
 					.style("text-decoration", "underline")
-					.style("writing-mode", "vertical-rl")
+					// .style("writing-mode", "vertical-rl")
 					.style("text-anchor", "middle")
-					.attr("y", beginningSpacing + plotSpacing*2 + plotDim/2 + i*(plotDim+plotSpacing))
-					.attr("x", beginningSpacing - 5);
+					.attr("transform", "rotate(-90)")
+					.attr("x", -(beginningSpacing + plotSpacing + plotDim/2 + i*(plotDim+plotSpacing)))
+					.attr("y", beginningSpacing - 5);
 
 				yLabels.append("rect")
 					.datum(i)
@@ -1715,11 +1716,12 @@ function loadFingerGraph() {
 									.attr("class", "temporaryLabel")
 									.text(varNames[d[1]])
 									.style("fill", "white")
-									.style("writing-mode", "vertical-rl")
+									// .style("writing-mode", "vertical-rl")
 									.style("text-anchor", "middle")
 									.style("font-size", 26)
-									.attr("x", beginningSpacing/2 + 13)
-									.attr("y", beginningSpacing + (height-beginningSpacing)/2);
+									.attr("transform", "rotate(-90)")
+									.attr("y", beginningSpacing/2 + 13)
+									.attr("x", -(beginningSpacing + (height-beginningSpacing)/2));
 
 								// add scale labels
 								// horizontal scale
@@ -1751,21 +1753,23 @@ function loadFingerGraph() {
 									.attr("class", "temporaryLabel")
 									.text(yDomain[1].toFixed(2))
 									.style("fill", "white")
-									.style("writing-mode", "vertical-rl")
-									.style("text-anchor", "begin")
+									// .style("writing-mode", "vertical-rl")
+									.style("text-anchor", "end")
 									.style("font-size", 20)
-									.attr("x", beginningSpacing/2 + 10)
-									.attr("y", beginningSpacing + 2*plotSpacing);
+									.attr("transform", "rotate(-90)")
+									.attr("y", beginningSpacing/2 + 10)
+									.attr("x", -(beginningSpacing + 2*plotSpacing));
 
 								mySVG.append("text")
 									.attr("class", "temporaryLabel")
 									.text(yDomain[0].toFixed(2))
 									.style("fill", "white")
-									.style("writing-mode", "vertical-rl")
-									.style("text-anchor", "end")
+									// .style("writing-mode", "vertical-rl")
+									.style("text-anchor", "begin")
 									.style("font-size", 20)
-									.attr("x", beginningSpacing/2 + 10)
-									.attr("y", width - 2*plotSpacing);
+									.attr("transform", "rotate(-90)")
+									.attr("y", beginningSpacing/2 + 10)
+									.attr("x", -(width - 2*plotSpacing - 10));
 
 								// calculate correlation and create correlation label
 								var s00, s11, s01;
