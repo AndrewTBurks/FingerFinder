@@ -1837,12 +1837,12 @@ function loadFingerGraph() {
 
 								if(runHighlighted) {
 									d3.select(".colHighlight").transition().duration(300)
-										.style("stroke-opacity", 0.5)
-										.attr("x", beginningSpacing + (plotSpacing/2) + runHighlighted.x * (plotSpacing + plotDim));
+										.style("stroke-opacity", 0.5);
+										// .attr("x", beginningSpacing + (plotSpacing/2) + runHighlighted.x * (plotSpacing + plotDim));
 
 									d3.select(".rowHighlight").transition().duration(300)
-										.style("stroke-opacity", 0.5)
-										.attr("y", beginningSpacing + (plotSpacing/2) + runHighlighted.y * (plotSpacing + plotDim));
+										.style("stroke-opacity", 0.5);
+										// .attr("y", beginningSpacing + (plotSpacing/2) + runHighlighted.y * (plotSpacing + plotDim));
 
 
 								}
@@ -1935,19 +1935,16 @@ function loadFingerGraph() {
 
 									d3.select(this).style("fill", "white").style("stroke", "#" + colorSplit[colorSplit.length-1]).style("stroke-width", 2);
 
-									if(!isZoomed) {
-										// horizontal
-										d3.select(".rowHighlight")
-											.attr("y", beginningSpacing + (plotSpacing/2) + d.row * (plotSpacing + plotDim))
-											.attr("x", beginningSpacing + (plotSpacing/2))
-											.style("stroke-opacity", 0.5);
+									// horizontal highlight
+									d3.select(".rowHighlight")
+										.attr("y", beginningSpacing + (plotSpacing/2) + d.row * (plotSpacing + plotDim))
+										.attr("x", beginningSpacing + (plotSpacing/2));
 
-										// vertical
-										d3.select(".colHighlight")
-											.attr("y", beginningSpacing + (plotSpacing/2))
-											.attr("x", beginningSpacing + (plotSpacing/2) + d.col * (plotSpacing + plotDim))
-											.style("stroke-opacity", 0.5);
-									}
+									// vertical highlight
+									d3.select(".colHighlight")
+										.attr("y", beginningSpacing + (plotSpacing/2))
+										.attr("x", beginningSpacing + (plotSpacing/2) + d.col * (plotSpacing + plotDim));
+
 									console.log(d);
 								}
 							})
