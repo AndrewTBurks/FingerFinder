@@ -676,6 +676,8 @@ function drawParticles(fileNum) {
 	function recolorSelectedRunLine() {
 		d3.select("#runLine" + runPick)
 		.style("stroke", "#" + colorSplit[Math.round(colorSplit.length/2)]);
+		d3.select("#numFingersTitle")
+		.style("color", "#" + colorSplit[Math.round(colorSplit.length/2)]);
 	}
 
 	/**
@@ -2269,8 +2271,8 @@ function sliderMove() {
 
 function fingerGraphBrush() {
 	var width = 500;
-	var height = 100;
-	var heightPadding = 25;
+	var height = 125;
+	var heightPadding = 35;
 
 	var maxFingers = d3.max(fingersPerTimestep, function(d) {
 		return d3.max(d);
@@ -2293,7 +2295,9 @@ function fingerGraphBrush() {
 	.tickPadding(5);
 	// .tickSize(-(height/5));
 
-	var yAxis = d3.svg.axis().scale(y).orient("left");
+	var yAxis = d3.svg.axis().scale(y).orient("left")
+	.tickValues([0, Math.round(maxFingers/2), maxFingers])
+	// .tickSize(0);
 
 	var line = d3.svg.line()
 	.x(function(d, i) {
@@ -2314,6 +2318,7 @@ function fingerGraphBrush() {
 	.attr("height", height);
 
 	var context = svg.append("g")
+	.attr("transform", "translate(0, " + 10 + ")")
 	.attr("class", "context");
 
 	context.append("g")
@@ -2323,6 +2328,12 @@ function fingerGraphBrush() {
 	.selectAll("text")
 	// .attr("y", -(height/2 - 10))
 	.attr("x", 0);
+
+	context.append("g")
+	.attr("class", "y axis")
+	.attr("transform", "translate(30, 0)")
+	.call(yAxis);
+	// .attr("x", 0);
 
 	// context.append("g")
 	// .attr("class", "y axis")
@@ -2349,6 +2360,8 @@ function fingerGraphBrush() {
 	// 	.tickFormat(function() {return null;}));
 
 	var currentRunColor = colorSplit[Math.floor(colorSplit.length/2)];
+
+	d3.select("#numFingersTitle").style("color", "#" + currentRunColor);
 
 
 	for (var i = 0; i < fingersPerTimestep.length; i++) {
