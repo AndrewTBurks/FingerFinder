@@ -2361,7 +2361,8 @@ function fingerGraphBrush() {
 
 	var currentRunColor = colorSplit[Math.floor(colorSplit.length/2)];
 
-	d3.select("#numFingersTitle").style("color", "#" + currentRunColor);
+	d3.select("#numFingersTitle")
+	.style("color", "#" + currentRunColor);
 
 
 	for (var i = 0; i < fingersPerTimestep.length; i++) {
