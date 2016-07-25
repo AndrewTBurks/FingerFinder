@@ -365,12 +365,16 @@ div.tooltip {
 .axis path {
   fill: none;
   stroke: #e0e0e0;
-  stroke-width: 4px;
+  stroke-width: 1px;
   }
 .axis line {
   fill: none;
   stroke: #e0e0e0;
-  stroke-width: 2px;
+  stroke-width: 1px;
+}
+
+.runLine {
+  fill: none;
 }
 
 .brush .extent {

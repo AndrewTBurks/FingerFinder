@@ -46,6 +46,7 @@ var colorSchemeChoice = 3;
 
 var numRuns = 8;
 var runSummaryData = new Array(numRuns);
+var fingersPerTimestep = new Array(numRuns).fill(null);
 
 /**
 * <p>Used to select the coloring mode for the 3D cylinder view.</p>
@@ -99,7 +100,7 @@ createSliceColorLegend();
 mouseWheelZoom();
 sliderMove();
 menuListener();
-fingerGraphBrush();
+// fingerGraphBrush();
 
 /**
 * Used to choose which file will be load into the visualization.
@@ -588,6 +589,7 @@ function drawParticles(fileNum) {
 		createColorLegend();
 		createSliceColorLegend();
 		recolorPairplots();
+		recolorSelectedRunLine();
 	}
 
 
@@ -670,6 +672,11 @@ function drawParticles(fileNum) {
 		});
 	}
 
+	function recolorSelectedRunLine() {
+		d3.select("#runLine" + runPick)
+		.style("stroke", "#" + colorSplit[Math.round(colorSplit.length/2)]);
+	}
+
 	/**
 	* Recolors the viscous finger graph according to the option selected.
 	*/
@@ -729,7 +736,7 @@ function loadFingerGraph() {
 		var myDiv = d3.select("#fingerGraph");
 		// no idea how to size this stuff
 		var width = 494;
-		var height = 700;
+		var height = HEIGHT;
 
 		// horribly inefficient, need to fix badly
 		d3.selectAll(".fingerPoint").remove();
@@ -1280,6 +1287,8 @@ function loadFingerGraph() {
 				// average finger point concentration
 			}
 
+			fingersPerTimestep[runNum-1] = timestepNumClusters;
+
 			var numClusters = d3.max(thisClusterCenters, function(el) {
 				return d3.max(el, function(el2) {
 					return el2.clusterID;
@@ -1304,6 +1313,7 @@ function loadFingerGraph() {
 			}
 			else {
 				drawPairplots();
+				fingerGraphBrush();
 			}
 
 		});
@@ -2005,6 +2015,17 @@ function loadFingerGraph() {
 
 			// thicker stroke on current run
 			d3.selectAll("#run" + runPick + "Circle").style("stroke-width", 1.5);
+
+			d3.selectAll(".runLine")
+			.style("stroke", "#e0e0e0")
+			.style("stroke-width", 1)
+			.style("stroke-opacity", .25);
+
+			d3.select("#runLine" + runPick)
+			.style("stroke", "#" + colorSplit[Math.round(colorSplit.length/2)])
+			.style("stroke-width", 2)
+			.style("stroke-opacity", 1);
+
 		});
 
 		recolorPairplots = function() {
@@ -2248,16 +2269,38 @@ function sliderMove() {
 function fingerGraphBrush() {
 	var width = 500;
 	var height = 100;
+	var heightPadding = 25;
+
+	var maxFingers = d3.max(fingersPerTimestep, function(d) {
+		return d3.max(d);
+	});
+
+	console.log(maxFingers);
 
 	var x = d3.scale.linear()
 	.domain([0, endFile])
 	.range([30, (width-30)]);
 
+	var y = d3.scale.linear()
+	.domain([0, maxFingers])
+	.range([(height - heightPadding), 0]);
+
 	var xAxis = d3.svg.axis().scale(x).orient("bottom")
 	// .tickValues([0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120])
-	.tickValues([0, 20, 40, 60, 80, 100, 120])
-	.tickPadding(10)
-	.tickSize(-(height/5));
+	// .tickValues([0, 20, 40, 60, 80, 100, 120])
+	.ticks(14)
+	.tickPadding(5);
+	// .tickSize(-(height/5));
+
+	var yAxis = d3.svg.axis().scale(y).orient("left");
+
+	var line = d3.svg.line()
+	.x(function(d, i) {
+		return x(i);
+	})
+	.y(function(d) {
+		return y(d);
+	})
 
 	var brush = d3.svg.brush()
 	.x(x)
@@ -2274,39 +2317,67 @@ function fingerGraphBrush() {
 
 	context.append("g")
 	.attr("class", "x axis")
-	.attr("transform", "translate(0, " + (height) + ")")
+	.attr("transform", "translate(0, " + (height - heightPadding) + ")")
 	.call(xAxis)
 	.selectAll("text")
-	.attr("y", -(height/2 - 10))
+	// .attr("y", -(height/2 - 10))
 	.attr("x", 0);
 
-	context.append("g")
-	.attr("class", "x axis")
-	.attr("transform", "translate(0, " + (height) + ")")
-	.call(d3.svg.axis()
-		.scale(x)
-		.orient("bottom")
-		// .ticks(20)
-		.tickSize(-height/5)
-		.tickFormat(function() {return null;}));
+	// context.append("g")
+	// .attr("class", "y axis")
+	// .call(yAxis);
 
-	context.append("g")
-	.attr("class", "x axis")
-	.attr("transform", "translate(0, " + (height) + ")")
-	.call(d3.svg.axis()
-		.scale(x)
-		.orient("bottom")
-		.ticks(20)
-		.tickSize(-height/10)
-		.tickFormat(function() {return null;}));
+	// context.append("g")
+	// .attr("class", "x axis")
+	// .attr("transform", "translate(0, " + (height) + ")")
+	// .call(d3.svg.axis()
+	// 	.scale(x)
+	// 	.orient("bottom")
+	// 	// .ticks(20)
+	// 	.tickSize(-height/5)
+	// 	.tickFormat(function() {return null;}));
+	//
+	// context.append("g")
+	// .attr("class", "x axis")
+	// .attr("transform", "translate(0, " + (height) + ")")
+	// .call(d3.svg.axis()
+	// 	.scale(x)
+	// 	.orient("bottom")
+	// 	.ticks(20)
+	// 	.tickSize(-height/10)
+	// 	.tickFormat(function() {return null;}));
 
+	var currentRunColor = colorSplit[Math.floor(colorSplit.length/2)];
+
+
+	for (var i = 0; i < fingersPerTimestep.length; i++) {
+		if ((i + 1) == parseInt(runPick)) {
+			context.append("path")
+		      .datum(fingersPerTimestep[i])
+		      .attr("class", "runLine")
+					.attr("id", "runLine" + ("00" + (i + 1)).substr(-2))
+		      .attr("d", line)
+					.style("stroke", "#" + currentRunColor)
+					.style("stroke-width", 2);
+		}
+		else {
+			context.append("path")
+		      .datum(fingersPerTimestep[i])
+		      .attr("class", "runLine")
+		      .attr("d", line)
+					.attr("id", "runLine" + ("00" + (i + 1)).substr(-2))
+					.style("stroke", "#e0e0e0")
+					.style("stroke-width", 1)
+					.style("stroke-opacity", .25);
+		}
+	}
 
 	context.append("g")
 	.attr("class", "x brush")
 	.call(brush)
 	.selectAll("rect")
-	.attr("y", 50)
-	.attr("height", height/2);
+	// .attr("y", height)
+	.attr("height", height - heightPadding);
 
 	function brushed() {
 		var xMouse = x.invert(d3.mouse(this)[0]);
