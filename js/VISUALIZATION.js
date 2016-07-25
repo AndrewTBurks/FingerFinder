@@ -2029,6 +2029,8 @@ function loadFingerGraph() {
 			.style("stroke-width", 2)
 			.style("stroke-opacity", 1);
 
+			recolor3DModel();
+
 		});
 
 		recolorPairplots = function() {
@@ -2118,17 +2120,18 @@ function loadFingerGraph() {
 	// read in cluster data
 	d3.json(folderPath + "allClusters.json", function(error, json) {
 		clusterData = json;
+
+		var end = new Date().getTime();
+		var time = end - startTime;
+		console.log('READ CSV: Execution time: ' + time + 'ms.');
+
+		drawParticles(n);
+		render();
+		updateFingerGraphFileLine();
+		highlightViscousFinger();
+		console.log("done");
 	});
 
-	var end = new Date().getTime();
-	var time = end - startTime;
-	console.log('READ CSV: Execution time: ' + time + 'ms.');
-
-	drawParticles(n);
-	render();
-	updateFingerGraphFileLine();
-	highlightViscousFinger();
-	console.log("done");
 });
 
 }
