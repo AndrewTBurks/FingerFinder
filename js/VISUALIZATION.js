@@ -574,6 +574,7 @@ function drawParticles(fileNum) {
 	*/
 	function recolorAll() {
 		color.range(colorSplit);
+		colorSlice.range(colorSplit);
 		fingerColor.range(colorSplit);
 
 		if (colorSchemeChoice == 0 || colorSchemeChoice == 1) {
