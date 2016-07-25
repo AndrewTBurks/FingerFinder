@@ -824,7 +824,7 @@ function loadFingerGraph() {
 		myElementG.append("rect")
 		.attr("width", "100%")
 		.attr("height", "100%")
-		.style("fill", "#0F0F0F");
+		.style("fill", "#050505");
 
 		// vertical line for which file is currently selected
 		myElementG.append("line")
@@ -1266,7 +1266,7 @@ function loadFingerGraph() {
 							(thisClusterCenters[i][j].zMax-thisClusterCenters[i][j].zMin));
 
 					if((thisClusterCenters[i][j].nextID != -1)
-					 		&& (thisClusterCenters[i][j].clusterID != thisClusterCenters[i][j].nextID))
+					 		&& (thisClusterCenters[i][j].clusterID != thisClusterCenters[i][j].nextClusterID))
 					{
 						// if this cluster doesnt disappear and also doesn't stay the same ID
 						timestepMergeFactors[i]++;
@@ -1435,6 +1435,155 @@ function loadFingerGraph() {
 
 			/* === SCALES CREATED === */
 
+			/* === calculate correlations ===
+					a lot of calculation... */
+
+			var sumVar = new Array(numVars);
+			// sumVar[0] - totalClusters
+			sumVar[0] = d3.sum(runSummaryData, function(el) {
+				return el.totalClusters;
+			});
+
+			// sumVar[1] - avgClusters
+			sumVar[1] = d3.sum(runSummaryData, function(el) {
+				return el.avgClusters;
+			});
+
+			// sumVar[2] - avgFingerConc
+			sumVar[2] = d3.sum(runSummaryData, function(el) {
+				return el.avgFingerConc;
+			});
+
+			// sumVar[3] - avgFingerPointConc
+			sumVar[3] = d3.sum(runSummaryData, function(el) {
+				return el.avgFingerPointConc;
+			});
+
+			// sumVar[4] - avgFingerDensity
+			sumVar[4] = d3.sum(runSummaryData, function(el) {
+				return el.avgFingerDensity;
+			});
+
+			// sumVar[5] - mergeFactor
+			sumVar[5] = d3.sum(runSummaryData, function(el) {
+				return el.mergeFactor;
+			});
+
+
+			var sumPairs = new Array(numVars);
+			for(var i = 0; i < numVars; i++) {
+				sumPairs[i] = new Array(numVars);
+			}
+
+			// all totalClusters * ______
+			sumPairs[0][0] = d3.sum(runSummaryData, function(el) {
+				return el.totalClusters * el.totalClusters;
+			});
+
+			sumPairs[0][1] = d3.sum(runSummaryData, function(el) {
+				return el.totalClusters * el.avgClusters;
+			});
+
+			sumPairs[0][2] = d3.sum(runSummaryData, function(el) {
+				return el.totalClusters * el.avgFingerConc;
+			});
+
+			sumPairs[0][3] = d3.sum(runSummaryData, function(el) {
+				return el.totalClusters * el.avgFingerPointConc;
+			});
+
+			sumPairs[0][4] = d3.sum(runSummaryData, function(el) {
+				return el.totalClusters * el.avgFingerDensity;
+			});
+
+			sumPairs[0][5] = d3.sum(runSummaryData, function(el) {
+				return el.totalClusters * el.mergeFactor;
+			});
+
+			// all avgClusters * ______
+			sumPairs[1][0] = sumPairs[0][1];
+
+			sumPairs[1][1] = d3.sum(runSummaryData, function(el) {
+				return el.avgClusters * el.avgClusters;
+			});
+
+			sumPairs[1][2] = d3.sum(runSummaryData, function(el) {
+				return el.avgClusters * el.avgFingerConc;
+			});
+
+			sumPairs[1][3] = d3.sum(runSummaryData, function(el) {
+				return el.avgClusters * el.avgFingerPointConc;
+			});
+
+			sumPairs[1][4] = d3.sum(runSummaryData, function(el) {
+				return el.avgClusters * el.avgFingerDensity;
+			});
+
+			sumPairs[1][5] = d3.sum(runSummaryData, function(el) {
+				return el.avgClusters * el.mergeFactor;
+			});
+
+			// all avgFingerConc * ______
+			sumPairs[2][0] = sumPairs[0][2];
+			sumPairs[2][1] = sumPairs[1][2];
+
+			sumPairs[2][2] = d3.sum(runSummaryData, function(el) {
+				return el.avgFingerConc * el.avgFingerConc;
+			});
+
+			sumPairs[2][3] = d3.sum(runSummaryData, function(el) {
+				return el.avgFingerConc * el.avgFingerPointConc;
+			});
+
+			sumPairs[2][4] = d3.sum(runSummaryData, function(el) {
+				return el.avgFingerConc * el.avgFingerDensity;
+			});
+
+			sumPairs[2][5] = d3.sum(runSummaryData, function(el) {
+				return el.avgFingerConc * el.mergeFactor;
+			});
+
+			// all avgFingerPointConc * ______
+			sumPairs[3][0] = sumPairs[0][3];
+			sumPairs[3][1] = sumPairs[1][3];
+			sumPairs[3][2] = sumPairs[2][3];
+
+			sumPairs[3][3] = d3.sum(runSummaryData, function(el) {
+				return el.avgFingerPointConc * el.avgFingerPointConc;
+			});
+
+			sumPairs[3][4] = d3.sum(runSummaryData, function(el) {
+				return el.avgFingerPointConc * el.avgFingerDensity;
+			});
+
+			sumPairs[3][5] = d3.sum(runSummaryData, function(el) {
+				return el.avgFingerPointConc * el.mergeFactor;
+			});
+
+			// all avgFingerDensity * ______
+			sumPairs[4][0] = sumPairs[0][4];
+			sumPairs[4][1] = sumPairs[1][4];
+			sumPairs[4][2] = sumPairs[2][4];
+			sumPairs[4][3] = sumPairs[3][4];
+
+			sumPairs[4][4] = d3.sum(runSummaryData, function(el) {
+				return el.avgFingerDensity * el.avgFingerDensity;
+			});
+
+			sumPairs[4][5] = d3.sum(runSummaryData, function(el) {
+				return el.avgFingerDensity * el.mergeFactor;
+			});
+
+			// all mergeFactor * ______
+			sumPairs[5][0] = sumPairs[0][5];
+			sumPairs[5][1] = sumPairs[1][5];
+			sumPairs[5][2] = sumPairs[2][5];
+			sumPairs[5][3] = sumPairs[3][5];
+			sumPairs[5][4] = sumPairs[4][5];
+
+			sumPairs[5][5] = d3.sum(runSummaryData, function(el) {
+				return el.mergeFactor * el.mergeFactor;
+			});
 
 
 			plots.append("rect")
@@ -1525,7 +1674,7 @@ function loadFingerGraph() {
 						.attr("width", plotDim)
 						.attr("x", (beginningSpacing + (i*plotDim) + ((i+1)*plotSpacing)))
 						.attr("y", (beginningSpacing + (j*plotDim) + ((j+1)*plotSpacing)))
-						.style("fill", "#0F0F0F")
+						.style("fill", "#050505")
 						.on("mouseup", function(d) {
 							// only zooms if the mouseup is caused by left click
 							if(d3.event.button === 0 && !isZoomed) {
@@ -1617,6 +1766,25 @@ function loadFingerGraph() {
 									.style("font-size", 20)
 									.attr("x", beginningSpacing/2 + 10)
 									.attr("y", width - 2*plotSpacing);
+
+								// calculate correlation and create correlation label
+								var s00, s11, s01;
+								s00 = sumPairs[d[0]][d[0]] - (Math.pow(sumVar[d[0]], 2)/numRuns);
+								s11 = sumPairs[d[1]][d[1]] - (Math.pow(sumVar[d[1]], 2)/numRuns);
+								s01 = sumPairs[d[0]][d[1]] - ((sumVar[d[0]] * sumVar[d[1]])/numRuns);
+
+								var correlation;
+
+								correlation = s01 / Math.sqrt(s00 * s11);
+
+								mySVG.append("text")
+									.attr("class", "temporaryLabel")
+									.text("Variable Correlation: " + correlation.toFixed(2))
+									.style("fill", "white")
+									.style("text-anchor", "middle")
+									.style("font-size", 20)
+									.attr("x", width/2)
+									.attr("y", beginningSpacing);
 
 								d3.selectAll(".temporaryLabel").style("opacity", 0);
 
