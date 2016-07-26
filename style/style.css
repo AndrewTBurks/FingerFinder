@@ -231,13 +231,13 @@ p.view2 {
 }
 
 #parallelWrapper {
-  max-width: 1326px;
+  /*max-width: 1326px;*/
   width: 1326px;
   height: 300px;
   max-height: 300px;
   position: relative;
   /*text-align: center;*/
-  /*top: 30;*/
+  margin-top: 10px;
 }
 
 #graphBrushWrapper {

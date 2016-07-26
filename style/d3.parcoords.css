@@ -1,12 +1,13 @@
 .parcoords > canvas {
   font-family: 'Lato', sans-serif;
+  color: #e0e0e0;
   position: absolute;
 }
 .parcoords > canvas {
   pointer-events: none;
 }
 .parcoords text.label {
-  cursor: default;
+  cursor: move;
 }
 .parcoords rect.background:hover {
   fill: rgba(224,224,224,0.5);

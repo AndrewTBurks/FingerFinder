@@ -60,7 +60,7 @@ var pc = function(selection) {
     .append("svg")
       .attr("width", __.width)
       .attr("height", __.height)
-      .style("font", "14px sans-serif")
+      // .style("font", "15px sans-serif")
       .style("position", "absolute")
 
     .append("svg:g")
@@ -742,12 +742,12 @@ pc.createAxes = function() {
 
         axisElement.selectAll("path")
             .style("fill", "none")
-            .style("stroke", "#222")
+            .style("stroke", "#e0e0e0")
             .style("shape-rendering", "crispEdges");
 
         axisElement.selectAll("line")
             .style("fill", "none")
-            .style("stroke", "#222")
+            .style("stroke", "#e0e0e0")
             .style("shape-rendering", "crispEdges");
       })
     .append("svg:text")
@@ -771,6 +771,7 @@ pc.createAxes = function() {
       .attr("stroke-width", 1)
       .attr("stroke", "#777")
       .attr("fill", "none")
+      .attr("display", "none")
       .attr("shape-rendering", "crispEdges");
   } else if (__.nullValueSeparator=="bottom") {
     pc.svg.append("line")
@@ -781,6 +782,7 @@ pc.createAxes = function() {
       .attr("stroke-width", 1)
       .attr("stroke", "#777")
       .attr("fill", "none")
+      .attr("display", "none")
       .attr("shape-rendering", "crispEdges");
   }
 
@@ -814,12 +816,12 @@ pc.updateAxes = function(animationTime) {
 
         axisElement.selectAll("path")
             .style("fill", "none")
-            .style("stroke", "#222")
+            .style("stroke", "#e0e0e0")
             .style("shape-rendering", "crispEdges");
 
         axisElement.selectAll("line")
             .style("fill", "none")
-            .style("stroke", "#222")
+            .style("stroke", "#e0e0e0")
             .style("shape-rendering", "crispEdges");
       })
     .append("svg:text")
@@ -1277,7 +1279,7 @@ pc.brushMode = function(mode) {
 
 		brush.selectAll("rect.extent")
 				.style("fill", "rgba(255,255,255,0.25)")
-				.style("stroke", "rgba(0,0,0,0.6)");
+				.style("stroke", "rgba(255,255,255,0.6)");
 
 		brush.selectAll(".resize rect")
 				.style("fill", "rgba(0,0,0,0.1)");
@@ -1782,7 +1784,7 @@ pc.brushMode = function(mode) {
           .attr("x", -15)
           .attr("width", 30)
           .style("fill", "rgba(255,255,255,0.25)")
-          .style("stroke", "rgba(0,0,0,0.6)");
+          .style("stroke", "rgba(255,255,255,0.6)");
       })
       .resizeAdaption(function(selection) {
     	 selection
@@ -1831,7 +1833,7 @@ pc.brushMode = function(mode) {
 
     brush.selectAll("rect.extent")
         .style("fill", "rgba(255,255,255,0.25)")
-        .style("stroke", "rgba(0,0,0,0.6)");
+        .style("stroke", "rgba(255,255,255,0.6)");
 
     brush.selectAll(".resize rect")
         .style("fill", "rgba(0,0,0,0.1)");
