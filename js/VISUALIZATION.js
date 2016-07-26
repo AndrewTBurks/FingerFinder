@@ -126,8 +126,7 @@ function drawSlice() {
 		color: 0xAAAAAA
 	});
 	var arrowMat = new THREE.LineBasicMaterial({
-		color: 0xAAAAAA,
-		linewidth: 5
+		color: 0xAAAAAA
 	});
 	// FRONT
 	var line1g = new THREE.Geometry();
@@ -255,7 +254,8 @@ var sliceArrow1 = svg.append("path")
 " m " + 2 + " " + 0 +
 " l " + -5 + " " + 5)
 .style("stroke", "white")
-.style("stroke-width", 2);
+.style("stroke-width", 2)
+.style("stroke-opacity", 0.5);
 
 var sliceArrow2 = svg2.append("path")
 .attr("class", "arrow")
@@ -268,9 +268,8 @@ var sliceArrow2 = svg2.append("path")
 " m " + 2 + " " + 0 +
 " l " + -5 + " " + 5)
 .style("stroke", "white")
-.style("stroke-width", 2);
-
-
+.style("stroke-width", 2)
+.style("stroke-opacity", 0.5);
 
 // render scene
 
@@ -543,7 +542,8 @@ function drawParticles(fileNum) {
 		" m " + 2 + " " + 0 +
 		" l " + -5 + " " + 5)
 		.style("stroke", "white")
-		.style("stroke-width", 2);
+		.style("stroke-width", 2)
+		.style("stroke-opacity", 0.5);
 
 		sliceArrow2.remove();
 		sliceArrow2 = svg2.append("path")
@@ -558,7 +558,8 @@ function drawParticles(fileNum) {
 		" m " + 2 + " " + 0 +
 		" l " + -5 + " " + 5)
 		.style("stroke", "white")
-		.style("stroke-width", 2);
+		.style("stroke-width", 2)
+		.style("stroke-opacity", 0.5);
 
 		var end = new Date().getTime();
 		var time = end - startTime;
@@ -838,8 +839,8 @@ function loadFingerGraph() {
 		.attr("y1", 0)
 		.attr("y2", height)
 		.style("stroke", "white")
-		.style("stroke-width", xSpacing)
-		.style("stroke-opacity", .1);
+		.style("stroke-width", 2)
+		.style("stroke-opacity", 0.25);
 
 		updateFingerGraphFileLine();
 
