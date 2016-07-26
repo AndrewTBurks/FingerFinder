@@ -2106,6 +2106,8 @@ function loadFingerGraph() {
 		};
 	}
 
+	var paralellCoordsPlot;
+
 	function createParallelCoordsPlots() {
 		var parallelDiv = d3.select("#parallelWrapper");
 
@@ -2129,7 +2131,7 @@ function loadFingerGraph() {
 				.domain(avgFingerExtent)
 				.range(colorSplit.slice(Math.round(colorSplit.length/4), colorSplit.length));
 
-			var pc = d3.parcoords()("#parallelWrapper")
+			parallelCoordsPlot = d3.parcoords()("#parallelWrapper")
 				// .attr("class", "parcoords")
 				.data(runSummaryData)
 				.color(function(d, i) {
@@ -2179,6 +2181,7 @@ function loadFingerGraph() {
 				.reorderable()
 				.brushMode("1D-axes")
 				.alphaOnBrushed(0.25);
+
 		}
 	}
 
