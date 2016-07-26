@@ -53,7 +53,7 @@ var fingersPerTimestep = new Array(numRuns).fill(null);
 * <p>0 for Normal, 1 for desaturate outside of slice, 2 for highlight slice, 3 for highlight fingers.</p>
 * @type {number}
 */
-var sliceColorMode = Number(d3.select('input[name="viewCylinder"]:checked').node().value);
+var sliceColorMode = Number(d3.select('select[name="viewCylinder"]').node().value);
 
 for(var i = 0; i < sliceResolution; i++) {
 	sliceAccumulated.push(new Array(sliceResolution));
@@ -733,8 +733,8 @@ function loadFingerGraph() {
 		var zoomCenter = false;
 
 		// update name to show timesteps in graph
-		d3.select("#fingerGraphWrapper").select("p")
-			.text("Viscous Fingers Size/Concentration Over Time (t: " + start + " to " + end + ")");
+		// d3.select("#fingerGraphWrapper").select("p")
+		// 	.text("Viscous Fingers Size/Concentration Over Time (t: " + start + " to " + end + ")");
 
 		var myDiv = d3.select("#fingerGraph");
 		// no idea how to size this stuff
@@ -2575,7 +2575,7 @@ function populateRunDropdown() {
 * Processes the selected options in the menu.
 */
 function menuListener() {
-	d3.selectAll('input[name="viewCylinder"]').on("change", function() {
+	d3.selectAll('select[name="viewCylinder"]').on("change", function() {
 		sliceColorMode = Number(this.value);
 		recolor3DModel();
 	});
@@ -2592,7 +2592,7 @@ function menuListener() {
 	// 	readFileNumCSV(filePick);
 	// 	loadFingerGraph();
 	// });
-	d3.selectAll('input[name="colorScheme"]').on("change", function() {
+	d3.selectAll('select[name="colorScheme"]').on("change", function() {
 		colorSchemeChoice = Number(this.value);
 		colorSplit = colorScheme[colorSchemeChoice].split(",");
 		// color = d3.scale.quantile()
