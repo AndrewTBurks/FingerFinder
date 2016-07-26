@@ -19,8 +19,8 @@
   stroke: rgba(0,0,0,0.6);
 }
 .parcoords .axis line, .parcoords .axis path {
-  fill: gray;
-  stroke-width:5px;
+  /*fill: gray;*/
+  stroke-width:1px;
   stroke: #00;
   shape-rendering: crispEdges;
 }

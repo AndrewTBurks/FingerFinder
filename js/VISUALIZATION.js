@@ -2106,12 +2106,45 @@ function loadFingerGraph() {
 			var pc = d3.parcoords()("#parallelWrapper")
 				// .attr("class", "parcoords")
 				.data(plotData)
-				.color(function(d) {
-					return "#000";
+				.color(function(d, i) {
+					return "#" + colorSplit[Math.round(colorSplit.length/2)];
+				})
+				.dimensions({
+					"totalClusters":
+			        {
+									title: "Total Clusters",
+									type: "number"
+			        },
+					"avgClusters":
+			        {
+									title: "Avg. Clusters",
+									type: "number"
+			        },
+					"avgFingerConc":
+			        {
+									title: "Avg. Finger Conc.",
+									type: "number"
+			        },
+					"avgFingerPointConc":
+			        {
+									title: "Avg. Finger Point Conc.",
+									type: "number"
+			        },
+					"avgFingerDensity":
+			        {
+									title: "Avg. Finger Density",
+									type: "number"
+			        },
+					"mergeFactor":
+			        {
+									title: "Merge Factor",
+									type: "number"
+			        },
 				})
   			.render()
-  			.reorderable()
+				.reorderable()
 				.brushable();
+
 		}
 	}
 

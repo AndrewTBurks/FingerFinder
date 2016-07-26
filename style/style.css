@@ -231,6 +231,7 @@ p.view2 {
   max-height: 300px;
   position: relative;
   /*text-align: center;*/
+  top: 30;
 }
 
 #graphBrushWrapper {
