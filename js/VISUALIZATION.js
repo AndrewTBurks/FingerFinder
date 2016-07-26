@@ -736,7 +736,7 @@ function loadFingerGraph() {
 		var myDiv = d3.select("#fingerGraph");
 		// no idea how to size this stuff
 		var width = 494;
-		var height = HEIGHT;
+		var height = HEIGHT - 25;
 
 		// horribly inefficient, need to fix badly
 		d3.selectAll(".fingerPoint").remove();
@@ -751,7 +751,7 @@ function loadFingerGraph() {
 		var mySVG = myDiv.append("svg")
 		.attr("class", "graphSVG")
 		.attr("width", width)
-		.attr("height", height)
+		.attr("height", height + 25)
 		.append("g")
 		.call(zoom);
 
@@ -788,6 +788,24 @@ function loadFingerGraph() {
 
 		xSpacing = (width/(end - start + 1));
 		var ySpacing = Math.floor(height/(numClustersReduced + 1));
+
+		var x = d3.scale.linear()
+		.domain([start, end])
+		.range([xSpacing/2, (width - xSpacing/2)]);
+
+		var numTicks = end - start;
+
+		var xAxis = d3.svg.axis().scale(x).orient("bottom")
+		.ticks(numTicks)
+		.tickPadding(5);
+
+		mySVG.append("g")
+		.attr("class", "x axis")
+		.attr("transform", "translate(0, " + height + ")")
+		.call(xAxis)
+		.selectAll("text")
+		// .attr("y", -(height/2 - 10))
+		.attr("x", 0);
 
 		var maxFingerConc = d3.max(reducedArray, function(el) {
 			return d3.max(el, function(el2) {
@@ -830,7 +848,7 @@ function loadFingerGraph() {
 		// draw background
 		myElementG.append("rect")
 		.attr("width", "100%")
-		.attr("height", "100%")
+		.attr("height", height)
 		.style("fill", "#050505");
 
 		// vertical line for which file is currently selected
