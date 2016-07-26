@@ -2104,6 +2104,7 @@ function loadFingerGraph() {
 			});
 
 			var pc = d3.parcoords()("#parallelWrapper")
+				// .attr("class", "parcoords")
 				.data(plotData)
 				.color(function(d) {
 					return "#000";
