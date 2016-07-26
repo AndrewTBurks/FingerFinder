@@ -130,6 +130,12 @@ p.view2 {
   text-align: center;
 }
 
+#wrapper2 {
+  max-width: 1500px;
+  max-height: 900px;
+  position: relative;
+}
+
 #sliceWrapper {
   max-width: 500px;
   height: 100%;
@@ -225,13 +231,13 @@ p.view2 {
 }
 
 #parallelWrapper {
-  max-width: 1500px;
-  width: 1500px;
+  max-width: 1326px;
+  width: 1326px;
   height: 300px;
   max-height: 300px;
   position: relative;
   /*text-align: center;*/
-  top: 30;
+  /*top: 30;*/
 }
 
 #graphBrushWrapper {

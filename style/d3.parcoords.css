@@ -9,7 +9,7 @@
   cursor: default;
 }
 .parcoords rect.background:hover {
-  fill: rgba(120,120,120,0.2);
+  fill: rgba(224,224,224,0.5);
 }
 .parcoords canvas {
   opacity: 1;
