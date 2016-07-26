@@ -744,16 +744,38 @@ function loadFingerGraph() {
 		d3.selectAll(".fingerFileIndicator").remove();
 		d3.selectAll(".graphSVG").remove();
 
+		xSpacing = (width/(end - start + 1));
+
+		var x = d3.scale.linear()
+		.domain([start, end])
+		.range([xSpacing/2, (width - xSpacing/2)]);
+
+		var numTicks = end - start;
+
+		var xAxis = d3.svg.axis().scale(x).orient("bottom")
+		.ticks(numTicks)
+		.tickPadding(5);
+
 		var zoom = d3.behavior.zoom()
+		.x(x)
 		.scaleExtent([1,10])
 		.on("zoom", zoomed);
 
 		var mySVG = myDiv.append("svg")
 		.attr("class", "graphSVG")
 		.attr("width", width)
-		.attr("height", height + 25)
+		.attr("height", HEIGHT)
 		.append("g")
+		// .attr("transform", "translate(0, " + ( ")")
 		.call(zoom);
+
+		mySVG.append("g")
+		.attr("class", "x axis")
+		.attr("transform", "translate(0, " + height + ")")
+		.call(xAxis)
+		.selectAll("text")
+		// .attr("y", -(height/2 - 10))
+		.attr("x", 0);
 
 		var myElementG = mySVG.append("g").on("contextmenu", clicked);
 
@@ -786,26 +808,10 @@ function loadFingerGraph() {
 		// console.log(reducedArray);
 		// console.log(numClustersReduced);
 
-		xSpacing = (width/(end - start + 1));
+
 		var ySpacing = Math.floor(height/(numClustersReduced + 1));
 
-		var x = d3.scale.linear()
-		.domain([start, end])
-		.range([xSpacing/2, (width - xSpacing/2)]);
 
-		var numTicks = end - start;
-
-		var xAxis = d3.svg.axis().scale(x).orient("bottom")
-		.ticks(numTicks)
-		.tickPadding(5);
-
-		mySVG.append("g")
-		.attr("class", "x axis")
-		.attr("transform", "translate(0, " + height + ")")
-		.call(xAxis)
-		.selectAll("text")
-		// .attr("y", -(height/2 - 10))
-		.attr("x", 0);
 
 		var maxFingerConc = d3.max(reducedArray, function(el) {
 			return d3.max(el, function(el2) {
@@ -1169,6 +1175,7 @@ function loadFingerGraph() {
 
 		function zoomed() {
 			myElementG.attr("transform", "translate(" + d3.event.translate + ") " + "scale(" + d3.event.scale + ")");
+			mySVG.select(".x.axis").call(xAxis);
 		}
 
 		function clicked() {
@@ -1176,6 +1183,7 @@ function loadFingerGraph() {
 			myElementG.attr("transform", "translate(" + 0 + ", " + 0 + ")");
 			zoom.translate([0,0]);
 			zoom.scale([1]);
+			mySVG.select(".x.axis").call(xAxis);
 		}
 
 		updateFingerGraphFileLine();
