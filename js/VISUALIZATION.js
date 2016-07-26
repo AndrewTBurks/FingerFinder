@@ -753,7 +753,9 @@ function loadFingerGraph() {
 		var numTicks = end - start;
 
 		var xAxis = d3.svg.axis().scale(x).orient("bottom")
-		.ticks(numTicks)
+		// .ticks(numTicks > 10 ? 10 : numTicks)
+		.tickFormat(d3.format("d"))
+		.tickSubdivide(0)
 		.tickPadding(5);
 
 		var zoom = d3.behavior.zoom()
@@ -2161,7 +2163,6 @@ function loadFingerGraph() {
 				.reorderable()
 				.brushMode("1D-axes")
 				.alphaOnBrushed(0.25);
-
 		}
 	}
 
