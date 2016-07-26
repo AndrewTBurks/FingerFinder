@@ -732,10 +732,6 @@ function loadFingerGraph() {
 
 		var zoomCenter = false;
 
-		// update name to show timesteps in graph
-		// d3.select("#fingerGraphWrapper").select("p")
-		// 	.text("Viscous Fingers Size/Concentration Over Time (t: " + start + " to " + end + ")");
-
 		var myDiv = d3.select("#fingerGraph");
 		// no idea how to size this stuff
 		var width = 494;
