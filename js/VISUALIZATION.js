@@ -2103,11 +2103,19 @@ function loadFingerGraph() {
 				};
 			});
 
+			var avgFingerExtent = d3.extent(runSummaryData, function(d) {
+				return d.avgFingerConc;
+			});
+
+			var lineColorScale = d3.scale.quantize()
+				.domain(avgFingerExtent)
+				.range(colorSplit.slice(Math.round(colorSplit.length/4), colorSplit.length));
+
 			var pc = d3.parcoords()("#parallelWrapper")
 				// .attr("class", "parcoords")
 				.data(plotData)
 				.color(function(d, i) {
-					return "#" + colorSplit[Math.round(colorSplit.length/2)];
+					return "#" + lineColorScale(d.avgFingerConc);
 				})
 				.dimensions({
 					"totalClusters":
@@ -2139,12 +2147,14 @@ function loadFingerGraph() {
 			        {
 									title: "Merge Factor",
 									type: "number"
-			        },
+			        }
 				})
   			.render()
+				.createAxes()
 				.reorderable()
 				.brushable();
 
+				pc.alphaOnBrushed(0.1);
 		}
 	}
 
