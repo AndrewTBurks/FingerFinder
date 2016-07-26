@@ -226,7 +226,9 @@ p.view2 {
 
 #parallelWrapper {
   max-width: 1500px;
-  max-height: 900px;
+  width: 1500px;
+  height: 300px;
+  max-height: 300px;
   position: relative;
   text-align: center;
 }

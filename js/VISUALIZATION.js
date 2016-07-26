@@ -1331,6 +1331,7 @@ function loadFingerGraph() {
 			}
 			else {
 				drawPairplots();
+				createParallelCoordsPlots()
 				fingerGraphBrush();
 			}
 
@@ -2077,6 +2078,32 @@ function loadFingerGraph() {
 			}
 
 		};
+	}
+
+	function createParallelCoordsPlots() {
+		var parallelDiv = d3.select("#parallelWrapper");
+
+		if(parallelDiv) {
+			var plotData = runSummaryData.map(function(d) {
+				return {
+					totalFingers: d.totalClusters,
+					avgFingers: d.avgClusters,
+					avgFingerConc: d.avgFingerConc,
+					avgFingerPointConc: d.avgFingerPointConc,
+					avgFingerDensity: d.avgFingerDensity,
+					mergeFactor: d.mergeFactor
+				};
+			});
+
+			var pc = d3.parcoords()("#parallelWrapper")
+				.data(plotData)
+				.color(function(d) {
+					return "#000";
+				})
+  			.render()
+  			.reorderable()
+				.brushable();
+		}
 	}
 
 	var mean, stddev, maxConc;
