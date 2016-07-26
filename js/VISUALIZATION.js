@@ -753,7 +753,8 @@ function loadFingerGraph() {
 		var numTicks = end - start;
 
 		var xAxis = d3.svg.axis().scale(x).orient("bottom")
-		.ticks(numTicks)
+		// .ticks(numTicks > 10 ? 10 : numTicks)
+		.tickFormat(d3.format("d"))
 		.tickPadding(5);
 
 		var zoom = d3.behavior.zoom()
@@ -764,20 +765,27 @@ function loadFingerGraph() {
 		var mySVG = myDiv.append("svg")
 		.attr("class", "graphSVG")
 		.attr("width", width)
-		.attr("height", HEIGHT)
-		.append("g")
-		// .attr("transform", "translate(0, " + ( ")")
-		.call(zoom);
+		.attr("height", height)
 
-		mySVG.append("g")
+		var axisSVG = myDiv.append("svg")
+		.attr("width", width)
+		.attr("height", 25);
+
+		axisSVG.append("g")
 		.attr("class", "x axis")
-		.attr("transform", "translate(0, " + height + ")")
+		// .attr("transform", "translate(0, " + height + ")")
 		.call(xAxis)
 		.selectAll("text")
-		// .attr("y", -(height/2 - 10))
 		.attr("x", 0);
 
-		var myElementG = mySVG.append("g").on("contextmenu", clicked);
+		// mySVG.append("g")
+		// // .attr("transform", "translate(0, " + (-25) + ")")
+		// .call(zoom);
+
+		var myElementG = mySVG.append("g")
+		// .attr("transform", "translate(0, "  + (-25) + ")")
+		.on("contextmenu", clicked)
+		.call(zoom);
 
 
 		// array to use for creating graph
@@ -1174,8 +1182,18 @@ function loadFingerGraph() {
 		}
 
 		function zoomed() {
-			myElementG.attr("transform", "translate(" + d3.event.translate + ") " + "scale(" + d3.event.scale + ")");
-			mySVG.select(".x.axis").call(xAxis);
+			var e = d3.event,
+              // now, constrain the x and y components of the translation by the
+              // dimensions of the viewport
+              tx = Math.min(0, Math.max(e.translate[0], width - width * e.scale)),
+              ty = Math.min(0, Math.max(e.translate[1], height - height * e.scale));
+			zoom.translate([tx, ty]);
+			myElementG.attr("transform", [
+            "translate(" + [tx, ty] + ")",
+            "scale(" + e.scale + ")"
+          ].join(" "));
+			// myElementG.attr("transform", "translate(" + d3.event.translate + ") " + "scale(" + d3.event.scale + ")");
+			axisSVG.select(".x.axis").call(xAxis);
 		}
 
 		function clicked() {
@@ -1183,7 +1201,7 @@ function loadFingerGraph() {
 			myElementG.attr("transform", "translate(" + 0 + ", " + 0 + ")");
 			zoom.translate([0,0]);
 			zoom.scale([1]);
-			mySVG.select(".x.axis").call(xAxis);
+			axisSVG.select(".x.axis").call(xAxis);
 		}
 
 		updateFingerGraphFileLine();
