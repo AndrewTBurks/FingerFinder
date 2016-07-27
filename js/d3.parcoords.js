@@ -1330,7 +1330,7 @@ pc.brushMode = function(mode) {
         return d.p2[0]; })
       .attr("y2", function(d) {
         return d.p2[1]; })
-      .attr("stroke", "black")
+      .attr("stroke", "#e0e0e0")
       .attr("stroke-width", 2);
 
     drag
@@ -1355,6 +1355,7 @@ pc.brushMode = function(mode) {
       .style("opacity", function(d, i) {
         return (activePoint !== undefined && i === activePoint) ? 0.8 : 0;
       })
+      .style("fill", "#e0e0e0")
       .on("mouseover", function() {
         d3.select(this).style("opacity", 0.8);
       })

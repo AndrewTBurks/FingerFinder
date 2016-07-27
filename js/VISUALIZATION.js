@@ -2202,7 +2202,7 @@ function loadFingerGraph() {
   			.render()
 				.createAxes()
 				.reorderable()
-				.brushMode("1D-axes")
+				.brushMode("2D-strums")
 				.alphaOnBrushed(0.15);
 
 		}
