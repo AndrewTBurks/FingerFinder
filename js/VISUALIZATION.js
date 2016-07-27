@@ -819,6 +819,20 @@ function loadFingerGraph() {
 
 		var ySpacing = Math.floor(height/(numClustersReduced + 1));
 
+		// var y = d3.scale.linear()
+		// .domain([d3.min(IDs), d3.max(IDs)])
+		// .range([ySpacing/2, (height - ySpacing/2)]);
+		//
+		// var yAxis = d3.svg.axis().scale(y).orient("left")
+		// .tickPadding(5);
+		//
+		// zoom.y(y);
+		//
+		// axisSVG.append("g")
+		// .attr("class", "y axis")
+		// // .attr("transform", "translate(0, " + height + ")")
+		// .call(yAxis);
+
 
 
 		var maxFingerConc = d3.max(reducedArray, function(el) {
@@ -2180,7 +2194,7 @@ function loadFingerGraph() {
 				.createAxes()
 				.reorderable()
 				.brushMode("1D-axes")
-				.alphaOnBrushed(0.25);
+				.alphaOnBrushed(0.15);
 
 		}
 	}
