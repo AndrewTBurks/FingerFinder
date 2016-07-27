@@ -759,7 +759,7 @@ pc.createAxes = function() {
         "class": "label"
       })
       .text(dimensionLabels)
-      .on("dblclick", flipAxisAndUpdatePCP(function(d){ return __.dimensions[d]; }))
+      .on("dblclick", flipAxisAndUpdatePCP)
       .on("wheel", rotateLabels);
 
   if (__.nullValueSeparator=="top") {
