@@ -743,6 +743,8 @@ function loadFingerGraph() {
 		d3.selectAll(".fingerTransition").remove();
 		d3.selectAll(".fingerFileIndicator").remove();
 		d3.selectAll(".graphSVG").remove();
+		// axisSVG.select(".x axis").remove();
+		d3.selectAll(".axisSVG").remove();
 
 		xSpacing = (width/(end - start + 1));
 
@@ -766,11 +768,18 @@ function loadFingerGraph() {
 		var mySVG = myDiv.append("svg")
 		.attr("class", "graphSVG")
 		.attr("width", width)
-		.attr("height", height)
+		.attr("height", height);
 
-		var axisSVG = myDiv.append("svg")
-		.attr("width", width)
-		.attr("height", 25);
+
+
+		var axisSVG;
+
+		axisSVG = myDiv.append("svg")
+			.attr("width", width)
+			.attr("class", "axisSVG")
+			.attr("height", 25);
+
+
 
 		axisSVG.append("g")
 		.attr("class", "x axis")
