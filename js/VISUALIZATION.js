@@ -592,6 +592,7 @@ function drawParticles(fileNum) {
 		createSliceColorLegend();
 		recolorPairplots();
 		recolorSelectedRunLine();
+		recolorParallelCoordinatePlots()
 	}
 
 
@@ -637,7 +638,8 @@ function drawParticles(fileNum) {
 		}
 		particleSystem.geometry.colorsNeedUpdate = true;
 
-		highlightViscousFinger();
+		if(currSelectedNode.timestep === filePick)
+			highlightViscousFinger();
 	}
 
 	function highlightViscousFinger() {
@@ -696,6 +698,13 @@ function drawParticles(fileNum) {
 	* defined within {@link vis.js.html#line1784}
 	*/
 	var recolorPairplots;
+
+
+	function recolorParallelCoordinatePlots() {
+		parallelCoordsPlot.color(function(d, i) {
+			return "#" + lineColorScale(d.avgFingerConc);
+		});
+	}
 
 	// file reading
 	// read 1 file
