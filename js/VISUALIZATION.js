@@ -305,6 +305,9 @@ var color = d3.scale.quantile()
 var colorSlice = d3.scale.quantile()
 .range(colorSplit);
 
+var lineColorScale = d3.scale.quantile()
+.range(colorSplit.slice(Math.round(colorSplit.length/4), colorSplit.length));
+
 var velWidth;
 var velLength;
 
@@ -577,6 +580,7 @@ function drawParticles(fileNum) {
 		color.range(colorSplit);
 		colorSlice.range(colorSplit);
 		fingerColor.range(colorSplit);
+		lineColorScale.range(colorSplit.slice(Math.round(colorSplit.length/4), colorSplit.length));
 
 		if (colorSchemeChoice == 0 || colorSchemeChoice == 1) {
 			renderer.setClearColor("#454545");
@@ -638,8 +642,9 @@ function drawParticles(fileNum) {
 		}
 		particleSystem.geometry.colorsNeedUpdate = true;
 
-		if(currSelectedNode.timestep === filePick)
+		if(currSelectedNode.timestep === filePick){
 			highlightViscousFinger();
+		}
 	}
 
 	function highlightViscousFinger() {
@@ -701,9 +706,9 @@ function drawParticles(fileNum) {
 
 
 	function recolorParallelCoordinatePlots() {
-		parallelCoordsPlot.color(function(d, i) {
-			return "#" + lineColorScale(d.avgFingerConc);
-		});
+		// needs to reset brush or it doesn't work (no clue why)
+		parallelCoordsPlot.brushReset();
+		parallelCoordsPlot.render();
 	}
 
 	// file reading
@@ -2159,7 +2164,7 @@ function loadFingerGraph() {
 				return d.avgFingerConc;
 			});
 
-			var lineColorScale = d3.scale.quantize()
+			lineColorScale
 				.domain(avgFingerExtent)
 				.range(colorSplit.slice(Math.round(colorSplit.length/4), colorSplit.length));
 
