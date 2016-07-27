@@ -642,14 +642,13 @@ function drawParticles(fileNum) {
 		}
 		particleSystem.geometry.colorsNeedUpdate = true;
 
-		if(currSelectedNode.timestep === filePick){
-			highlightViscousFinger();
-		}
+		highlightViscousFinger();
+
 	}
 
 	function highlightViscousFinger() {
 		// desaturate all points
-		if(currSelectedNode.timestep != -1){
+		if(currSelectedNode.timestep != -1 && currSelectedNode.timestep === filePick){
 			console.log("Highlighting");
 			for(var p = 0; p < data.length; p++) {
 				particleSystem.geometry.colors[p] = new THREE.Color("#" + color(Number(data[p].concentration)));
@@ -706,7 +705,6 @@ function drawParticles(fileNum) {
 
 
 	function recolorParallelCoordinatePlots() {
-		// needs to reset brush or it doesn't work (no clue why)
 		parallelCoordsPlot.brushReset();
 		parallelCoordsPlot.render();
 	}
