@@ -2736,8 +2736,8 @@ function setupTitleTooltips() {
 
 
 	d3.select("#flowTooltip")
-		// .style("text-decoration", "underline")
-		.style("font-size", "20px")
+		.style("font-size", "24px")
+		.style("color", "#69C3E0")
 		.on('mousemove', function(d) {
 			// var matrix = this.getScreenCTM()
 			// 	.translate(+ this.getAttribute("cx"), + this.getAttribute("cy"));
@@ -2752,7 +2752,7 @@ function setupTitleTooltips() {
 		});
 
 		d3.select("#forestTooltip")
-			.style("text-decoration", "underline")
+			.style("font-size", "24px")
 			.style("color", "#69C3E0")
 			.on('mousemove', function(d) {
 				// var matrix = this.getScreenCTM()
@@ -2768,7 +2768,7 @@ function setupTitleTooltips() {
 			});
 
 			d3.select("#parallelTooltip")
-				.style("text-decoration", "underline")
+				.style("font-size", "24px")
 				.style("color", "#69C3E0")
 				.on('mousemove', function(d) {
 					// var matrix = this.getScreenCTM()
