@@ -100,6 +100,7 @@ createSliceColorLegend();
 mouseWheelZoom();
 sliderMove();
 menuListener();
+setupTitleTooltips()
 // fingerGraphBrush();
 
 /**
@@ -2725,6 +2726,62 @@ function populateRunDropdown() {
 			el.value = opt;
 			select.appendChild(el);
 		}
+}
+
+function setupTitleTooltips() {
+	var flowTooltip = "Left-Mouse ↻: Rotate Cylinder<br>Right-Mouse ↕: Pan Camera Vertically<br>Right-Mouse ↔: Pan Around Cylinder";
+	var forestTooltip = "<strong>Background:</strong><br>Mouse-Wheel: Zoom<br>Left-Mouse ↕↔: Pan<br>Right-Mouse: Reset Zoom<br><strong>Circle:</strong><br>Left-Mouse: Select/Deselect Viscous Finger";
+	var parallelTooltip = "Run Summary Tooltip:";
+
+
+
+	d3.select("#flowTooltip")
+		.style("text-decoration", "underline")
+		.style("color", "#69C3E0")
+		.on('mousemove', function(d) {
+			// var matrix = this.getScreenCTM()
+			// 	.translate(+ this.getAttribute("cx"), + this.getAttribute("cy"));
+			var position = this.getBoundingClientRect();
+			tooltip.classed("hidden", false)
+				.html(flowTooltip)
+				.style("left", (window.pageXOffset + (position.left+position.right)/2) + "px")
+				.style("top", (window.pageYOffset + position.top) + "px");
+		})
+		.on('mouseout', function() {
+			tooltip.classed("hidden", true);
+		});
+
+		d3.select("#forestTooltip")
+			.style("text-decoration", "underline")
+			.style("color", "#69C3E0")
+			.on('mousemove', function(d) {
+				// var matrix = this.getScreenCTM()
+				// 	.translate(+ this.getAttribute("cx"), + this.getAttribute("cy"));
+				var position = this.getBoundingClientRect();
+				tooltip.classed("hidden", false)
+					.html(forestTooltip)
+					.style("left", (window.pageXOffset + (position.left+position.right)/2 + 40) + "px")
+					.style("top", (window.pageYOffset + position.top) + "px");
+			})
+			.on('mouseout', function() {
+				tooltip.classed("hidden", true);
+			});
+
+			d3.select("#parallelTooltip")
+				.style("text-decoration", "underline")
+				.style("color", "#69C3E0")
+				.on('mousemove', function(d) {
+					// var matrix = this.getScreenCTM()
+					// 	.translate(+ this.getAttribute("cx"), + this.getAttribute("cy"));
+					var position = this.getBoundingClientRect();
+					tooltip.classed("hidden", false)
+						.html(parallelTooltip)
+						.style("left", (window.pageXOffset + (position.left+position.right)/2 + 40) + "px")
+						.style("top", (window.pageYOffset + position.top) + "px");
+				})
+				.on('mouseout', function() {
+					tooltip.classed("hidden", true);
+				});
 }
 
 /**
