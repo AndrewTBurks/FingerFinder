@@ -2736,8 +2736,8 @@ function setupTitleTooltips() {
 
 
 	d3.select("#flowTooltip")
-		.style("text-decoration", "underline")
-		.style("color", "#69C3E0")
+		// .style("text-decoration", "underline")
+		.style("font-size", "20px")
 		.on('mousemove', function(d) {
 			// var matrix = this.getScreenCTM()
 			// 	.translate(+ this.getAttribute("cx"), + this.getAttribute("cy"));
