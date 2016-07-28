@@ -534,7 +534,9 @@ function drawParticles(fileNum) {
 			}
 		}
 		sliceArrow1.remove();
-		sliceArrow1 = svg.append("path")
+
+		sliceArrow1 = svg.append("g");
+		sliceArrow1.append("path")
 		.attr("class", "arrow")
 		.attr("stroke-linecap", "round")
 		.attr("d", "M " + (WIDTH_SLICE-15) + " " + (WIDTH_SLICE-10) +
@@ -549,8 +551,29 @@ function drawParticles(fileNum) {
 		.style("stroke-width", 2)
 		.style("stroke-opacity", 0.5);
 
+		sliceArrow1.append("rect")
+		.attr("x", WIDTH_SLICE-17)
+		.attr("y", WIDTH_SLICE-17)
+		.attr("width", 15)
+		.attr("height", 15)
+		.style("opacity", 0)
+		.on('mousemove', function(d) {
+			// var matrix = this.getScreenCTM()
+			// 	.translate(+ this.getAttribute("cx"), + this.getAttribute("cy"));
+			var position = this.getBoundingClientRect();
+			tooltip.classed("hidden", false)
+				.html("Slice Orientation")
+				.style("left", (window.pageXOffset + (position.left+position.right)/2 + 15) + "px")
+				.style("top", (window.pageYOffset + position.top - 15) + "px");
+		})
+		.on('mouseout', function() {
+			tooltip.classed("hidden", true);
+		});
+
 		sliceArrow2.remove();
-		sliceArrow2 = svg2.append("path")
+		sliceArrow2 = svg2.append("g");
+
+		sliceArrow2.append("path")
 		.attr("class", "arrow")
 		.attr("stroke-linecap", "round")
 		.attr("d", "M " + (WIDTH_SLICE-15) + " " + (WIDTH_SLICE-10) +
@@ -564,6 +587,25 @@ function drawParticles(fileNum) {
 		.style("stroke", "white")
 		.style("stroke-width", 2)
 		.style("stroke-opacity", 0.5);
+
+		sliceArrow2.append("rect")
+		.attr("x", WIDTH_SLICE-17)
+		.attr("y", WIDTH_SLICE-17)
+		.attr("width", 15)
+		.attr("height", 15)
+		.style("opacity", 0)
+		.on('mousemove', function(d) {
+			// var matrix = this.getScreenCTM()
+			// 	.translate(+ this.getAttribute("cx"), + this.getAttribute("cy"));
+			var position = this.getBoundingClientRect();
+			tooltip.classed("hidden", false)
+				.html("Slice Orientation")
+				.style("left", (window.pageXOffset + (position.left+position.right)/2 + 15) + "px")
+				.style("top", (window.pageYOffset + position.top - 15) + "px");
+		})
+		.on('mouseout', function() {
+			tooltip.classed("hidden", true);
+		});
 
 		var end = new Date().getTime();
 		var time = end - startTime;
