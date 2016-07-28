@@ -2217,6 +2217,7 @@ function loadFingerGraph() {
 				.reorderable()
 				.brushMode("2D-strums")
 				.alphaOnBrushed(0.15);
+				parallelCoordsPlot.brushReset();
 
 		}
 	}
