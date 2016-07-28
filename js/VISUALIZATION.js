@@ -916,6 +916,7 @@ function loadFingerGraph() {
 		// to have the same index
 		var concArray = new Array(end-start+1);
 		var sizeArray = new Array(end-start+1);
+		var numPointsArray = new Array(end-start+1);
 		var includedArray = new Array(end-start+1);
 		var nextArray = new Array(end-start+1);
 
@@ -931,6 +932,7 @@ function loadFingerGraph() {
 			concArray[i] = new Array(numClusters).fill(0);
 			sizeArray[i] = new Array(numClusters).fill(0);
 			nextArray[i] = new Array(numClusters).fill(-1);
+			numPointsArray[i] = new Array(numClusters).fill(0);
 
 			for(var j = 0; j < reducedArray[i].length; j++) {
 				var thisFinger = reducedArray[i][j];
@@ -939,6 +941,8 @@ function loadFingerGraph() {
 					(thisFinger.xMax - thisFinger.xMin)
 					+ (thisFinger.yMax - thisFinger.yMin)
 					+ (thisFinger.zMax - thisFinger.zMin);
+
+				numPointsArray[i][reducedArray[i][j].clusterID] += reducedArray[i][j].size;
 
 				includedArray[i][reducedArray[i][j].clusterID].push(j);
 
@@ -1097,7 +1101,7 @@ function loadFingerGraph() {
 			for(var j = 0; j < numClusters; j++) {
 
 				myElementG.append("circle")
-					.datum({timestep: i+start, id: j, conc: concArray[i][j].toFixed(2), includes: includedArray[i][j]})
+					.datum({timestep: i+start, id: j, conc: concArray[i][j].toFixed(2), size: numPointsArray[i][j], includes: includedArray[i][j]})
 					.attr("class", "fingerPoint")
 					.attr("cy", (height - (3*ySpacing/2 + (ySpacing*indexMap[j]))))
 					.attr("cx", (xSpacing * (i)) + xSpacing/2)
@@ -1168,7 +1172,7 @@ function loadFingerGraph() {
 						var matrix = this.getScreenCTM()
         			.translate(+ this.getAttribute("cx"), + this.getAttribute("cy"));
 						tooltip.classed("hidden", false)
-							.html("ID: " + d.id + "<br>Timestep: " + d.timestep + "<br>Concentration: " + d.conc)
+							.html("<b>ID:</b> " + d.id + "<br><b>Timestep:</b> " + d.timestep + "<br><b>Concentration:</b> " + d.conc + "<br><b># Points:</b> " + d.size)
 							.style("left", (window.pageXOffset + matrix.e + 30) + "px")
 			        .style("top", (window.pageYOffset + matrix.f - 15) + "px");
 					})
