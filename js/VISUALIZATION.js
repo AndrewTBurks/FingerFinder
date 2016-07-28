@@ -1169,8 +1169,8 @@ function loadFingerGraph() {
         			.translate(+ this.getAttribute("cx"), + this.getAttribute("cy"));
 						tooltip.classed("hidden", false)
 							.html("ID: " + d.id + "<br>Timestep: " + d.timestep + "<br>Concentration: " + d.conc)
-							.style("left", (window.pageXOffset + matrix.e + 15) + "px")
-			        .style("top", (window.pageYOffset + matrix.f - 80) + "px");
+							.style("left", (window.pageXOffset + matrix.e + 30) + "px")
+			        .style("top", (window.pageYOffset + matrix.f - 15) + "px");
 					})
 					.on('mouseout', function() {
 						tooltip.classed("hidden", true);
@@ -2730,7 +2730,7 @@ function populateRunDropdown() {
 
 function setupTitleTooltips() {
 	var flowTooltip = "Left-Mouse ↻: Rotate Cylinder<br>Right-Mouse ↕: Pan Camera Vertically<br>Right-Mouse ↔: Pan Around Cylinder";
-	var forestTooltip = "<strong>Background:</strong><br>Mouse-Wheel: Zoom<br>Left-Mouse ↕↔: Pan<br>Right-Mouse: Reset Zoom<br><strong>Circle:</strong><br>Left-Mouse: Select/Deselect Viscous Finger";
+	var forestTooltip = "<strong>Background:</strong><br>Mouse-Wheel: Zoom<br>Left-Mouse ↕↔: Pan<br>Right-Mouse: Reset Zoom<br><strong>Circle:</strong><br>Left-Mouse: Select/Deselect Viscous Finger<br>Hover: Show Viscous Finger Information";
 	var parallelTooltip = "<strong>Background:</strong><br>Left-Mouse:<br>&nbsp&nbsp&nbspDrag: Strum Select Lines<br>&nbsp&nbsp&nbspClick: Clear Selection<br><strong>Titles:</strong><br>Left-Mouse:<br>&nbsp&nbsp&nbsp↕↔: Rearrange Axes<br>&nbsp&nbsp&nbspDouble-Click: Flip Axis";
 
 
