@@ -43,14 +43,17 @@ h1 {
 #flowTooltip {
   font-weight: bold;
   font-size: 20px;
+  cursor: help;
 }
 #forestTooltip {
   font-weight: bold;
   font-size: 20px;
+  cursor: help;
 }
 #parallelTooltip {
   font-weight: bold;
   font-size: 20px;
+  cursor: help;
 }
 
 #canvas {
