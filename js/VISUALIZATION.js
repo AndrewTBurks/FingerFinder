@@ -2736,7 +2736,7 @@ function setupTitleTooltips() {
 
 
 	d3.select("#flowTooltip")
-		.style("font-size", "24px")
+		// .style("font-size", "24px")
 		.style("color", "#69C3E0")
 		.on('mousemove', function(d) {
 			// var matrix = this.getScreenCTM()
@@ -2752,7 +2752,7 @@ function setupTitleTooltips() {
 		});
 
 		d3.select("#forestTooltip")
-			.style("font-size", "24px")
+			// .style("font-size", "24px")
 			.style("color", "#69C3E0")
 			.on('mousemove', function(d) {
 				// var matrix = this.getScreenCTM()
@@ -2768,7 +2768,7 @@ function setupTitleTooltips() {
 			});
 
 			d3.select("#parallelTooltip")
-				.style("font-size", "24px")
+				// .style("font-size", "24px")
 				.style("color", "#69C3E0")
 				.on('mousemove', function(d) {
 					// var matrix = this.getScreenCTM()
