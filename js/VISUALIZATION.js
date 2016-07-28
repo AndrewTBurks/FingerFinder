@@ -44,7 +44,7 @@ var sliced = [];
 var sliceAccumulated = [];
 var colorSchemeChoice = 3;
 
-var numRuns = 8;
+var numRuns = 10;
 var runSummaryData = new Array(numRuns);
 var fingersPerTimestep = new Array(numRuns).fill(null);
 
