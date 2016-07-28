@@ -2744,7 +2744,7 @@ function setupTitleTooltips() {
 			var position = this.getBoundingClientRect();
 			tooltip.classed("hidden", false)
 				.html(flowTooltip)
-				.style("left", (window.pageXOffset + (position.left+position.right)/2) + "px")
+				.style("left", (window.pageXOffset + (position.left+position.right)/2 + 40) + "px")
 				.style("top", (window.pageYOffset + position.top) + "px");
 		})
 		.on('mouseout', function() {
