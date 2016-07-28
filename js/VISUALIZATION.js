@@ -817,7 +817,7 @@ function loadFingerGraph() {
 
 		var zoom = d3.behavior.zoom()
 		.x(x)
-		.scaleExtent([1,10])
+		.scaleExtent([1,5])
 		.on("zoom", zoomed);
 
 		var mySVG = myDiv.append("svg")
