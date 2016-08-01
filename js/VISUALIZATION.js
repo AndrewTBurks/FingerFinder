@@ -2337,6 +2337,9 @@ function loadFingerGraph() {
 			}
 
 			d3.selectAll(".starPlot").append("path")
+				.datum(function(d, i) {
+					return runSummaryData[i];
+				})
 				.attr("d", function(d, i) {
 					var path = "",
 							coord;
@@ -2371,7 +2374,10 @@ function loadFingerGraph() {
 				.style("fill", function(d, i) {
 					return "#" + scales[2](runSummaryData[i].avgFingerConc);
 				})
-				.style("opacity", 0.75);
+				.style("opacity", 0.75)
+				.on("click", function(d) {
+					console.log(d);
+				});
 
 
 
