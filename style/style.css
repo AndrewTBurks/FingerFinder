@@ -56,6 +56,12 @@ h1 {
   cursor: help;
 }
 
+#starplotTooltip {
+  font-weight: bold;
+  font-size: 20px;
+  cursor: help;
+}
+
 #canvas {
   width: 450px;
   height: 25px;
@@ -254,6 +260,17 @@ p.view2 {
   position: relative;
   /*text-align: center;*/
   margin-top: 10px;
+}
+
+#starplotWrapper {
+  /*max-width: 1326px;*/
+  width: 1326px;
+  height: 300px;
+  max-height: 300px;
+  position: relative;
+  /*text-align: center;*/
+  margin-top: 10px;
+  background-color: black;
 }
 
 #graphBrushWrapper {

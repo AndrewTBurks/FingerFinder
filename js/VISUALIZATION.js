@@ -1438,8 +1438,9 @@ function loadFingerGraph() {
 				getRunSummary(runNum+1);
 			}
 			else {
-				drawPairplots();
-				createParallelCoordsPlots()
+				// drawPairplots();
+				// createParallelCoordsPlots();
+				drawStarplots();
 				fingerGraphBrush();
 			}
 
@@ -2188,6 +2189,154 @@ function loadFingerGraph() {
 		};
 	}
 
+	function drawStarplots() {
+		var myDiv = d3.select("#starplotWrapper");
+
+		if(myDiv) {
+			var mySVG = myDiv.append("svg")
+				.attr("width", "100%")
+				.attr("height", "100%");
+
+			var numVars = 6;
+			var varNames = ["Total Fingers", "Avg Fingers", "Avg Finger Conc.", "Avg Point Conc.", "Avg Finger Dens.", "Merge Factor"];
+			var varDescriptions = [
+				"Total number of unique fingers over the entire run.",
+				"Number of fingers in each timestep, averaged over the entire run.",
+				"Average concentration of fingers in each timestep, averaged over the entire run.",
+				"Average concentraion of points in viscous fingers in each timestep, averaged over the entire run.",
+				"Average finger density (finger concentration / finger volume) in each timestep, averaged over the entire run.",
+				"Number of merges (not including fingers which disappear) in each timestep, averaged over the entire run.",
+			];
+
+			var width = 1326,
+					height = 300;
+
+			var plotSpacing = 10;
+			var beginningSpacing = 50;
+			var plotDim = (width - ((numRuns+1)*(plotSpacing)))/numRuns;
+
+			var isZoomed = false;
+			var runHighlighted = null;
+			var runGroupHighlighted = [];
+
+			/* === CREATE SCALES === */
+
+			var scales = new Array(numVars);
+
+			var min, max;
+			var circleRadius = 5;
+			var circleStrokeWidth = 0.5;
+			// get ranges of values for each variable
+
+			// ======================================
+			// total number of fingers
+			min = d3.min(runSummaryData, function(el) {
+				return el.totalClusters;
+			});
+			max = d3.max(runSummaryData, function(el) {
+				return el.totalClusters;
+			});
+
+			scales[0] = d3.scale.linear()
+				.domain([min, max])
+				.range([circleRadius + circleStrokeWidth, plotDim-(circleRadius + circleStrokeWidth)]);
+
+			// ======================================
+			// average number of fingers per timestep
+			min = d3.min(runSummaryData, function(el) {
+				return el.avgClusters;
+			});
+			max = d3.max(runSummaryData, function(el) {
+				return el.avgClusters;
+			});
+
+			scales[1] = d3.scale.linear()
+				.domain([min, max])
+				.range([circleRadius + circleStrokeWidth, plotDim-(circleRadius + circleStrokeWidth)]);
+
+			// =========================================
+			// average finger concentration per timestep
+			min = d3.min(runSummaryData, function(el) {
+				return el.avgFingerConc;
+			});
+			max = d3.max(runSummaryData, function(el) {
+				return el.avgFingerConc;
+			});
+
+			scales[2] = d3.scale.linear()
+				.domain([min, max])
+				.range([circleRadius + circleStrokeWidth, plotDim-(circleRadius + circleStrokeWidth)]);
+
+			// =========================================
+			// average finger point concentration per timestep
+			min = d3.min(runSummaryData, function(el) {
+				return el.avgFingerPointConc;
+			});
+			max = d3.max(runSummaryData, function(el) {
+				return el.avgFingerPointConc;
+			});
+
+			scales[3] = d3.scale.linear()
+				.domain([min, max])
+				.range([circleRadius + circleStrokeWidth, plotDim-(circleRadius + circleStrokeWidth)]);
+
+			// =========================================
+			// average finger density per timestep
+			min = d3.min(runSummaryData, function(el) {
+				return el.avgFingerDensity;
+			});
+			max = d3.max(runSummaryData, function(el) {
+				return el.avgFingerDensity;
+			});
+
+			scales[4] = d3.scale.linear()
+				.domain([min, max])
+				.range([circleRadius + circleStrokeWidth, plotDim-(circleRadius + circleStrokeWidth)]);
+
+			// =========================================
+			// average finger density per timestep
+			min = d3.min(runSummaryData, function(el) {
+				return el.mergeFactor;
+			});
+			max = d3.max(runSummaryData, function(el) {
+				return el.mergeFactor;
+			});
+
+			scales[5] = d3.scale.linear()
+				.domain([min, max])
+				.range([circleRadius + circleStrokeWidth, plotDim-(circleRadius + circleStrokeWidth)]);
+
+			/* === SCALES CREATED === */
+
+			// central point test for each plotDim
+			for(var i = 0; i < numRuns; i++) {
+				mySVG.append("g")
+					.attr("class", "starPlot")
+					.attr("transform", "translate(" + (i*(plotDim+plotSpacing) + plotSpacing + plotDim/2) + "," + ((plotDim/2) + beginningSpacing) + ")");
+			}
+
+			d3.selectAll(".starPlot")
+				.append("text")
+					.text(function(d, i) { return i+1; })
+					.attr("y", -plotDim/2 - 20)
+					.style("fill", "white")
+					.style("text-anchor", "middle");
+
+			for(var i = 0; i < numVars-1; i++) {
+				d3.selectAll(".starPlot").append("line")
+					.attr("class", "starPlotAxis")
+					.attr("x1", 0)
+					.attr("x2", plotDim/2)
+					.attr("y1", 0)
+					.attr("y2", 0)
+					.attr("transform", "rotate(" + ((360 * i/(numVars-1)) - 90) + ")")
+					.style("stroke", "white")
+					.style("stroke-width", 2);
+			}
+
+		}
+	}
+
 	var paralellCoordsPlot;
 
 	function createParallelCoordsPlots() {
@@ -2779,6 +2928,7 @@ function setupTitleTooltips() {
 	var flowTooltip = "Left-Mouse ↻: Rotate Cylinder<br>Right-Mouse ↕: Pan Camera Vertically<br>Right-Mouse ↔: Pan Around Cylinder";
 	var forestTooltip = "<strong>Background:</strong><br>Mouse-Wheel: Zoom<br>Right-Mouse: Reset Zoom<br><br><strong>Circle:</strong><br>Left-Mouse: Select/Deselect Viscous Finger<br>Hover: Show Viscous Finger Information";
 	var parallelTooltip = "<strong>Background:</strong><br>Left-Mouse:<br>&nbsp&nbsp&nbspDrag: Strum Select Lines<br>&nbsp&nbsp&nbspClick: Clear Selection<br><br><strong>Titles:</strong><br>Left-Mouse:<br>&nbsp&nbsp&nbsp↔: Rearrange Axes<br>&nbsp&nbsp&nbspDouble-Click: Flip Axis";
+	var starplotTooltip = "<strong>Hi this is a Star Plot</strong>";
 
 
 
@@ -2829,6 +2979,22 @@ function setupTitleTooltips() {
 				.on('mouseout', function() {
 					tooltip.classed("hidden", true);
 				});
+
+				d3.select("#starplotTooltip")
+					// .style("font-size", "24px")
+					.style("color", "#69C3E0")
+					.on('mousemove', function(d) {
+						// var matrix = this.getScreenCTM()
+						// 	.translate(+ this.getAttribute("cx"), + this.getAttribute("cy"));
+						var position = this.getBoundingClientRect();
+						tooltip.classed("hidden", false)
+							.html(starplotTooltip)
+							.style("left", (window.pageXOffset + (position.left+position.right)/2 + 40) + "px")
+							.style("top", (window.pageYOffset + position.top) + "px");
+					})
+					.on('mouseout', function() {
+						tooltip.classed("hidden", true);
+					});
 }
 
 /**
