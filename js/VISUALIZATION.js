@@ -2239,7 +2239,7 @@ function loadFingerGraph() {
 
 			scales[0] = d3.scale.linear()
 				.domain([min, max])
-				.range([circleRadius + circleStrokeWidth, plotDim-(circleRadius + circleStrokeWidth)]);
+				.range([0, plotDim/2]);
 
 			// ======================================
 			// average number of fingers per timestep
@@ -2252,10 +2252,11 @@ function loadFingerGraph() {
 
 			scales[1] = d3.scale.linear()
 				.domain([min, max])
-				.range([circleRadius + circleStrokeWidth, plotDim-(circleRadius + circleStrokeWidth)]);
+				.range([0, plotDim/2]);
 
 			// =========================================
 			// average finger concentration per timestep
+			// using for coloring
 			min = d3.min(runSummaryData, function(el) {
 				return el.avgFingerConc;
 			});
@@ -2263,9 +2264,9 @@ function loadFingerGraph() {
 				return el.avgFingerConc;
 			});
 
-			scales[2] = d3.scale.linear()
+			scales[2] = d3.scale.quantile()
 				.domain([min, max])
-				.range([circleRadius + circleStrokeWidth, plotDim-(circleRadius + circleStrokeWidth)]);
+				.range(colorSplit);
 
 			// =========================================
 			// average finger point concentration per timestep
@@ -2278,7 +2279,7 @@ function loadFingerGraph() {
 
 			scales[3] = d3.scale.linear()
 				.domain([min, max])
-				.range([circleRadius + circleStrokeWidth, plotDim-(circleRadius + circleStrokeWidth)]);
+				.range([0, plotDim/2]);
 
 			// =========================================
 			// average finger density per timestep
@@ -2291,7 +2292,7 @@ function loadFingerGraph() {
 
 			scales[4] = d3.scale.linear()
 				.domain([min, max])
-				.range([circleRadius + circleStrokeWidth, plotDim-(circleRadius + circleStrokeWidth)]);
+				.range([0, plotDim/2]);
 
 			// =========================================
 			// average finger density per timestep
@@ -2304,13 +2305,14 @@ function loadFingerGraph() {
 
 			scales[5] = d3.scale.linear()
 				.domain([min, max])
-				.range([circleRadius + circleStrokeWidth, plotDim-(circleRadius + circleStrokeWidth)]);
+				.range([0, plotDim/2]);
 
 			/* === SCALES CREATED === */
 
 			// central point test for each plotDim
 			for(var i = 0; i < numRuns; i++) {
 				mySVG.append("g")
+					.datum(runSummaryData[i])
 					.attr("class", "starPlot")
 					.attr("transform", "translate(" + (i*(plotDim+plotSpacing) + plotSpacing + plotDim/2) + "," + ((plotDim/2) + beginningSpacing) + ")");
 			}
@@ -2334,6 +2336,57 @@ function loadFingerGraph() {
 					.style("stroke-width", 2);
 			}
 
+			d3.selectAll(".starPlot").append("path")
+				.attr("d", function(d, i) {
+					var path = "",
+							coord;
+
+					// axes: 0 1 3 4 5
+					// 		 :totalClusters, avgClusters, avgFingerPointConc, avgFingerDensity, mergeFactor
+
+					// totalClusters
+					coord = rotate(scales[0](runSummaryData[i].totalClusters), ((360 * 0/(numVars-1)) - 90));
+					path += "M " + coord[0] + " " + coord[1] + " ";
+
+					// avgClusters
+					coord = rotate(scales[1](runSummaryData[i].avgClusters), ((360 * 1/(numVars-1)) - 90));
+					path += "L " + coord[0] + " " + coord[1] + " ";
+
+
+					// avgFingerPointConc
+					coord = rotate(scales[3](runSummaryData[i].avgFingerPointConc), ((360 * 2/(numVars-1)) - 90));
+					path += "L " + coord[0] + " " + coord[1] + " ";
+
+					// avgFingerDensity
+					coord = rotate(scales[4](runSummaryData[i].avgFingerDensity), ((360 * 3/(numVars-1)) - 90));
+					path += "L " + coord[0] + " " + coord[1] + " ";
+
+
+					// mergeFactor
+					coord = rotate(scales[5](runSummaryData[i].mergeFactor), ((360 * 4/(numVars-1)) - 90));
+					path += "L " + coord[0] + " " + coord[1] + " Z";
+
+					return path;
+				})
+				.style("fill", function(d, i) {
+					return "#" + scales[2](runSummaryData[i].avgFingerConc);
+				})
+				.style("opacity", 0.75);
+
+
+
+
+			}
+
+
+
+		function rotate(x, angle) {
+		    var radians = (Math.PI / 180) * angle,
+		        cos = Math.cos(radians),
+		        sin = Math.sin(radians),
+		        nx = (cos * x),
+		        ny = (sin * x);
+		    return [nx, ny];
 		}
 	}
 
