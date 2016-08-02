@@ -2153,6 +2153,10 @@ function loadFingerGraph() {
 
 			recolor3DModel();
 
+
+			d3.selectAll(".starPlotCircle") // + runPick)
+				.style("stroke-width", function(d) { return d === runPick ? 2 : 0; });
+
 		});
 
 		recolorPairplots = function() {
@@ -2198,7 +2202,7 @@ function loadFingerGraph() {
 				.attr("height", "100%");
 
 			var numVars = 6;
-			var varNames = ["Total Fingers", "Avg Fingers", "Avg Finger Conc.", "Avg Point Conc.", "Avg Finger Dens.", "Merge Factor"];
+			var varNames = ["Total Fingers", "Avg Fingers", "Avg Point Conc.", "Avg Finger Dens.", "Merge Factor"];
 			var varDescriptions = [
 				"Total number of unique fingers over the entire run.",
 				"Number of fingers in each timestep, averaged over the entire run.",
@@ -2239,7 +2243,7 @@ function loadFingerGraph() {
 
 			scales[0] = d3.scale.linear()
 				.domain([min, max])
-				.range([0, plotDim/2]);
+				.range([10, plotDim/2 - 5]);
 
 			// ======================================
 			// average number of fingers per timestep
@@ -2252,7 +2256,7 @@ function loadFingerGraph() {
 
 			scales[1] = d3.scale.linear()
 				.domain([min, max])
-				.range([0, plotDim/2]);
+				.range([10, plotDim/2 - 5]);
 
 			// =========================================
 			// average finger concentration per timestep
@@ -2279,7 +2283,7 @@ function loadFingerGraph() {
 
 			scales[3] = d3.scale.linear()
 				.domain([min, max])
-				.range([0, plotDim/2]);
+				.range([10, plotDim/2 - 5]);
 
 			// =========================================
 			// average finger density per timestep
@@ -2292,7 +2296,7 @@ function loadFingerGraph() {
 
 			scales[4] = d3.scale.linear()
 				.domain([min, max])
-				.range([0, plotDim/2]);
+				.range([10, plotDim/2 - 5]);
 
 			// =========================================
 			// average finger density per timestep
@@ -2305,7 +2309,7 @@ function loadFingerGraph() {
 
 			scales[5] = d3.scale.linear()
 				.domain([min, max])
-				.range([0, plotDim/2]);
+				.range([10, plotDim/2 - 5]);
 
 			/* === SCALES CREATED === */
 
@@ -2323,6 +2327,22 @@ function loadFingerGraph() {
 					.attr("y", -plotDim/2 - 20)
 					.style("fill", "white")
 					.style("text-anchor", "middle");
+
+			d3.selectAll(".starPlot")
+				.append("circle")
+				.attr("class", "starPlotCircle")
+				.datum(function(d, i) {
+					console.log(("00" + (i + 1)).substr(-2));
+					return ("00" + (i + 1)).substr(-2); } )
+				// .attr("id", function(d, i) { return "starPlotCircle" + ("00" + (i + 1)).substr(-2); })
+				.attr("cy", -plotDim/2 - 25)
+				.attr("r", 14)
+				.style("fill-opacity", 0)
+				.style("stroke", "white")
+				.style("stroke-width", 0);
+
+			d3.selectAll(".starPlotCircle") // + runPick)
+				.style("stroke-width", function(d) { return d === runPick ? 2 : 0; });
 
 			for(var i = 0; i < numVars-1; i++) {
 				d3.selectAll(".starPlot").append("line")
@@ -2403,9 +2423,9 @@ function loadFingerGraph() {
 					return "#" + scales[2](runSummaryData[d.runNum].avgFingerConc);
 				})
 				.style("fill-opacity", 0.8)
-				.on("click", function(d) {
-					console.log("Run " + (d.runNum+1) + " - " + varNames[d.sliceNum] + ": " + d.varValue.toFixed(2));
-				})
+				// .on("click", function(d) {
+				// 	console.log("Run " + (d.runNum+1) + " - " + varNames[d.sliceNum] + ": " + d.varValue.toFixed(2));
+				// })
 				.on("mouseover", function(d) {
 					d3.selectAll("#" + d3.select(this).attr("id"))
 						.style("stroke", "white")
@@ -2413,10 +2433,17 @@ function loadFingerGraph() {
 						.moveToFront();
 
 					d3.select(this).style("stroke-width", 3);
+
+					var position = this.getBoundingClientRect();
+					tooltip.classed("hidden", false)
+						.html("Run " + (d.runNum+1) + "<br>" + varNames[d.sliceNum] + ": " + d.varValue.toFixed(2))
+						.style("left", (window.pageXOffset + (position.left+position.right)/2 + 40) + "px")
+						.style("top", (window.pageYOffset + position.top) + "px");
 				})
 				.on("mouseout", function(d) {
 					d3.selectAll("#" + d3.select(this).attr("id"))
 						.style("stroke", "none");
+					tooltip.classed("hidden", true);
 				});
 
 
