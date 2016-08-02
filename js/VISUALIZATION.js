@@ -2398,7 +2398,8 @@ function loadFingerGraph() {
 				.on("mouseover", function(d) {
 					d3.selectAll("#" + d3.select(this).attr("id"))
 						.style("stroke", "white")
-						.style("stroke-width", 2);
+						.style("stroke-width", 2)
+						.moveToFront();
 
 					d3.select(this).style("stroke-width", 3);
 				})
