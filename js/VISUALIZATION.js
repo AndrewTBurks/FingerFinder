@@ -2155,7 +2155,10 @@ function loadFingerGraph() {
 
 
 			d3.selectAll(".starPlotCircle") // + runPick)
-				.style("stroke-width", function(d) { return d === runPick ? 2 : 0; });
+				// .style("stroke-width", function(d) { return d === runPick ? 2 : 0; });
+				.style("stroke-width", 0);
+			d3.select("#starPlotCircle" + runPick)
+				.style("stroke-width", 2);
 
 		});
 
@@ -2331,18 +2334,31 @@ function loadFingerGraph() {
 			d3.selectAll(".starPlot")
 				.append("circle")
 				.attr("class", "starPlotCircle")
-				.datum(function(d, i) {
-					console.log(("00" + (i + 1)).substr(-2));
-					return ("00" + (i + 1)).substr(-2); } )
-				// .attr("id", function(d, i) { return "starPlotCircle" + ("00" + (i + 1)).substr(-2); })
+				// .datum(function(d, i) {
+				// 	console.log(("00" + (i + 1)).substr(-2));
+				// 	return ("00" + (i + 1)).substr(-2); } )
+				.attr("id", function(d, i) { return "starPlotCircle" + ("00" + (i + 1)).substr(-2); })
 				.attr("cy", -plotDim/2 - 25)
 				.attr("r", 14)
 				.style("fill-opacity", 0)
 				.style("stroke", "white")
-				.style("stroke-width", 0);
+				.style("stroke-width", 0)
+				.on("mousemove", function(d) {
+					var position = this.getBoundingClientRect();
+					tooltip.classed("hidden", false)
+						.html("Avg Finger Conc.: " + d.avgFingerConc.toFixed(2))
+						.style("left", (window.pageXOffset + (position.left+position.right)/2 + 10) + "px")
+						.style("top", (window.pageYOffset + position.top) + "px");
+				})
+				.on("mouseout", function() {
+					tooltip.classed("hidden", true);
+				});;
 
 			d3.selectAll(".starPlotCircle") // + runPick)
-				.style("stroke-width", function(d) { return d === runPick ? 2 : 0; });
+				// .style("stroke-width", function(d) { return d === runPick ? 2 : 0; });
+				.style("stroke-width", 0);
+			d3.select("#starPlotCircle" + runPick)
+				.style("stroke-width", 2);
 
 			for(var i = 0; i < numVars-1; i++) {
 				d3.selectAll(".starPlot").append("line")
@@ -2355,17 +2371,53 @@ function loadFingerGraph() {
 					.style("stroke", "white")
 					.style("stroke-width", 2);
 
-					d3.selectAll(".starPlot").append("circle")
+					d3.select(".starPlot").append("circle")
 						.datum(i)
 						.attr("class", "starPlotAxisTooltip")
 						.attr("cx", plotDim/2)
-						.attr("r", 5)
+						.attr("r", 4)
 						.attr("transform", "rotate(" + ((360 * i/(numVars-1)) - 90) + ")")
+						.style("stroke", "white")
 						.style("fill", "#69C3E0")
+						.style("stroke-width", 1)
 						.on("mousemove", function(d) {
-							console.log(varNames[d]);
+							var position = this.getBoundingClientRect();
+							tooltip.classed("hidden", false)
+								.html("<b>" + varNames[d] + "</b><br>" + varDescriptions[d])
+								.style("left", (window.pageXOffset + (position.left+position.right)/2 + 10) + "px")
+								.style("top", (window.pageYOffset + position.top) + "px");
+						})
+						.on("mouseout", function() {
+							tooltip.classed("hidden", true);
 						});
 			}
+
+			d3.select(".starPlot").append("circle")
+				.datum(i)
+				.attr("class", "starPlotAxisTooltip")
+				.attr("cy", -plotDim/2 - 25)
+				.attr("cx", 25)
+				.attr("r", 4)
+				.style("stroke", "white")
+				.style("fill", "#69C3E0")
+				.style("stroke-width", 1)
+				.on("mousemove", function(d) {
+					var position = this.getBoundingClientRect();
+					tooltip.classed("hidden", false)
+						.html("<b>" + "Avg Finger Conc." + "</b><br>" + "Average concentration of fingers in each timestep, averaged over the entire run.")
+						.style("left", (window.pageXOffset + (position.left+position.right)/2 + 10) + "px")
+						.style("top", (window.pageYOffset + position.top) + "px");
+				})
+				.on("mouseout", function() {
+					tooltip.classed("hidden", true);
+				});
+
+			d3.select(".starPlot").append("text")
+				.text("Run: ")
+				.style("text-anchor", "end")
+				.attr("y", -plotDim/2 - 20)
+				.attr("x", -25)
+				.style("fill", "white");
 
 
 			d3.selectAll(".starPlot").append("g")
@@ -2436,7 +2488,7 @@ function loadFingerGraph() {
 
 					var position = this.getBoundingClientRect();
 					tooltip.classed("hidden", false)
-						.html("Run " + (d.runNum+1) + "<br>" + varNames[d.sliceNum] + ": " + d.varValue.toFixed(2))
+						.html(varNames[d.sliceNum] + ": " + d.varValue.toFixed(2))
 						.style("left", (window.pageXOffset + (position.left+position.right)/2 + 40) + "px")
 						.style("top", (window.pageYOffset + position.top) + "px");
 				})
