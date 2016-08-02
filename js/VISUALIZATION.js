@@ -2334,6 +2334,17 @@ function loadFingerGraph() {
 					.attr("transform", "rotate(" + ((360 * i/(numVars-1)) - 90) + ")")
 					.style("stroke", "white")
 					.style("stroke-width", 2);
+
+					d3.selectAll(".starPlot").append("circle")
+						.datum(i)
+						.attr("class", "starPlotAxisTooltip")
+						.attr("cx", plotDim/2)
+						.attr("r", 5)
+						.attr("transform", "rotate(" + ((360 * i/(numVars-1)) - 90) + ")")
+						.style("fill", "#69C3E0")
+						.on("mousemove", function(d) {
+							console.log(varNames[d]);
+						});
 			}
 
 

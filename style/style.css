@@ -62,6 +62,10 @@ h1 {
   cursor: help;
 }
 
+.starplotAxisTooltip {
+  cursor: help;
+}
+
 #canvas {
   width: 450px;
   height: 25px;
