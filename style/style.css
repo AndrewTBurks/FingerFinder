@@ -32,7 +32,7 @@ h1 {
   font-weight: 300;
   padding-bottom: 0;
   margin-bottom: 0;
-  text-transform: uppercase;
+  /*text-transform: uppercase;*/
   text-align: center;
 }
 
@@ -273,7 +273,7 @@ p.view2 {
   max-height: 300px;
   position: relative;
   /*text-align: center;*/
-  margin-top: 10px;
+  /*margin-top: 10px;*/
   /*background-color: black;*/
 }
 

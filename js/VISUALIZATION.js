@@ -2347,7 +2347,7 @@ function loadFingerGraph() {
 					var position = this.getBoundingClientRect();
 					tooltip.classed("hidden", false)
 						.html("Avg Finger Conc.: " + d.avgFingerConc.toFixed(2))
-						.style("left", (window.pageXOffset + (position.left+position.right)/2 + 10) + "px")
+						.style("left", (window.pageXOffset + (position.left+position.right)/2 + 35) + "px")
 						.style("top", (window.pageYOffset + position.top) + "px");
 				})
 				.on("mouseout", function() {
@@ -2384,7 +2384,7 @@ function loadFingerGraph() {
 							var position = this.getBoundingClientRect();
 							tooltip.classed("hidden", false)
 								.html("<b>" + varNames[d] + "</b><br>" + varDescriptions[d])
-								.style("left", (window.pageXOffset + (position.left+position.right)/2 + 10) + "px")
+								.style("left", (window.pageXOffset + (position.left+position.right)/2 + 20) + "px")
 								.style("top", (window.pageYOffset + position.top) + "px");
 						})
 						.on("mouseout", function() {
@@ -2405,7 +2405,7 @@ function loadFingerGraph() {
 					var position = this.getBoundingClientRect();
 					tooltip.classed("hidden", false)
 						.html("<b>" + "Avg Finger Conc." + "</b><br>" + "Average concentration of fingers in each timestep, averaged over the entire run.")
-						.style("left", (window.pageXOffset + (position.left+position.right)/2 + 10) + "px")
+						.style("left", (window.pageXOffset + (position.left+position.right)/2 + 20) + "px")
 						.style("top", (window.pageYOffset + position.top) + "px");
 				})
 				.on("mouseout", function() {
