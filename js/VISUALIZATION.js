@@ -2202,7 +2202,7 @@ function loadFingerGraph() {
 			var varDescriptions = [
 				"Total number of unique fingers over the entire run.",
 				"Number of fingers in each timestep, averaged over the entire run.",
-				"Average concentration of fingers in each timestep, averaged over the entire run.",
+				// "Average concentration of fingers in each timestep, averaged over the entire run.", // now used for coloring
 				"Average concentraion of points in viscous fingers in each timestep, averaged over the entire run.",
 				"Average finger density (finger concentration / finger volume) in each timestep, averaged over the entire run.",
 				"Number of merges (not including fingers which disappear) in each timestep, averaged over the entire run.",
@@ -2336,47 +2336,75 @@ function loadFingerGraph() {
 					.style("stroke-width", 2);
 			}
 
-			d3.selectAll(".starPlot").append("path")
-				.datum(function(d, i) {
-					return runSummaryData[i];
+
+			d3.selectAll(".starPlot").append("g")
+				.attr("class", "spPathGroup")
+			.selectAll(".plotSlice")
+				.data(function(d, i) {
+					var coords = new Array(numVars-1);
+					var values = new Array(numVars-1);
+					var dataToBind = [];
+
+					coords[0] = rotate(scales[0](runSummaryData[i].totalClusters), ((360 * 0/(numVars-1)) - 90));
+					coords[1] = rotate(scales[1](runSummaryData[i].avgClusters), ((360 * 1/(numVars-1)) - 90));
+					coords[2] = rotate(scales[3](runSummaryData[i].avgFingerPointConc), ((360 * 2/(numVars-1)) - 90));
+					coords[3] = rotate(scales[4](runSummaryData[i].avgFingerDensity), ((360 * 3/(numVars-1)) - 90));
+					coords[4] = rotate(scales[5](runSummaryData[i].mergeFactor), ((360 * 4/(numVars-1)) - 90));
+
+					values[0] = runSummaryData[i].totalClusters;
+					values[1] = runSummaryData[i].avgClusters;
+					values[2] = runSummaryData[i].avgFingerPointConc;
+					values[3] = runSummaryData[i].avgFingerDensity;
+					values[4] = runSummaryData[i].mergeFactor;
+
+					for(var j = 0; j < numVars-1; j++) {
+						dataToBind.push({
+							runNum: i,
+							sliceNum: j,
+							coordBefore: coords[(j+(numVars-2))%(numVars-1)],
+							coordThis: coords[j],
+							coordAfter: coords[(j+1)%(numVars-1)],
+							varValue: values[j]
+						});
+					}
+					return dataToBind;
 				})
-				.attr("d", function(d, i) {
-					var path = "",
-							coord;
+			.enter().append("path")
+				.attr("class", "plotSlice")
+				.attr("id", function(d, i) { return "plotSliceAttr" + i })
+				.attr("d", function(d) {
+					var path = "";
 
-					// axes: 0 1 3 4 5
-					// 		 :totalClusters, avgClusters, avgFingerPointConc, avgFingerDensity, mergeFactor
-
-					// totalClusters
-					coord = rotate(scales[0](runSummaryData[i].totalClusters), ((360 * 0/(numVars-1)) - 90));
-					path += "M " + coord[0] + " " + coord[1] + " ";
-
-					// avgClusters
-					coord = rotate(scales[1](runSummaryData[i].avgClusters), ((360 * 1/(numVars-1)) - 90));
-					path += "L " + coord[0] + " " + coord[1] + " ";
-
-
-					// avgFingerPointConc
-					coord = rotate(scales[3](runSummaryData[i].avgFingerPointConc), ((360 * 2/(numVars-1)) - 90));
-					path += "L " + coord[0] + " " + coord[1] + " ";
-
-					// avgFingerDensity
-					coord = rotate(scales[4](runSummaryData[i].avgFingerDensity), ((360 * 3/(numVars-1)) - 90));
-					path += "L " + coord[0] + " " + coord[1] + " ";
-
-
-					// mergeFactor
-					coord = rotate(scales[5](runSummaryData[i].mergeFactor), ((360 * 4/(numVars-1)) - 90));
-					path += "L " + coord[0] + " " + coord[1] + " Z";
+					// start at origin
+					path += "M 0 0 ";
+					// line to halfway between coord before and this coord
+					path += "L " + ((d.coordBefore[0] + d.coordThis[0])/2) + " " + ((d.coordBefore[1] + d.coordThis[1])/2) + " ";
+					// line to this coord
+					path += "L " + d.coordThis[0] + " " + d.coordThis[1] + " ";
+					// line to halfway between this coord and next coord
+					path += "L " + ((d.coordAfter[0] + d.coordThis[0])/2) + " " + ((d.coordAfter[1] + d.coordThis[1])/2) + " ";
+					// close path
+					path += "Z";
 
 					return path;
 				})
 				.style("fill", function(d, i) {
-					return "#" + scales[2](runSummaryData[i].avgFingerConc);
+					return "#" + scales[2](runSummaryData[d.runNum].avgFingerConc);
 				})
-				.style("opacity", 0.75)
+				.style("fill-opacity", 0.8)
 				.on("click", function(d) {
-					console.log(d);
+					console.log("Run " + (d.runNum+1) + " - " + varNames[d.sliceNum] + ": " + d.varValue.toFixed(2));
+				})
+				.on("mouseover", function(d) {
+					d3.selectAll("#" + d3.select(this).attr("id"))
+						.style("stroke", "white")
+						.style("stroke-width", 2);
+
+					d3.select(this).style("stroke-width", 3);
+				})
+				.on("mouseout", function(d) {
+					d3.selectAll("#" + d3.select(this).attr("id"))
+						.style("stroke", "none");
 				});
 
 

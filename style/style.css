@@ -273,6 +273,15 @@ p.view2 {
   background-color: black;
 }
 
+/*.plotSlice {
+  stroke: none;
+}
+
+.plotSlice:hover {
+  stroke: #ffffff;
+  stroke-width: 2;
+}*/
+
 #graphBrushWrapper {
   width: 100%;
   max-width: 500px;
