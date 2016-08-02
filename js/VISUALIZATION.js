@@ -1438,7 +1438,7 @@ function loadFingerGraph() {
 				getRunSummary(runNum+1);
 			}
 			else {
-				// drawPairplots();
+				drawPairplots();
 				// createParallelCoordsPlots();
 				drawStarplots();
 				fingerGraphBrush();
