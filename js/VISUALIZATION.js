@@ -3106,7 +3106,7 @@ function setupTitleTooltips() {
 	var flowTooltip = "Left-Mouse ↻: Rotate Cylinder<br>Right-Mouse ↕: Pan Camera Vertically<br>Right-Mouse ↔: Pan Around Cylinder";
 	var forestTooltip = "<strong>Background:</strong><br>Mouse-Wheel: Zoom<br>Right-Mouse: Reset Zoom<br><br><strong>Circle:</strong><br>Left-Mouse: Select/Deselect Viscous Finger<br>Hover: Show Viscous Finger Information";
 	var parallelTooltip = "<strong>Background:</strong><br>Left-Mouse:<br>&nbsp&nbsp&nbspDrag: Strum Select Lines<br>&nbsp&nbsp&nbspClick: Clear Selection<br><br><strong>Titles:</strong><br>Left-Mouse:<br>&nbsp&nbsp&nbsp↔: Rearrange Axes<br>&nbsp&nbsp&nbspDouble-Click: Flip Axis";
-	var starplotTooltip = "<strong>Hi this is a Star Plot</strong>";
+	var starplotTooltip = "<strong>Labels:</strong><br>Hover: Average Finger Concentration<br><br><b>Sections:</b><br>Hover: Run Properties<br><br><b>Blue Dots:</b><br>Hover: Property Details";
 
 
 
