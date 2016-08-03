@@ -778,7 +778,7 @@ function drawParticles(fileNum) {
 
 
 	// readFileNumJSON(filePick);
-loadFingerGraph();
+
 
 function loadFingerGraph() {
 	d3.json(folderPath + "allClusterCenters.json", function(err, json) {
@@ -1382,8 +1382,6 @@ function loadFingerGraph() {
 		}
 
 	}
-
-	getRunSummary(1);
 
 	function getRunSummary(runNum) {
 		var clusterCentersFile = "clean.44/run" + ('00' + runNum).substr(-2) + "/allClusterCenters.json";
@@ -2694,6 +2692,8 @@ function loadFingerGraph() {
 
 		drawParticles(n);
 		render();
+		loadFingerGraph();
+		getRunSummary(1);
 		updateFingerGraphFileLine();
 		highlightViscousFinger();
 		console.log("done");
