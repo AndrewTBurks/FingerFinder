@@ -639,7 +639,8 @@ function drawParticles(fileNum) {
 		createSliceColorLegend();
 		recolorPairplots();
 		recolorSelectedRunLine();
-		recolorParallelCoordinatePlots()
+		// recolorParallelCoordinatePlots();
+		recolorStarplots();
 	}
 
 
@@ -742,9 +743,15 @@ function drawParticles(fileNum) {
 
 	/**
 	* Recolors the pairplots according to the option selected. function
-	* defined within {@link vis.js.html#line1784}
+	* defined within {@link drawPairplots}
 	*/
 	var recolorPairplots;
+
+	/**
+	* Recolors the pairplots according to the option selected. function
+	* defined within {@link drawStarplots}
+	*/
+	var recolorStarplots;
 
 
 	function recolorParallelCoordinatePlots() {
@@ -2182,9 +2189,7 @@ function loadFingerGraph() {
 			}
 			// thicker stroke on current run
 			d3.selectAll("#run" + runPick + "Circle").style("stroke-width", 1.5);
-			console.log(runHighlighted);
-
-			console
+			// console.log(runHighlighted);
 
 			if (colorSchemeChoice == 0 || colorSchemeChoice == 1) {
 				plots.selectAll("rect").style("fill", "#454545");
@@ -2328,7 +2333,8 @@ function loadFingerGraph() {
 				.append("text")
 					.text(function(d, i) { return i+1; })
 					.attr("y", -plotDim/2 - 20)
-					.style("fill", "white")
+					.style("fill", "#69C3E0")
+					.style("text-decoration", "underline")
 					.style("text-anchor", "middle");
 
 			d3.selectAll(".starPlot")
@@ -2513,6 +2519,14 @@ function loadFingerGraph() {
 		        ny = (sin * x);
 		    return [nx, ny];
 		}
+
+		recolorStarplots = function() {
+			// change scale range
+			scales[2].range(colorSplit);
+			d3.selectAll(".plotSlice").style("fill", function(d, i) {
+				return "#" + scales[2](runSummaryData[d.runNum].avgFingerConc);
+			})
+		};
 	}
 
 	var paralellCoordsPlot;
