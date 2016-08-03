@@ -749,9 +749,9 @@ function drawParticles(fileNum) {
 	* Recolors the viscous finger graph according to the option selected.
 	*/
 	function recolorFingerGraph() {
-		fingerColor.range(colorSplit); // update range
+		color.range(colorSplit); // update range
 		d3.selectAll(".fingerPoint").style("fill", function(d) {
-			return fingerColor(d.conc);
+			return color(d.conc);
 		});
 	}
 
@@ -920,17 +920,17 @@ function loadFingerGraph() {
 
 
 
-		var maxFingerConc = d3.max(reducedArray, function(el) {
-			return d3.max(el, function(el2) {
-				return el2.concTotal;
-			})
-		});
-
-		var minFingerConc = d3.min(reducedArray, function(el) {
-			return d3.min(el, function(el2) {
-				return el2.concTotal;
-			})
-		});
+		// var maxFingerConc = d3.max(reducedArray, function(el) {
+		// 	return d3.max(el, function(el2) {
+		// 		return el2.concTotal;
+		// 	})
+		// });
+		//
+		// var minFingerConc = d3.min(reducedArray, function(el) {
+		// 	return d3.min(el, function(el2) {
+		// 		return el2.concTotal;
+		// 	})
+		// });
 
 		var maxFingerSize = d3.max(reducedArray, function(el) {
 			return d3.max(el, function(el2) {
@@ -952,7 +952,7 @@ function loadFingerGraph() {
 
 
 
-		fingerColor.domain([minFingerConc, maxFingerConc]);
+		// fingerColor.domain([minFingerConc, maxFingerConc]);
 
 		lineThickness.domain([minFingerConc, maxFingerConc]);
 		// lineThickness.range([1,d3.min([xSpacing/2, ySpacing/2])-4]);
@@ -999,7 +999,7 @@ function loadFingerGraph() {
 
 			for(var j = 0; j < reducedArray[i].length; j++) {
 				var thisFinger = reducedArray[i][j];
-				concArray[i][reducedArray[i][j].clusterID] += reducedArray[i][j].concTotal;
+				concArray[i][reducedArray[i][j].clusterID] += reducedArray[i][j].concTotal/reducedArray[i][j].size;
 				sizeArray[i][reducedArray[i][j].clusterID] +=
 					(thisFinger.xMax - thisFinger.xMin)
 					+ (thisFinger.yMax - thisFinger.yMin)
@@ -1016,6 +1016,12 @@ function loadFingerGraph() {
 				}
 			}
 		}
+
+		var maxFingerConc = d3.max(concArray);
+
+		var minFingerConc = d3.min(concArray);
+
+		fingerColor.domain([minFingerConc, maxFingerConc]);
 
 		maxConcAllTimesteps = new Array(numClustersReduced).fill(0);
 		indexMap = new Array(numClusters);
@@ -1169,7 +1175,7 @@ function loadFingerGraph() {
 					.attr("cy", (height - (3*ySpacing/2 + (ySpacing*indexMap[j]))))
 					.attr("cx", (xSpacing * (i)) + xSpacing/2)
 					.attr("r", concArray[i][j] === 0 ? 0 : fingerSize(sizeArray[i][j]))
-					.style("fill", fingerColor(concArray[i][j]))
+					.style("fill", color(concArray[i][j]))
 					.style("stroke", "white")
 					.style("stroke-width", 0.5)
 					.on('mouseup', function(d) {
