@@ -2238,6 +2238,9 @@ function loadFingerGraph() {
 			var min, max;
 			var circleRadius = 5;
 			var circleStrokeWidth = 0.5;
+
+			var varNumToScaleMap = [0, 1, 3, 4, 5];
+
 			// get ranges of values for each variable
 
 			// ======================================
@@ -2389,7 +2392,7 @@ function loadFingerGraph() {
 						.on("mousemove", function(d) {
 							var position = this.getBoundingClientRect();
 							tooltip.classed("hidden", false)
-								.html("<b>" + varNames[d] + "</b><br>" + varDescriptions[d])
+								.html("<b>" + varNames[d] + " : [" + scales[varNumToScaleMap[d]].domain().map(function (e) { return e.toFixed(2); }) + "]</b><br>" + varDescriptions[d])
 								.style("left", (window.pageXOffset + (position.left+position.right)/2 + 20) + "px")
 								.style("top", (window.pageYOffset + position.top) + "px");
 						})
@@ -2410,7 +2413,7 @@ function loadFingerGraph() {
 				.on("mousemove", function(d) {
 					var position = this.getBoundingClientRect();
 					tooltip.classed("hidden", false)
-						.html("<b>" + "Avg Finger Conc." + "</b><br>" + "Average concentration of fingers in each timestep, averaged over the entire run.")
+						.html("<b>" + "Avg Finger Conc." + " : [" + scales[2].domain().map(function (e) { return e.toFixed(2); }) + "]</b><br>" + "Average concentration of fingers in each timestep, averaged over the entire run.")
 						.style("left", (window.pageXOffset + (position.left+position.right)/2 + 20) + "px")
 						.style("top", (window.pageYOffset + position.top) + "px");
 				})
