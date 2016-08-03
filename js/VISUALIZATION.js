@@ -45,6 +45,7 @@ var sliceAccumulated = [];
 var colorSchemeChoice = 3;
 
 var numRuns = 10;
+var summaryDataCollected = false;
 var runSummaryData = new Array(numRuns);
 var fingersPerTimestep = new Array(numRuns).fill(null);
 
@@ -2693,7 +2694,11 @@ function loadFingerGraph() {
 		drawParticles(n);
 		render();
 		loadFingerGraph();
-		getRunSummary(1);
+		if(!summaryDataCollected)
+		 {
+			 getRunSummary(1);
+			 summaryDataCollected = true;
+		 }
 		updateFingerGraphFileLine();
 		highlightViscousFinger();
 		console.log("done");
