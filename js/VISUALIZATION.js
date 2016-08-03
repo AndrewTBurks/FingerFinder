@@ -632,7 +632,7 @@ function drawParticles(fileNum) {
 			renderer.setClearColor("#050505");
 		}
 
-		recolor3DModel();
+
 		recolorHeatMaps();
 		recolorFingerGraph();
 		createColorLegend();
@@ -641,6 +641,7 @@ function drawParticles(fileNum) {
 		recolorSelectedRunLine();
 		// recolorParallelCoordinatePlots();
 		recolorStarplots();
+		recolor3DModel();
 	}
 
 
@@ -692,7 +693,7 @@ function drawParticles(fileNum) {
 
 	function highlightViscousFinger() {
 		// desaturate all points
-		if(currSelectedNode.timestep != -1 && currSelectedNode.timestep === filePick){
+		if(currSelectedNode.timestep != -1 && currSelectedNode.timestep === filePick && currSelectedNode.run === runPick){
 			console.log("Highlighting");
 			for(var p = 0; p < data.length; p++) {
 				particleSystem.geometry.colors[p] = new THREE.Color("#" + color(Number(data[p].concentration)));
@@ -1172,10 +1173,11 @@ function loadFingerGraph() {
 								// highlight new node
 								currSelectedNode.timestep = d.timestep;
 								currSelectedNode.ID = d.id;
+								currSelectedNode.run = runPick;
 								currSelectedNode.includes = d.includes;
 
 								// highlightViscousFinger();
-								d3.selectAll("circle")
+								d3.selectAll(".fingerPoint")
 									.style("stroke-width", 0.5)
 									.style("stroke", "white");
 								d3.select(this)
