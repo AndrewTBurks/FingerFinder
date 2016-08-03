@@ -58,7 +58,7 @@ var sliceColorMode = Number(d3.select('select[name="viewCylinder"]').node().valu
 for(var i = 0; i < sliceResolution; i++) {
 	sliceAccumulated.push(new Array(sliceResolution));
 	for(var j = 0; j < sliceResolution; j++) {
-		sliceAccumulated[i][j] = {x: i, y: j, conc: 0 , vel: new THREE.Vector3(0,0,0)};
+		sliceAccumulated[i][j] = {x: i, y: j, conc: 0 , vel: new THREE.Vector3(0,0,0), count: 0};
 	}
 }
 
@@ -413,6 +413,7 @@ function drawParticles(fileNum) {
 			for(var j = 0; j < sliceResolution; j++) {
 				sliceAccumulated[i][j].conc = 0;
 				sliceAccumulated[i][j].vel = new THREE.Vector3(0,0,0);
+				sliceAccumulated[i][j].count = 0;
 			}
 		}
 
@@ -428,6 +429,16 @@ function drawParticles(fileNum) {
 			sliceAccumulated[thisX][sliceResolution - thisZ - 1].vel.x += data[sliced[i].num].velocity0;
 			sliceAccumulated[thisX][sliceResolution - thisZ - 1].vel.y += data[sliced[i].num].velocity1;
 			sliceAccumulated[thisX][sliceResolution - thisZ - 1].vel.z += data[sliced[i].num].velocity2;
+			sliceAccumulated[thisX][sliceResolution - thisZ - 1].count ++;
+		}
+
+		for (var i = 0; i < sliceAccumulated.length; i++) {
+			for (var j = 0; j < sliceAccumulated[i].length; j++) {
+				sliceAccumulated[i][j].conc = sliceAccumulated[i][j].conc/sliceAccumulated[i][j].count;
+				sliceAccumulated[i][j].vel.x = sliceAccumulated[i][j].count == 0 ? 0 : sliceAccumulated[i][j].vel.x/sliceAccumulated[i][j].count;
+				sliceAccumulated[i][j].vel.y = sliceAccumulated[i][j].count == 0 ? 0 : sliceAccumulated[i][j].vel.y/sliceAccumulated[i][j].count;
+				sliceAccumulated[i][j].vel.z = sliceAccumulated[i][j].count == 0 ? 0 : sliceAccumulated[i][j].vel.z/sliceAccumulated[i][j].count;
+			}
 		}
 
 		// create/color rectangles of slice
@@ -438,8 +449,8 @@ function drawParticles(fileNum) {
 
 		var colorDomain = color.domain();
 
-		d3.select("#sliceScaleMin").text("< " + (colorDomain[0]*3).toFixed(2));
-		d3.select("#sliceScaleMax").text("> " + (colorDomain[1]*3).toFixed(2));
+		d3.select("#sliceScaleMin").text(colorDomain[0].toFixed(2));
+		d3.select("#sliceScaleMax").text(colorDomain[1].toFixed(2));
 
 		var maxVelSlice = d3.max(sliceAccumulated, function(e) {
 			return d3.max(e, function(e) {
@@ -447,9 +458,11 @@ function drawParticles(fileNum) {
 			});
 		});
 
+		console.log(maxVelSlice);
 
 
-		colorSlice.domain([colorDomain[0]*3, colorDomain[1]*3]);
+
+		colorSlice.domain([meanConcSlice, maxConcSlice]);
 
 		d3.selectAll(".slicePixel").remove();
 		d3.selectAll(".sliceLine").remove();
@@ -492,8 +505,8 @@ function drawParticles(fileNum) {
 			}
 		}
 		// draw lines for velocity
-		for(var i = 0; i < sliceResolution; i++) {
-			for(var j = 0; j < sliceResolution; j++) {
+		for(var i = sliceResolution-1; i >=0 ; i--) {
+			for(var j = sliceResolution-1; j >=0 ; j--) {
 
 				var vecX = sliceAccumulated[i][j].vel.x < 0 ?
 				-velLength(+sliceAccumulated[i][j].vel.x) :
@@ -1194,7 +1207,7 @@ function loadFingerGraph() {
 								currSelectedNode.includes = d.includes;
 
 								highlightViscousFinger();
-								d3.selectAll("circle")
+								d3.selectAll(".fingerPoint")
 									.style("stroke-width", 0.5)
 									.style("stroke", "white");
 								d3.select(this)
