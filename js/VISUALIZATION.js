@@ -2504,7 +2504,7 @@ function loadFingerGraph() {
 					console.log(runSummaryData[d.runNum].avgFingerPointConc);
 					return "#" + color(runSummaryData[d.runNum].avgFingerPointConc);
 				})
-				.style("fill-opacity", 0.8)
+				.style("fill-opacity", 0.95)
 				// .on("click", function(d) {
 				// 	console.log("Run " + (d.runNum+1) + " - " + varNames[d.sliceNum] + ": " + d.varValue.toFixed(2));
 				// })
