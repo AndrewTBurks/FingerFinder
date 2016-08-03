@@ -300,8 +300,8 @@ p.view2 {
 }
 
 #slice {
-  max-width: 340px;
-  max-height: 340px;
+  max-width: 500px;
+  max-height: 606px;
   /*border: solid #e0e0e0 3px;*/
   /*border-radius: 1px;*/
   position: relative;
@@ -310,15 +310,15 @@ p.view2 {
 }
 
 #slice2 {
-  max-width: 340px;
-  max-height: 340px;
+  max-width: 500px;
+  max-height: 606px;
   /*border: solid #e0e0e0 3px;*/
   /*border-radius: 1px;*/
-  display: inline-block;
+  /*display: inline-block;*/
   /*display: table-cell;*/
-  position: relative;
+  position: absolute;
   /*vertical-align: bottom;*/
-  /*bottom: 0;*/
+  bottom: 0;
 
 }
 

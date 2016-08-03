@@ -20,7 +20,7 @@
 // constants for width and height of the scene
 var WIDTH = 450,
 	HEIGHT = 632;
-var WIDTH_SLICE = 338;
+var WIDTH_SLICE = 380;
 var numFiles = 121;
 // Range of file data available
 var startFile = 1;
@@ -96,7 +96,7 @@ var controls = new THREE.TrackballControls(camera, renderer.domElement);
 mouseDragRotate();
 drawSlice();
 createColorLegend();
-createSliceColorLegend();
+// createSliceColorLegend();
 mouseWheelZoom();
 sliderMove();
 menuListener();
