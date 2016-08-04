@@ -650,7 +650,7 @@ function drawParticles(fileNum) {
 		recolorHeatMaps();
 		recolorFingerGraph();
 		createColorLegend();
-		createSliceColorLegend();
+		// createSliceColorLegend();
 		recolorPairplots();
 		recolorSelectedRunLine();
 		// recolorParallelCoordinatePlots();
@@ -732,10 +732,10 @@ function drawParticles(fileNum) {
 	*/
 	function recolorHeatMaps() {
 		d3.selectAll(".slicePixel").style("fill", function(d) {
-			return d3.rgb("#" + color(sliceAccumulated[d.i][d.j].conc/3));
+			return d3.rgb("#" + color(sliceAccumulated[d.i][d.j].conc));
 		});
 		d3.selectAll(".sliceLine").style("fill", function(d) {
-			return d3.rgb("#" + color(sliceAccumulated[d.i][d.j].conc/3));
+			return d3.rgb("#" + color(sliceAccumulated[d.i][d.j].conc));
 		});
 	}
 
@@ -2549,7 +2549,7 @@ function loadFingerGraph() {
 					console.log(runSummaryData[d.runNum].avgFingerPointConc);
 					return "#" + color(runSummaryData[d.runNum].avgFingerPointConc);
 				})
-				.style("fill-opacity", 0.8)
+				.style("fill-opacity", 0.95)
 				// .on("click", function(d) {
 				// 	console.log("Run " + (d.runNum+1) + " - " + varNames[d.sliceNum] + ": " + d.varValue.toFixed(2));
 				// })
