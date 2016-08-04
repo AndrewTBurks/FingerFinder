@@ -2230,12 +2230,12 @@ function loadFingerGraph() {
 				.attr("height", "100%");
 
 			var numVars = 6;
-			var varNames = ["Total Fingers", "Avg Fingers", "Avg Finger Conc.", "Avg Finger Dens.", "Merge Factor"];
+			var varNames = ["Total Fingers", "Avg Fingers", "Avg Finger Conc.", "Avg Finger Point Conc.", "Avg Finger Dens.", "Merge Factor"];
 			var varDescriptions = [
 				"Total number of unique fingers over the entire run.",
 				"Number of fingers in each timestep, averaged over the entire run.",
 				"Average concentration of fingers in each timestep, averaged over the entire run.",
-				// "Average concentraion of points in viscous fingers in each timestep, averaged over the entire run.", // now used for coloring
+				"Average concentraion of points in viscous fingers in each timestep, averaged over the entire run.", // also used for coloring
 				"Average finger density (finger concentration / finger volume) in each timestep, averaged over the entire run.",
 				"Number of merges (not including fingers which disappear) in each timestep, averaged over the entire run.",
 			];
@@ -2259,7 +2259,7 @@ function loadFingerGraph() {
 			var circleRadius = 5;
 			var circleStrokeWidth = 0.5;
 
-			var varNumToScaleMap = [0, 1, 2, 4, 5];
+			var varNumToScaleMap = [0, 1, 2, 3, 4, 5];
 
 			// get ranges of values for each variable
 
@@ -2314,7 +2314,7 @@ function loadFingerGraph() {
 
 			scales[3] = d3.scale.quantile()
 				.domain([min, max])
-				.range(colorSplit);
+				.range([10, plotDim/2 - 5]);
 
 			// =========================================
 			// average finger density per timestep
@@ -2434,14 +2434,14 @@ function loadFingerGraph() {
 			d3.select("#starPlotCircle" + runPick)
 				.style("stroke-width", 2);
 
-			for(var i = 0; i < numVars-1; i++) {
+			for(var i = 0; i < numVars; i++) {
 				d3.selectAll(".starPlot").append("line")
 					.attr("class", "starPlotAxis")
 					.attr("x1", 0)
 					.attr("x2", plotDim/2)
 					.attr("y1", 0)
 					.attr("y2", 0)
-					.attr("transform", "rotate(" + ((360 * i/(numVars-1)) - 90) + ")")
+					.attr("transform", "rotate(" + ((360 * i/(numVars)) - 90) + ")")
 					.style("stroke", "white")
 					.style("stroke-width", 2);
 
@@ -2450,7 +2450,7 @@ function loadFingerGraph() {
 						.attr("class", "starPlotAxisTooltip")
 						.attr("cx", plotDim/2)
 						.attr("r", 4)
-						.attr("transform", "rotate(" + ((360 * i/(numVars-1)) - 90) + ")")
+						.attr("transform", "rotate(" + ((360 * i/(numVars)) - 90) + ")")
 						.style("stroke", "white")
 						.style("fill", "#69C3E0")
 						.style("stroke-width", 1)
@@ -2502,25 +2502,27 @@ function loadFingerGraph() {
 					var values = new Array(numVars-1);
 					var dataToBind = [];
 
-					coords[0] = rotate(scales[0](runSummaryData[i].totalClusters), ((360 * 0/(numVars-1)) - 90));
-					coords[1] = rotate(scales[1](runSummaryData[i].avgClusters), ((360 * 1/(numVars-1)) - 90));
-					coords[2] = rotate(scales[2](runSummaryData[i].avgFingerConc), ((360 * 2/(numVars-1)) - 90));
-					coords[3] = rotate(scales[4](runSummaryData[i].avgFingerDensity), ((360 * 3/(numVars-1)) - 90));
-					coords[4] = rotate(scales[5](runSummaryData[i].mergeFactor), ((360 * 4/(numVars-1)) - 90));
+					coords[0] = rotate(scales[0](runSummaryData[i].totalClusters), ((360 * 0/(numVars)) - 90));
+					coords[1] = rotate(scales[1](runSummaryData[i].avgClusters), ((360 * 1/(numVars)) - 90));
+					coords[2] = rotate(scales[2](runSummaryData[i].avgFingerConc), ((360 * 2/(numVars)) - 90));
+					coords[3] = rotate(scales[2](runSummaryData[i].avgFingerConc), ((360 * 3/(numVars)) - 90));
+					coords[4] = rotate(scales[4](runSummaryData[i].avgFingerDensity), ((360 * 4/(numVars)) - 90));
+					coords[5] = rotate(scales[5](runSummaryData[i].mergeFactor), ((360 * 5/(numVars)) - 90));
 
 					values[0] = runSummaryData[i].totalClusters;
 					values[1] = runSummaryData[i].avgClusters;
 					values[2] = runSummaryData[i].avgFingerConc;
-					values[3] = runSummaryData[i].avgFingerDensity;
-					values[4] = runSummaryData[i].mergeFactor;
+					values[3] = runSummaryData[i].avgFingerPointConc;
+					values[4] = runSummaryData[i].avgFingerDensity;
+					values[5] = runSummaryData[i].mergeFactor;
 
-					for(var j = 0; j < numVars-1; j++) {
+					for(var j = 0; j < numVars; j++) {
 						dataToBind.push({
 							runNum: i,
 							sliceNum: j,
-							coordBefore: coords[(j+(numVars-2))%(numVars-1)],
+							coordBefore: coords[(j+(numVars-1))%(numVars)],
 							coordThis: coords[j],
-							coordAfter: coords[(j+1)%(numVars-1)],
+							coordAfter: coords[(j+1)%(numVars)],
 							varValue: values[j]
 						});
 					}
