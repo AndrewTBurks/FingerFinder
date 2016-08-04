@@ -2364,8 +2364,8 @@ function loadFingerGraph() {
 				.append("circle")
 				.attr("class", "starPlotCircle")
 				// .datum(function(d, i) {
-				// 	console.log(("00" + (i + 1)).substr(-2));
-				// 	return ("00" + (i + 1)).substr(-2); } )
+				// 	return ("00" + (i + 1)).substr(-2);
+				// })
 				.attr("id", function(d, i) { return "starPlotCircle" + ("00" + (i + 1)).substr(-2); })
 				.attr("cy", -plotDim/2 - 25)
 				.attr("r", 14)
@@ -2381,7 +2381,52 @@ function loadFingerGraph() {
 				})
 				.on("mouseout", function() {
 					tooltip.classed("hidden", true);
-				});;
+				})
+				.on("click", function(d){
+					runPick = ("00" + d.run).substr(-2);
+					folderPath = "clean.44/" + "run" + runPick + "/";
+
+					var dropdown = document.getElementById("runDropdown");
+					dropdown.value = runPick;
+
+					readFileNumCSV(filePick);
+					loadFingerGraph();
+
+					// // update colors of all circles
+					// // set all back to normal color
+					// d3.selectAll(".runCircle")
+					// 	.style("fill", "#" + colorSplit[0])
+					// 	.style("stroke", "white")
+					// 	.style("stroke-width", 0.5);
+					//
+					// // set all in run group to be highlighted in secondary color
+					// for(var i = 0; i < runGroupHighlighted.length; i++) {
+					// 	d3.selectAll("#run" + ('00' + runGroupHighlighted[i].num).substr(-2) + "Circle")
+					// 		.style("fill", "#" + colorSplit[Math.round(colorSplit.length/2)]);
+					// }
+
+					// thicker stroke on current run
+					d3.selectAll("#run" + runPick + "Circle").style("stroke-width", 1.5);
+
+					d3.selectAll(".runLine")
+					.style("stroke", "#e0e0e0")
+					.style("stroke-width", 1)
+					.style("stroke-opacity", .25);
+
+					d3.select("#runLine" + runPick)
+					.style("stroke", "#" + colorSplit[Math.round(colorSplit.length/2)])
+					.style("stroke-width", 2)
+					.style("stroke-opacity", 1);
+
+					recolor3DModel();
+
+
+					d3.selectAll(".starPlotCircle") // + runPick)
+						// .style("stroke-width", function(d) { return d === runPick ? 2 : 0; });
+						.style("stroke-width", 0);
+					d3.select("#starPlotCircle" + runPick)
+						.style("stroke-width", 2);
+				});
 
 			d3.selectAll(".starPlotCircle") // + runPick)
 				// .style("stroke-width", function(d) { return d === runPick ? 2 : 0; });
@@ -3150,7 +3195,7 @@ function setupTitleTooltips() {
 	var flowTooltip = "Left-Mouse ↻: Rotate Cylinder<br>Right-Mouse ↕: Pan Camera Vertically<br>Right-Mouse ↔: Pan Around Cylinder";
 	var forestTooltip = "<strong>Background:</strong><br>Mouse-Wheel: Zoom<br>Right-Mouse: Reset Zoom<br><br><strong>Circle:</strong><br>Left-Mouse: Select/Deselect Viscous Finger<br>Hover: Show Viscous Finger Information";
 	var parallelTooltip = "<strong>Background:</strong><br>Left-Mouse:<br>&nbsp&nbsp&nbspDrag: Strum Select Lines<br>&nbsp&nbsp&nbspClick: Clear Selection<br><br><strong>Titles:</strong><br>Left-Mouse:<br>&nbsp&nbsp&nbsp↔: Rearrange Axes<br>&nbsp&nbsp&nbspDouble-Click: Flip Axis";
-	var starplotTooltip = "<strong>Labels:</strong><br>Hover: Average Finger Concentration<br><br><b>Sections:</b><br>Hover: Run Properties<br><br><b>Blue Dots:</b><br>Hover: Property Details";
+	var starplotTooltip = "<strong>Run Labels:</strong><br>Hover: Average Finger Concentration<br>Click: Load Run<br><br><b>Sections:</b><br>Hover: Run Properties<br><br><b>Blue Dots:</b><br>Hover: Property Details";
 
 
 
