@@ -2222,7 +2222,7 @@ function loadFingerGraph() {
 	}
 
 	function drawStarplots() {
-		var myDiv = d3.select("#starplotWrapper");
+		var myDiv = d3.select("#starplots");
 
 		if(myDiv) {
 			var mySVG = myDiv.append("svg")
@@ -2240,16 +2240,19 @@ function loadFingerGraph() {
 				"Number of merges (not including fingers which disappear) in each timestep, averaged over the entire run.",
 			];
 
-			var width = 1326,
-					height = 300;
+			var width = 650, // 122 dimension, 5 wide
+					height = 804;
 
 			var plotSpacing = 10;
 			var beginningSpacing = 50;
-			var plotDim = (width - ((numRuns+1)*(plotSpacing)))/numRuns;
+			var runsPerLine = 5;
+			var numRows = numRuns / runsPerLine;
 
-			var isZoomed = false;
-			var runHighlighted = null;
-			var runGroupHighlighted = [];
+			var dimVals = [(width - ((runsPerLine+1)*(plotSpacing)))/runsPerLine, (height - ((numRows+1)*(plotSpacing) + (numRows*beginningSpacing)))/runsPerLine]
+
+			console.log(dimVals);
+
+			var plotDim = d3.min(dimVals);
 
 			/* === CREATE SCALES === */
 
@@ -2349,7 +2352,15 @@ function loadFingerGraph() {
 				mySVG.append("g")
 					.datum(runSummaryData[i])
 					.attr("class", "starPlot")
-					.attr("transform", "translate(" + (i*(plotDim+plotSpacing) + plotSpacing + plotDim/2) + "," + ((plotDim/2) + beginningSpacing) + ")");
+					.attr("transform", function() {
+						var x, y;
+						x = ((i%runsPerLine)*(dimVals[0]+plotSpacing) + plotSpacing + dimVals[0]/2);
+						y = (Math.floor(i/runsPerLine)*(dimVals[1]+plotSpacing + beginningSpacing) + (dimVals[1]/2) + beginningSpacing);
+
+						console.log(x, y);
+
+						return "translate(" + x + "," + y + ")";
+					});
 			}
 
 			d3.selectAll(".starPlot")

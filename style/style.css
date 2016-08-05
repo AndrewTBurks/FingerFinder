@@ -150,7 +150,8 @@ p.view2 {
 }
 
 #wrapper {
-  max-width: 1500px;
+  max-width: 2500px;
+  min-width: 2040px;
   max-height: 900px;
   position: relative;
   text-align: center;
@@ -206,6 +207,17 @@ p.view2 {
   vertical-align: top;
   position: relative;
   /*margin-left: 16px;*/
+}
+
+#starplotWrapper {
+  max-width: 650px;
+  height: 100%;
+  max-height: 824px;
+  min-height: 824px;
+  display: inline-block;
+  vertical-align: top;
+  position: relative;
+  margin-left: 16px;
 }
 
 #menuWrapper {
@@ -266,11 +278,11 @@ p.view2 {
   margin-top: 10px;
 }
 
-#starplotWrapper {
-  /*max-width: 1326px;*/
-  width: 1326px;
-  height: 300px;
-  max-height: 300px;
+#starplots {
+  max-width: 650px;
+  width: 650px;
+  height: 804px;
+  max-height: 804px;
   position: relative;
   /*text-align: center;*/
   /*margin-top: 10px;*/
