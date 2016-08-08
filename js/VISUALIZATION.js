@@ -651,7 +651,7 @@ function drawParticles(fileNum) {
 		recolorFingerGraph();
 		createColorLegend();
 		// createSliceColorLegend();
-		recolorPairplots();
+		// recolorPairplots();
 		recolorSelectedRunLine();
 		// recolorParallelCoordinatePlots();
 		recolorStarplots();
@@ -936,13 +936,13 @@ function loadFingerGraph() {
 
 		var maxFingerSize = d3.max(reducedArray, function(el) {
 			return d3.max(el, function(el2) {
-				return (el2.xMax - el2.xMin) + (el2.yMax - el2.yMin) + (el2.zMax - el2.zMin);
+				return el2.size;
 			})
 		});
 
 		var minFingerSize = d3.min(reducedArray, function(el) {
 			return d3.min(el, function(el2) {
-				return (el2.xMax - el2.xMin) + (el2.yMax - el2.yMin) + (el2.zMax - el2.zMin);
+				return el2.size;
 			})
 		});
 
@@ -1176,8 +1176,8 @@ function loadFingerGraph() {
 					.attr("class", "fingerPoint")
 					.attr("cy", (height - (3*ySpacing/2 + (ySpacing*indexMap[j]))))
 					.attr("cx", (xSpacing * (i)) + xSpacing/2)
-					.attr("r", concArray[i][j] === 0 ? 0 : fingerSize(sizeArray[i][j]))
-					.style("fill", color(concArray[i][j]))
+					.attr("r", function(d) { return concArray[i][j] === 0 ? 0 : fingerSize(d.size); })
+					.style("fill", function(d) { return color(d.conc); })
 					.style("stroke", "white")
 					.style("stroke-width", 0.5)
 					.on('mouseup', function(d) {
