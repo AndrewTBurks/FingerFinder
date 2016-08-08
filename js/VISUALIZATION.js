@@ -544,7 +544,7 @@ function drawParticles(fileNum) {
 				.attr("d", "M " + (xStart-dXEndLine) + " " + (yStart-dYEndLine) +
 				" L " + (xStart+dXEndLine) + " " + (yStart+dYEndLine) +
 				" L " + xEnd + " " + yEnd + " Z")
-				.attr('stroke-linecap', 'round')
+				.attr('stroke-linecap', 'butt')
 				.style("fill", d3.rgb("#" + colorSlice(sliceAccumulated[i][j].conc)));
 			}
 		}
@@ -3256,7 +3256,7 @@ function setupTitleTooltips() {
 	var flowTooltip = "Left-Mouse ↻: Rotate Cylinder<br>Right-Mouse ↕: Pan Camera Vertically<br>Right-Mouse ↔: Pan Around Cylinder";
 	var forestTooltip = "<strong>Background:</strong><br>Mouse-Wheel: Zoom<br>Right-Mouse: Reset Zoom<br><br><strong>Circle:</strong><br>Left-Mouse: Select/Deselect Viscous Finger<br>Hover: Show Viscous Finger Information";
 	var parallelTooltip = "<strong>Background:</strong><br>Left-Mouse:<br>&nbsp&nbsp&nbspDrag: Strum Select Lines<br>&nbsp&nbsp&nbspClick: Clear Selection<br><br><strong>Titles:</strong><br>Left-Mouse:<br>&nbsp&nbsp&nbsp↔: Rearrange Axes<br>&nbsp&nbsp&nbspDouble-Click: Flip Axis";
-	var starplotTooltip = "<strong>Run Labels:</strong><br>Hover: Average Finger Concentration<br>Click: Load Run<br><br><b>Sections:</b><br>Hover: Run Properties<br><br><b>Blue Dots:</b><br>Hover: Property Details";
+	var starplotTooltip = "<strong>Run Labels:</strong><br>Click: Load Run<br><br><b>Sections:</b><br>Hover: Run Properties<br><br><b>Blue Dots/Axes:</b><br>Hover: Property Details";
 
 
 
