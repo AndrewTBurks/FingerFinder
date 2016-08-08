@@ -44,8 +44,9 @@ var sliced = [];
 var sliceAccumulated = [];
 var colorSchemeChoice = 3;
 
-var numRuns = 18;
+var numRuns = 20;
 var summaryDataCollected = false;
+var fingerGraphLoaded = false;
 var runSummaryData = new Array(numRuns);
 var fingersPerTimestep = new Array(numRuns).fill(null);
 
@@ -2465,6 +2466,7 @@ function loadFingerGraph() {
 
 			for(var i = 0; i < numVars; i++) {
 				d3.selectAll(".starPlot").append("line")
+					.datum(i)
 					.attr("class", "starPlotAxis")
 					.attr("x1", 0)
 					.attr("x2", plotDim/2)
@@ -2472,25 +2474,37 @@ function loadFingerGraph() {
 					.attr("y2", 0)
 					.attr("transform", "rotate(" + ((360 * i/(numVars)) - 90) + ")")
 					.style("stroke", "white")
-					.style("stroke-width", 2);
+					.style("stroke-width", 3)
+					.on("mousemove", function(d) {
+						// if(d){
+							var position = this.getBoundingClientRect();
+							tooltip.classed("hidden", false)
+								.html("<b>" + varNames[d] + " : [" + scales[d].domain().map(function (e) { return e.toFixed(2); }) + "]</b><br>" + varDescriptions[d])
+								.style("left", (window.pageXOffset + (position.left+position.right)/2 + 20) + "px")
+								.style("top", (window.pageYOffset + position.top) + "px");
+						// }
+					})
+					.on("mouseout", function() {
+						tooltip.classed("hidden", true);
+					});
 
 					d3.select(".starPlot").append("circle")
 						.datum(i)
 						.attr("class", "starPlotAxisTooltip")
 						.attr("cx", plotDim/2)
-						.attr("r", 4)
+						.attr("r", 6)
 						.attr("transform", "rotate(" + ((360 * i/(numVars)) - 90) + ")")
 						.style("stroke", "white")
 						.style("fill", "#69C3E0")
 						.style("stroke-width", 1)
 						.on("mousemove", function(d) {
-							if(d){
+							// if(d){
 								var position = this.getBoundingClientRect();
 								tooltip.classed("hidden", false)
-									.html("<b>" + varNames[d] + " : [" + scales[varNumToScaleMap[d]].domain().map(function (e) { return e.toFixed(2); }) + "]</b><br>" + varDescriptions[d])
+									.html("<b>" + varNames[d] + " : [" + scales[d].domain().map(function (e) { return e.toFixed(2); }) + "]</b><br>" + varDescriptions[d])
 									.style("left", (window.pageXOffset + (position.left+position.right)/2 + 20) + "px")
 									.style("top", (window.pageYOffset + position.top) + "px");
-							}
+							// }
 						})
 						.on("mouseout", function() {
 							tooltip.classed("hidden", true);
@@ -2774,7 +2788,10 @@ function loadFingerGraph() {
 
 		drawParticles(n);
 		render();
-		loadFingerGraph();
+		if(!fingerGraphLoaded) {
+			loadFingerGraph();
+			fingerGraphLoaded = true;
+		}
 		if(!summaryDataCollected)
 		 {
 			 getRunSummary(1);
