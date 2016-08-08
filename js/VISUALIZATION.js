@@ -2411,18 +2411,18 @@ function loadFingerGraph() {
 				.style("fill-opacity", 0)
 				.style("stroke", "white")
 				.style("stroke-width", 0)
-				.on("mousemove", function(d) {
-					if(d) {
-					var position = this.getBoundingClientRect();
-					tooltip.classed("hidden", false)
-						.html("Avg Finger Point Conc.: " + d.avgFingerPointConc.toFixed(2))
-						.style("left", (window.pageXOffset + (position.left+position.right)/2 + 35) + "px")
-						.style("top", (window.pageYOffset + position.top) + "px");
-					}
-				})
-				.on("mouseout", function() {
-					tooltip.classed("hidden", true);
-				})
+				// .on("mousemove", function(d) {
+				// 	if(d) {
+				// 	var position = this.getBoundingClientRect();
+				// 	tooltip.classed("hidden", false)
+				// 		.html("Avg Finger Point Conc.: " + d.avgFingerPointConc.toFixed(2))
+				// 		.style("left", (window.pageXOffset + (position.left+position.right)/2 + 35) + "px")
+				// 		.style("top", (window.pageYOffset + position.top) + "px");
+				// 	}
+				// })
+				// .on("mouseout", function() {
+				// 	tooltip.classed("hidden", true);
+				// })
 				.on("click", function(d){
 					if(d) {
 						runPick = ("00" + d.run).substr(-2);
@@ -2511,25 +2511,26 @@ function loadFingerGraph() {
 						});
 			}
 
-			d3.select(".starPlot").append("circle")
-				.datum(i)
-				.attr("class", "starPlotAxisTooltip")
-				.attr("cy", -plotDim/2 - 25)
-				.attr("cx", 25)
-				.attr("r", 4)
-				.style("stroke", "white")
-				.style("fill", "#69C3E0")
-				.style("stroke-width", 1)
-				.on("mousemove", function(d) {
-					var position = this.getBoundingClientRect();
-					tooltip.classed("hidden", false)
-						.html("<b>" + "Avg Finger Point Conc." + " : [" + color.domain().map(function (e) { return e.toFixed(2); }) + "]</b><br>" + "Average concentration of fingers in each timestep, averaged over the entire run.")
-						.style("left", (window.pageXOffset + (position.left+position.right)/2 + 20) + "px")
-						.style("top", (window.pageYOffset + position.top) + "px");
-				})
-				.on("mouseout", function() {
-					tooltip.classed("hidden", true);
-				});
+			// tooltip near run circle for first plot
+			// d3.select(".starPlot").append("circle")
+			// 	.datum(i)
+			// 	.attr("class", "starPlotAxisTooltip")
+			// 	.attr("cy", -plotDim/2 - 25)
+			// 	.attr("cx", 25)
+			// 	.attr("r", 4)
+			// 	.style("stroke", "white")
+			// 	.style("fill", "#69C3E0")
+			// 	.style("stroke-width", 1)
+			// 	.on("mousemove", function(d) {
+			// 		var position = this.getBoundingClientRect();
+			// 		tooltip.classed("hidden", false)
+			// 			.html("<b>" + "Avg Finger Point Conc." + " : [" + color.domain().map(function (e) { return e.toFixed(2); }) + "]</b><br>" + "Average concentration of fingers in each timestep, averaged over the entire run.")
+			// 			.style("left", (window.pageXOffset + (position.left+position.right)/2 + 20) + "px")
+			// 			.style("top", (window.pageYOffset + position.top) + "px");
+			// 	})
+			// 	.on("mouseout", function() {
+			// 		tooltip.classed("hidden", true);
+			// 	});
 
 			d3.select(".starPlot").append("text")
 				.text("Run: ")
