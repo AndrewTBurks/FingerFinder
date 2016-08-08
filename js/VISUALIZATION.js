@@ -805,6 +805,7 @@ function loadFingerGraph() {
 	var prevIDs;
 
 	function drawFingerGraph(start, end) {
+		var startTime = new Date().getTime();
 
 		var useGraphBrush = false;
 
@@ -1315,6 +1316,10 @@ function loadFingerGraph() {
 			axisSVG.select(".x.axis").call(xAxis);
 		}
 
+		var end = new Date().getTime();
+		var time = end - startTime;
+		console.log('DRAW FINGER FOREST: Execution time: ' + time + 'ms.');
+
 		updateFingerGraphFileLine();
 
 	}
@@ -1461,7 +1466,6 @@ function loadFingerGraph() {
 					avgFingerPointConc: d3.mean(timestepAvgPointConc),
 					avgFingerDensity: d3.mean(timestepAvgFingerDensity)
 				};
-				console.log(thisRunData);
 
 				runSummaryData[runNum-1] = thisRunData;
 			}
@@ -1475,10 +1479,6 @@ function loadFingerGraph() {
 				drawStarplots();
 				fingerGraphBrush();
 
-				// d3.selectAll("#runOption").attr("disabled", function(d, i) {
-				// 	return false;
-				// 	return runSummaryData[i] === null ? false : true;
-				// });
 			}
 
 		});
