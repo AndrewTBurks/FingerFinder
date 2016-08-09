@@ -3064,6 +3064,9 @@ function fingerGraphBrush() {
 		}
 	}
 
+	d3.select("#runLine" + runPick)
+	.moveToFront();
+
 	context.append("g")
 	.attr("class", "x brush")
 	.call(brush)
@@ -3371,7 +3374,8 @@ function menuListener() {
 		d3.select("#runLine" + runPick)
 		.style("stroke", "#" + colorSplit[Math.round(colorSplit.length/2)])
 		.style("stroke-width", 2)
-		.style("stroke-opacity", 1);
+		.style("stroke-opacity", 1)
+		.moveToFront();
 
 		recolor3DModel();
 
