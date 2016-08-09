@@ -1245,7 +1245,7 @@ function loadFingerGraph() {
 						var matrix = this.getScreenCTM()
         			.translate(+ this.getAttribute("cx"), + this.getAttribute("cy"));
 						tooltip.classed("hidden", false)
-							.html("<b>ID:</b> " + d.id + "<br><b>Timestep:</b> " + d.timestep + "<br><b>Concentration:</b> " + d.conc + "<br><b># Points:</b> " + d.size)
+							.html("<b>ID:</b> " + d.id + "<br><b>Timestep:</b> " + d.timestep + "<br><b># Points:</b> " + d.size + "<br><b>Avg. Conc.:</b> " + d.conc)
 							.style("left", (window.pageXOffset + matrix.e + 30) + "px")
 			        .style("top", (window.pageYOffset + matrix.f - 15) + "px");
 					})
