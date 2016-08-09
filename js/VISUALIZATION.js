@@ -50,6 +50,8 @@ var fingerGraphLoaded = false;
 var runSummaryData = new Array(numRuns);
 var fingersPerTimestep = new Array(numRuns).fill(null);
 
+var starplotColorMode = 0;
+
 /**
 * <p>Used to select the coloring mode for the 3D cylinder view.</p>
 * <p>0 for Normal, 1 for desaturate outside of slice, 2 for highlight slice, 3 for highlight fingers.</p>
@@ -2204,7 +2206,7 @@ function loadFingerGraph() {
 				"Total number of unique fingers over the entire run.",
 				"Number of fingers in each timestep, averaged over the entire run.",
 				"Average concentration of fingers in each timestep, averaged over the entire run.",
-				"Average concentraion of points in viscous fingers in each timestep, averaged over the entire run.", // also used for coloring
+				"Average concentration of points in viscous fingers in each timestep, averaged over the entire run.", // also used for coloring
 				"Average finger density (finger concentration / finger volume) in each timestep, averaged over the entire run.",
 				"Number of merges (not including fingers which disappear) in each timestep, averaged over the entire run.",
 			];
@@ -2226,6 +2228,8 @@ function loadFingerGraph() {
 			/* === CREATE SCALES === */
 
 			var scales = new Array(numVars);
+			var colorScales = new Array(3);
+			var modes = ["totalClusters", "", "mergeFactor"];
 
 			var min, max;
 			var circleRadius = 5;
@@ -2257,6 +2261,10 @@ function loadFingerGraph() {
 			scales[0] = d3.scale.linear()
 				.domain([min, max])
 				.range([10, plotDim/2 - 5]);
+
+			colorScales[0] = d3.scale.linear()
+				.domain([min, max])
+				.range(["white", "blue"]);
 
 			// ======================================
 			// average number of fingers per timestep
@@ -2373,6 +2381,10 @@ function loadFingerGraph() {
 			scales[5] = d3.scale.linear()
 				.domain([min, max])
 				.range([10, plotDim/2 - 5]);
+
+			colorScales[2] = d3.scale.linear()
+				.domain([min, max])
+				.range(["white", "blue"]);
 
 			/* === SCALES CREATED === */
 
@@ -2540,6 +2552,7 @@ function loadFingerGraph() {
 				.style("fill", "white");
 
 
+			// path slices
 			d3.selectAll(".starPlot").append("g")
 				.attr("class", "spPathGroup")
 			.selectAll(".plotSlice")
@@ -2547,22 +2560,22 @@ function loadFingerGraph() {
 					var dataToBind = [];
 
 					if(d) {
-						var coords = new Array(numVars-1);
-						var values = new Array(numVars-1);
+						var coords = new Array(numVars);
+						var values = new Array(numVars);
 
-						coords[0] = rotate(scales[0](runSummaryData[i].totalClusters), ((360 * 0/(numVars)) - 90));
-						coords[1] = rotate(scales[1](runSummaryData[i].avgClusters), ((360 * 1/(numVars)) - 90));
-						coords[2] = rotate(scales[2](runSummaryData[i].avgFingerConc), ((360 * 2/(numVars)) - 90));
-						coords[3] = rotate(scales[2](runSummaryData[i].avgFingerConc), ((360 * 3/(numVars)) - 90));
-						coords[4] = rotate(scales[4](runSummaryData[i].avgFingerDensity), ((360 * 4/(numVars)) - 90));
-						coords[5] = rotate(scales[5](runSummaryData[i].mergeFactor), ((360 * 5/(numVars)) - 90));
+						coords[0] = rotate(scales[0](d.totalClusters), ((360 * 0/(numVars)) - 90));
+						coords[1] = rotate(scales[1](d.avgClusters), ((360 * 1/(numVars)) - 90));
+						coords[2] = rotate(scales[2](d.avgFingerConc), ((360 * 2/(numVars)) - 90));
+						coords[3] = rotate(scales[2](d.avgFingerConc), ((360 * 3/(numVars)) - 90));
+						coords[4] = rotate(scales[4](d.avgFingerDensity), ((360 * 4/(numVars)) - 90));
+						coords[5] = rotate(scales[5](d.mergeFactor), ((360 * 5/(numVars)) - 90));
 
-						values[0] = runSummaryData[i].totalClusters;
-						values[1] = runSummaryData[i].avgClusters;
-						values[2] = runSummaryData[i].avgFingerConc;
-						values[3] = runSummaryData[i].avgFingerPointConc;
-						values[4] = runSummaryData[i].avgFingerDensity;
-						values[5] = runSummaryData[i].mergeFactor;
+						values[0] = d.totalClusters;
+						values[1] = d.avgClusters;
+						values[2] = d.avgFingerConc;
+						values[3] = d.avgFingerPointConc;
+						values[4] = d.avgFingerDensity;
+						values[5] = d.mergeFactor;
 
 						for(var j = 0; j < numVars; j++) {
 							dataToBind.push({
@@ -2642,11 +2655,13 @@ function loadFingerGraph() {
 
 		recolorStarplots = function() {
 			// change scale range
-			scales[3].range(colorSplit);
+			// scales[3].range(colorSplit);
 			d3.selectAll(".plotSlice").style("fill", function(d, i) {
-				return "#" + color(runSummaryData[d.runNum].avgFingerPointConc);
+				return "#" + colorScales[starplotColorMode](runSummaryData[d.runNum][modes[starplotColorMode]]);
 			});
 		};
+
+		recolorStarplots();
 	}
 
 	var paralellCoordsPlot;
@@ -3395,6 +3410,10 @@ function menuListener() {
 		// colorSlice = d3.scale.quantile()
 		// .range(colorSplit);
 		recolorAll();
+	});
+	d3.selectAll('select[name="starplotColor"]').on("change", function() {
+		starplotColorMode = Number(this.value);
+		recolorStarplots();
 	});
 }
 

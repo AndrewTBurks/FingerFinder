@@ -5,7 +5,7 @@
 <body>
 <script>
 
-var folderPath = "clean.44/run20/";
+var folderPath = "clean.44/run04/";
 
 var data = [];
 var dataLength;
@@ -229,6 +229,7 @@ function findCenterOfConc(n) {
   var clusterSize;
   var xTot, yTot, zTot, concTot;
   var xVelTot, yVelTot, zVelTot;
+  var magVelTot, magVelConcTot;
   var xMax, xMin, yMax, yMin, zMax, zMin;
   var thisConc;
 
@@ -246,6 +247,10 @@ function findCenterOfConc(n) {
     xVelTot = 0;
     yVelTot = 0;
     zVelTot = 0;
+
+    // get avg magnitude of velocity
+    magVelTot = 0;
+    magVelConcTot = 0;
 
     // extents of the cluster
     xMax = -100;
@@ -270,6 +275,11 @@ function findCenterOfConc(n) {
       xVelTot += point.velocity0 * thisConc;
       yVelTot += point.velocity1 * thisConc;
       zVelTot += point.velocity2 * thisConc;
+
+      var thisVelMag = Math.sqrt(Math.pow(point.velocity0, 2) + Math.pow(point.velocity1, 2) + Math.pow(point.velocity2, 2));
+
+      magVelTot += thisVelMag;
+      magVelConcTot += thisVelMag * thisConc;
 
       // calculating extents of cluster
       if(point.Points0 < xMin) {
@@ -297,6 +307,7 @@ function findCenterOfConc(n) {
     clusterCenters[n][i] = {size: clusterSize, concTotal: concTot, clusterID: i, nextClusterID: -1,
                             cx: xTot/concTot, cy: yTot/concTot, cz: zTot/concTot,
                             vx: xVelTot/concTot, vy: yVelTot/concTot, vz: zVelTot/concTot,
+                            vMag: magVelTot/clusterSize, vMagConc: magVelConcTot/concTot,
                             xMax: xMax, xMin: xMin, yMax: yMax, yMin: yMin, zMax: zMax, zMin: zMin};
   }
 
