@@ -2262,9 +2262,9 @@ function loadFingerGraph() {
 				.domain([min, max])
 				.range([10, plotDim/2 - 5]);
 
-			colorScales[0] = d3.scale.linear()
+			colorScales[0] = d3.scale.quantize()
 				.domain([min, max])
-				.range(["white", "blue"]);
+				.range(colorSplit);
 
 			// ======================================
 			// average number of fingers per timestep
@@ -2332,7 +2332,7 @@ function loadFingerGraph() {
 				}
 			});
 
-			scales[3] = d3.scale.quantile()
+			scales[3] = d3.scale.linear()
 				.domain([min, max])
 				.range([10, plotDim/2 - 5]);
 
@@ -2382,9 +2382,9 @@ function loadFingerGraph() {
 				.domain([min, max])
 				.range([10, plotDim/2 - 5]);
 
-			colorScales[2] = d3.scale.linear()
+			colorScales[2] = d3.scale.quantize()
 				.domain([min, max])
-				.range(["white", "blue"]);
+				.range(colorSplit);
 
 			/* === SCALES CREATED === */
 
