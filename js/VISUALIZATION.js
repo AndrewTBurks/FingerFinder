@@ -1410,6 +1410,8 @@ function loadFingerGraph() {
 				var timestepNumClusters = new Array(120).fill(0);
 				var timestepAvgFingerConc = new Array(120).fill(0);
 				var timestepAvgPointConc = new Array(120).fill(0);
+				var timestepAvgFingerVelMag = new Array(120).fill(0);
+				var timestepAvgFingerVelMagConc = new Array(120).fill(0);
 				var timestepAvgFingerDensity = new Array(120).fill(0);
 
 				// for each timestep
@@ -1426,12 +1428,17 @@ function loadFingerGraph() {
 					var totalTimestepConc = 0;
 					var totalTimestepNumPoints = 0;
 					var totalTimestepDensity = 0;
+					var totalTimestepVelMag = 0;
+					var totalTimestepVelMagConc = 0;
 
 					// merge factors (new method)
 					timestepMergeFactors[i] = 0
 					for(var j = 0; j < thisClusterCenters[i].length; j++) {
 						totalTimestepConc += thisClusterCenters[i][j].concTotal;
 						totalTimestepNumPoints += thisClusterCenters[i][j].size;
+						totalTimestepVelMag += thisClusterCenters[i][j].vMag;
+						totalTimestepVelMagConc += thisClusterCenters[i][j].vMagConc;
+
 						totalTimestepDensity += thisClusterCenters[i][j].concTotal/
 							((thisClusterCenters[i][j].xMax-thisClusterCenters[i][j].xMin) *
 								(thisClusterCenters[i][j].yMax-thisClusterCenters[i][j].yMin) *
@@ -1448,6 +1455,8 @@ function loadFingerGraph() {
 					timestepAvgFingerConc[i] = totalTimestepConc/thisClusterCenters[i].length;
 					timestepAvgPointConc[i] = totalTimestepConc/totalTimestepNumPoints;
 					timestepAvgFingerDensity[i] = totalTimestepDensity/thisClusterCenters[i].length;
+					timestepAvgFingerVelMag[i] = totalTimestepVelMag/thisClusterCenters[i].length;
+					timestepAvgFingerVelMagConc[i] = totalTimestepVelMagConc/thisClusterCenters[i].length;
 
 					// average finger point concentration
 				}
@@ -1467,8 +1476,12 @@ function loadFingerGraph() {
 					mergeFactor: d3.mean(timestepMergeFactors),
 					avgFingerConc: d3.mean(timestepAvgFingerConc),
 					avgFingerPointConc: d3.mean(timestepAvgPointConc),
-					avgFingerDensity: d3.mean(timestepAvgFingerDensity)
+					avgFingerDensity: d3.mean(timestepAvgFingerDensity),
+					avgFingerVelMag: d3.mean(timestepAvgFingerVelMag),
+					avgFingerVelMagConc: d3.mean(timestepAvgFingerVelMagConc)
 				};
+
+				console.log(thisRunData);
 
 				runSummaryData[runNum-1] = thisRunData;
 			}
@@ -1477,7 +1490,10 @@ function loadFingerGraph() {
 				getRunSummary(runNum+1);
 			}
 			else {
-				drawPairplots();
+				console.log("Vel Mag", d3.extent(runSummaryData, function(el) { return el ? el.avgFingerVelMag : null; }));
+				console.log("Vel Mag Conc", d3.extent(runSummaryData, function(el) { return el ? el.avgFingerVelMagConc : null; }));
+
+				// drawPairplots();
 				// createParallelCoordsPlots();
 				drawStarplots();
 				fingerGraphBrush();
@@ -1492,673 +1508,673 @@ function loadFingerGraph() {
 	 */
 	function drawPairplots() {
 
-		// var myDiv = d3.select("#pairplots");
-		//
-		// if(myDiv) {
-		// 	var mySVG = myDiv.append("svg")
-		// 		.attr("width", "100%")
-		// 		.attr("height", "100%");
-		//
-		// 	var plots = mySVG.append("g");
-		// 	var xLabels = mySVG.append("g");
-		// 	var yLabels = mySVG.append("g");
-		//
-		// 	var numVars = 6;
-		// 	var varNames = ["Total Fingers", "Avg Fingers", "Avg Finger Conc.", "Avg Point Conc.", "Avg Finger Dens.", "Merge Factor"];
-		// 	var varDescriptions = [
-		// 		"Total number of unique fingers over the entire run.",
-		// 		"Number of fingers in each timestep, averaged over the entire run.",
-		// 		"Average concentration of fingers in each timestep, averaged over the entire run.",
-		// 		"Average concentraion of points in viscous fingers in each timestep, averaged over the entire run.",
-		// 		"Average finger density (finger concentration / finger volume) in each timestep, averaged over the entire run.",
-		// 		"Number of merges (not including fingers which disappear) in each timestep, averaged over the entire run.",
-		// 	];
-		//
-		// 	var width = 804;
-		// 	var height = 804;
-		//
-		// 	var plotSpacing = 8;
-		// 	var beginningSpacing = 30;
-		// 	var plotDim = ((width-beginningSpacing)-((numVars+1) * plotSpacing))/numVars;
-		//
-		// 	var isZoomed = false;
-		// 	var runHighlighted = null;
-		// 	var runGroupHighlighted = [];
-		//
-		// 	/* === CREATE SCALES === */
-		//
-		// 	var scales = new Array(numVars);
-		//
-		// 	var min, max;
-		// 	var circleRadius = 5;
-		// 	var circleStrokeWidth = 0.5;
-		// 	// get ranges of values for each variable
-		//
-		// 	// ======================================
-		// 	// total number of fingers
-		// 	min = d3.min(runSummaryData, function(el) {
-		// 		return el.totalClusters;
-		// 	});
-		// 	max = d3.max(runSummaryData, function(el) {
-		// 		return el.totalClusters;
-		// 	});
-		//
-		// 	scales[0] = d3.scale.linear()
-		// 		.domain([min, max])
-		// 		.range([circleRadius + circleStrokeWidth, plotDim-(circleRadius + circleStrokeWidth)]);
-		//
-		// 	// ======================================
-		// 	// average number of fingers per timestep
-		// 	min = d3.min(runSummaryData, function(el) {
-		// 		return el.avgClusters;
-		// 	});
-		// 	max = d3.max(runSummaryData, function(el) {
-		// 		return el.avgClusters;
-		// 	});
-		//
-		// 	scales[1] = d3.scale.linear()
-		// 		.domain([min, max])
-		// 		.range([circleRadius + circleStrokeWidth, plotDim-(circleRadius + circleStrokeWidth)]);
-		//
-		// 	// =========================================
-		// 	// average finger concentration per timestep
-		// 	min = d3.min(runSummaryData, function(el) {
-		// 		return el.avgFingerConc;
-		// 	});
-		// 	max = d3.max(runSummaryData, function(el) {
-		// 		return el.avgFingerConc;
-		// 	});
-		//
-		// 	scales[2] = d3.scale.linear()
-		// 		.domain([min, max])
-		// 		.range([circleRadius + circleStrokeWidth, plotDim-(circleRadius + circleStrokeWidth)]);
-		//
-		// 	// =========================================
-		// 	// average finger point concentration per timestep
-		// 	min = d3.min(runSummaryData, function(el) {
-		// 		return el.avgFingerPointConc;
-		// 	});
-		// 	max = d3.max(runSummaryData, function(el) {
-		// 		return el.avgFingerPointConc;
-		// 	});
-		//
-		// 	scales[3] = d3.scale.linear()
-		// 		.domain([min, max])
-		// 		.range([circleRadius + circleStrokeWidth, plotDim-(circleRadius + circleStrokeWidth)]);
-		//
-		// 	// =========================================
-		// 	// average finger density per timestep
-		// 	min = d3.min(runSummaryData, function(el) {
-		// 		return el.avgFingerDensity;
-		// 	});
-		// 	max = d3.max(runSummaryData, function(el) {
-		// 		return el.avgFingerDensity;
-		// 	});
-		//
-		// 	scales[4] = d3.scale.linear()
-		// 		.domain([min, max])
-		// 		.range([circleRadius + circleStrokeWidth, plotDim-(circleRadius + circleStrokeWidth)]);
-		//
-		// 	// =========================================
-		// 	// average finger density per timestep
-		// 	min = d3.min(runSummaryData, function(el) {
-		// 		return el.mergeFactor;
-		// 	});
-		// 	max = d3.max(runSummaryData, function(el) {
-		// 		return el.mergeFactor;
-		// 	});
-		//
-		// 	scales[5] = d3.scale.linear()
-		// 		.domain([min, max])
-		// 		.range([circleRadius + circleStrokeWidth, plotDim-(circleRadius + circleStrokeWidth)]);
-		//
-		// 	/* === SCALES CREATED === */
-		//
-		// 	/* === calculate correlations ===
-		// 			a lot of calculation... */
-		//
-		// 	var sumVar = new Array(numVars);
-		// 	// sumVar[0] - totalClusters
-		// 	sumVar[0] = d3.sum(runSummaryData, function(el) {
-		// 		return el.totalClusters;
-		// 	});
-		//
-		// 	// sumVar[1] - avgClusters
-		// 	sumVar[1] = d3.sum(runSummaryData, function(el) {
-		// 		return el.avgClusters;
-		// 	});
-		//
-		// 	// sumVar[2] - avgFingerConc
-		// 	sumVar[2] = d3.sum(runSummaryData, function(el) {
-		// 		return el.avgFingerConc;
-		// 	});
-		//
-		// 	// sumVar[3] - avgFingerPointConc
-		// 	sumVar[3] = d3.sum(runSummaryData, function(el) {
-		// 		return el.avgFingerPointConc;
-		// 	});
-		//
-		// 	// sumVar[4] - avgFingerDensity
-		// 	sumVar[4] = d3.sum(runSummaryData, function(el) {
-		// 		return el.avgFingerDensity;
-		// 	});
-		//
-		// 	// sumVar[5] - mergeFactor
-		// 	sumVar[5] = d3.sum(runSummaryData, function(el) {
-		// 		return el.mergeFactor;
-		// 	});
-		//
-		//
-		// 	var sumPairs = new Array(numVars);
-		// 	for(var i = 0; i < numVars; i++) {
-		// 		sumPairs[i] = new Array(numVars);
-		// 	}
-		//
-		// 	// all totalClusters * ______
-		// 	sumPairs[0][0] = d3.sum(runSummaryData, function(el) {
-		// 		return el.totalClusters * el.totalClusters;
-		// 	});
-		//
-		// 	sumPairs[0][1] = d3.sum(runSummaryData, function(el) {
-		// 		return el.totalClusters * el.avgClusters;
-		// 	});
-		//
-		// 	sumPairs[0][2] = d3.sum(runSummaryData, function(el) {
-		// 		return el.totalClusters * el.avgFingerConc;
-		// 	});
-		//
-		// 	sumPairs[0][3] = d3.sum(runSummaryData, function(el) {
-		// 		return el.totalClusters * el.avgFingerPointConc;
-		// 	});
-		//
-		// 	sumPairs[0][4] = d3.sum(runSummaryData, function(el) {
-		// 		return el.totalClusters * el.avgFingerDensity;
-		// 	});
-		//
-		// 	sumPairs[0][5] = d3.sum(runSummaryData, function(el) {
-		// 		return el.totalClusters * el.mergeFactor;
-		// 	});
-		//
-		// 	// all avgClusters * ______
-		// 	sumPairs[1][0] = sumPairs[0][1];
-		//
-		// 	sumPairs[1][1] = d3.sum(runSummaryData, function(el) {
-		// 		return el.avgClusters * el.avgClusters;
-		// 	});
-		//
-		// 	sumPairs[1][2] = d3.sum(runSummaryData, function(el) {
-		// 		return el.avgClusters * el.avgFingerConc;
-		// 	});
-		//
-		// 	sumPairs[1][3] = d3.sum(runSummaryData, function(el) {
-		// 		return el.avgClusters * el.avgFingerPointConc;
-		// 	});
-		//
-		// 	sumPairs[1][4] = d3.sum(runSummaryData, function(el) {
-		// 		return el.avgClusters * el.avgFingerDensity;
-		// 	});
-		//
-		// 	sumPairs[1][5] = d3.sum(runSummaryData, function(el) {
-		// 		return el.avgClusters * el.mergeFactor;
-		// 	});
-		//
-		// 	// all avgFingerConc * ______
-		// 	sumPairs[2][0] = sumPairs[0][2];
-		// 	sumPairs[2][1] = sumPairs[1][2];
-		//
-		// 	sumPairs[2][2] = d3.sum(runSummaryData, function(el) {
-		// 		return el.avgFingerConc * el.avgFingerConc;
-		// 	});
-		//
-		// 	sumPairs[2][3] = d3.sum(runSummaryData, function(el) {
-		// 		return el.avgFingerConc * el.avgFingerPointConc;
-		// 	});
-		//
-		// 	sumPairs[2][4] = d3.sum(runSummaryData, function(el) {
-		// 		return el.avgFingerConc * el.avgFingerDensity;
-		// 	});
-		//
-		// 	sumPairs[2][5] = d3.sum(runSummaryData, function(el) {
-		// 		return el.avgFingerConc * el.mergeFactor;
-		// 	});
-		//
-		// 	// all avgFingerPointConc * ______
-		// 	sumPairs[3][0] = sumPairs[0][3];
-		// 	sumPairs[3][1] = sumPairs[1][3];
-		// 	sumPairs[3][2] = sumPairs[2][3];
-		//
-		// 	sumPairs[3][3] = d3.sum(runSummaryData, function(el) {
-		// 		return el.avgFingerPointConc * el.avgFingerPointConc;
-		// 	});
-		//
-		// 	sumPairs[3][4] = d3.sum(runSummaryData, function(el) {
-		// 		return el.avgFingerPointConc * el.avgFingerDensity;
-		// 	});
-		//
-		// 	sumPairs[3][5] = d3.sum(runSummaryData, function(el) {
-		// 		return el.avgFingerPointConc * el.mergeFactor;
-		// 	});
-		//
-		// 	// all avgFingerDensity * ______
-		// 	sumPairs[4][0] = sumPairs[0][4];
-		// 	sumPairs[4][1] = sumPairs[1][4];
-		// 	sumPairs[4][2] = sumPairs[2][4];
-		// 	sumPairs[4][3] = sumPairs[3][4];
-		//
-		// 	sumPairs[4][4] = d3.sum(runSummaryData, function(el) {
-		// 		return el.avgFingerDensity * el.avgFingerDensity;
-		// 	});
-		//
-		// 	sumPairs[4][5] = d3.sum(runSummaryData, function(el) {
-		// 		return el.avgFingerDensity * el.mergeFactor;
-		// 	});
-		//
-		// 	// all mergeFactor * ______
-		// 	sumPairs[5][0] = sumPairs[0][5];
-		// 	sumPairs[5][1] = sumPairs[1][5];
-		// 	sumPairs[5][2] = sumPairs[2][5];
-		// 	sumPairs[5][3] = sumPairs[3][5];
-		// 	sumPairs[5][4] = sumPairs[4][5];
-		//
-		// 	sumPairs[5][5] = d3.sum(runSummaryData, function(el) {
-		// 		return el.mergeFactor * el.mergeFactor;
-		// 	});
-		//
-		//
-		// 	plots.append("rect")
-		// 		.attr("class", "rowHighlight")
-		// 		.attr("y", 0)
-		// 		.attr("x", 0)
-		// 		.attr("width", (plotSpacing + plotDim) * numVars)
-		// 		.attr("height", plotDim + plotSpacing)
-		// 		.style("fill-opacity", 0)
-		// 		.style("stroke", "#" + colorSplit[colorSplit.length-1])
-		// 		.style("stroke-width", 1)
-		// 		.style("stroke-opacity", 0);
-		//
-		// 	// vertical
-		// 	plots.append("rect")
-		// 		.attr("class", "colHighlight")
-		// 		.attr("y", 0)
-		// 		.attr("x", 0)
-		// 		.attr("width", plotDim + plotSpacing)
-		// 		.attr("height", (plotSpacing + plotDim) * numVars)
-		// 		.style("fill-opacity", 0)
-		// 		.style("stroke", "#" + colorSplit[colorSplit.length-1])
-		// 		.style("stroke-width", 1)
-		// 		.style("stroke-opacity", 0);
-		//
-		// 	for(var i = 0; i < numVars; i++) {
-		// 		xLabels.append("text")
-		// 			.attr("class", "variableLabel")
-		// 			.text(varNames[i])
-		// 			.style("fill", "#5BBDDE")
-		// 			.style("text-decoration", "underline")
-		// 			.style("text-anchor", "middle")
-		// 			.attr("x", beginningSpacing + plotSpacing + plotDim/2 + i*(plotDim+plotSpacing))
-		// 			.attr("y", beginningSpacing - 5);
-		//
-		// 		xLabels.append("rect")
-		// 			.datum(i)
-		// 			.attr("x", beginningSpacing + 3*plotSpacing/4 + i*(plotDim+plotSpacing))
-		// 			.attr("y", plotSpacing/4)
-		// 			.attr("width", plotDim + plotSpacing/2)
-		// 			.attr("height", beginningSpacing + plotSpacing/2)
-		// 			.style("fill-opacity", 0)
-		// 			.on('mousemove', function(d) {
-		// 				var matrix = this.getScreenCTM()
-		// 					.translate(+ this.getAttribute("x"), + this.getAttribute("y"));
-		// 				tooltip.classed("hidden", false)
-		// 					.html(varDescriptions[d])
-		// 					.style("left", (window.pageXOffset + matrix.e + (plotDim/2)) + "px")
-		// 					.style("top", (window.pageYOffset + matrix.f - 40) + "px");
-		// 			})
-		// 			.on('mouseout', function() {
-		// 				tooltip.classed("hidden", true);
-		// 			});
-		//
-		// 		yLabels.append("text")
-		// 			.attr("class", "variableLabel")
-		// 			.text(varNames[i])
-		// 			.style("fill", "#5BBDDE")
-		// 			.style("text-decoration", "underline")
-		// 			// .style("writing-mode", "vertical-rl")
-		// 			.style("text-anchor", "middle")
-		// 			.attr("transform", "rotate(-90)")
-		// 			.attr("x", -(beginningSpacing + plotSpacing + plotDim/2 + i*(plotDim+plotSpacing)))
-		// 			.attr("y", beginningSpacing - 5);
-		//
-		// 		yLabels.append("rect")
-		// 			.datum(i)
-		// 			.attr("x", plotSpacing/4)
-		// 			.attr("y", beginningSpacing + 3*plotSpacing/4 + i*(plotDim+plotSpacing))
-		// 			.attr("width", beginningSpacing + plotSpacing/2)
-		// 			.attr("height", plotDim + plotSpacing/2)
-		// 			.style("fill-opacity", 0)
-		// 			.on('mousemove', function(d) {
-		// 				var matrix = this.getScreenCTM()
-		// 					.translate(+ this.getAttribute("x"), + this.getAttribute("y"));
-		// 				tooltip.classed("hidden", false)
-		// 					.html(varDescriptions[d])
-		// 					.style("left", (window.pageXOffset + matrix.e + (beginningSpacing/2)) + "px")
-		// 					.style("top", (window.pageYOffset + matrix.f - 30) + "px");
-		// 			})
-		// 			.on('mouseout', function() {
-		// 				tooltip.classed("hidden", true);
-		// 			});
-		//
-		// 		for(var j = 0; j < numVars; j++) {
-		// 			plots.append("rect")
-		// 				.datum([i, j])
-		// 				.attr("height", plotDim)
-		// 				.attr("width", plotDim)
-		// 				.attr("x", (beginningSpacing + (i*plotDim) + ((i+1)*plotSpacing)))
-		// 				.attr("y", (beginningSpacing + (j*plotDim) + ((j+1)*plotSpacing)))
-		// 				.style("fill", "#050505")
-		// 				.on("mouseup", function(d) {
-		// 					// only zooms if the mouseup is caused by left click
-		// 					if(d3.event.button === 0 && !isZoomed) {
-		// 						isZoomed = true;
-		//
-		// 						console.log("zoom into plot:", d);
-		// 						var xTranslate, yTranslate, scale;
-		//
-		// 						// zoom into the selected plot
-		// 						xTranslate = -1 * (beginningSpacing + (d[0] * (plotSpacing + plotDim)));
-		// 						yTranslate = -1 * (beginningSpacing + (d[1] * (plotSpacing + plotDim)));
-		// 						scale = (numVars * (plotSpacing + plotDim)) / (plotDim + plotSpacing);
-		//
-		// 						plots.transition().duration(300).ease("expOut")
-		// 							.attr("transform", "scale(" + scale + ") translate(" + xTranslate + "," + yTranslate + ")");
-		//
-		// 						// hide the main axis labels
-		// 						xLabels.transition().duration(150).style("opacity", 0);
-		// 						yLabels.transition().duration(150).style("opacity", 0);
-		//
-		// 						xLabels.transition().delay(150).style("visibility", "hidden");
-		// 						yLabels.transition().delay(150).style("visibility", "hidden");
-		//
-		//
-		// 						// create temporary labels for selected variables
-		// 						// horizontal label
-		// 						mySVG.append("text")
-		// 							.attr("class", "temporaryLabel")
-		// 							.text(varNames[d[0]])
-		// 							.style("fill", "white")
-		// 							.style("text-anchor", "middle")
-		// 							.style("font-size", 26)
-		// 							.attr("x", beginningSpacing + (width-beginningSpacing)/2)
-		// 							.attr("y", height - 13);
-		//
-		// 						// vertical label
-		// 						mySVG.append("text")
-		// 							.attr("class", "temporaryLabel")
-		// 							.text(varNames[d[1]])
-		// 							.style("fill", "white")
-		// 							// .style("writing-mode", "vertical-rl")
-		// 							.style("text-anchor", "middle")
-		// 							.style("font-size", 26)
-		// 							.attr("transform", "rotate(-90)")
-		// 							.attr("y", beginningSpacing/2 + 13)
-		// 							.attr("x", -(beginningSpacing + (height-beginningSpacing)/2));
-		//
-		// 						// add scale labels
-		// 						// horizontal scale
-		// 						var xDomain = scales[d[0]].domain();
-		//
-		// 						mySVG.append("text")
-		// 							.attr("class", "temporaryLabel")
-		// 							.text(xDomain[0].toFixed(2))
-		// 							.style("fill", "white")
-		// 							.style("text-anchor", "begin")
-		// 							.style("font-size", 20)
-		// 							.attr("x", beginningSpacing + 2*plotSpacing)
-		// 							.attr("y", height - 10);
-		//
-		// 						mySVG.append("text")
-		// 							.attr("class", "temporaryLabel")
-		// 							.text(xDomain[1].toFixed(2))
-		// 							.style("fill", "white")
-		// 							.style("text-anchor", "end")
-		// 							.style("font-size", 20)
-		// 							.attr("x", width - 2*plotSpacing)
-		// 							.attr("y", height - 10);
-		//
-		// 						// vertical scale
-		//
-		// 						var yDomain = scales[d[1]].domain();
-		//
-		// 						mySVG.append("text")
-		// 							.attr("class", "temporaryLabel")
-		// 							.text(yDomain[1].toFixed(2))
-		// 							.style("fill", "white")
-		// 							// .style("writing-mode", "vertical-rl")
-		// 							.style("text-anchor", "end")
-		// 							.style("font-size", 20)
-		// 							.attr("transform", "rotate(-90)")
-		// 							.attr("y", beginningSpacing/2 + 10)
-		// 							.attr("x", -(beginningSpacing + 2*plotSpacing));
-		//
-		// 						mySVG.append("text")
-		// 							.attr("class", "temporaryLabel")
-		// 							.text(yDomain[0].toFixed(2))
-		// 							.style("fill", "white")
-		// 							// .style("writing-mode", "vertical-rl")
-		// 							.style("text-anchor", "begin")
-		// 							.style("font-size", 20)
-		// 							.attr("transform", "rotate(-90)")
-		// 							.attr("y", beginningSpacing/2 + 10)
-		// 							.attr("x", -(width - 2*plotSpacing - 10));
-		//
-		// 						// calculate correlation and create correlation label
-		// 						var s00, s11, s01;
-		// 						s00 = sumPairs[d[0]][d[0]] - (Math.pow(sumVar[d[0]], 2)/numRuns);
-		// 						s11 = sumPairs[d[1]][d[1]] - (Math.pow(sumVar[d[1]], 2)/numRuns);
-		// 						s01 = sumPairs[d[0]][d[1]] - ((sumVar[d[0]] * sumVar[d[1]])/numRuns);
-		//
-		// 						var correlation;
-		//
-		// 						correlation = s01 / Math.sqrt(s00 * s11);
-		//
-		// 						mySVG.append("text")
-		// 							.attr("class", "temporaryLabel")
-		// 							.text("Variable Correlation: " + correlation.toFixed(2))
-		// 							.style("fill", "white")
-		// 							.style("text-anchor", "middle")
-		// 							.style("font-size", 20)
-		// 							.attr("x", width/2)
-		// 							.attr("y", beginningSpacing);
-		//
-		// 						d3.selectAll(".temporaryLabel").style("opacity", 0);
-		//
-		// 						d3.selectAll(".temporaryLabel").transition().duration(150).delay(150)
-		// 							.style("opacity", 1);
-		//
-		// 						// hide the highlighting rectangles
-		// 						d3.select(".colHighlight").transition().duration(300)
-		// 							.style("stroke-opacity", 0);
-		//
-		// 						d3.select(".rowHighlight").transition().duration(300)
-		// 							.style("stroke-opacity", 0);
-		// 					}
-		// 				})
-		// 				.on("contextmenu", function(d) { // "right click"
-		// 					d3.event.preventDefault();
-		// 					if(isZoomed) {
-		// 						isZoomed = false;
-		//
-		// 						console.log("zoom out of plot: ", d);
-		// 						// zoom out of plots
-		// 						plots.transition().duration(300).ease("expIn")
-		// 							.attr("transform", "scale(1) translate(0,0)");
-		// 						// set labels to be visible again, remove temporary labels
-		//
-		// 						xLabels.style("visibility", "visible");
-		// 						yLabels.style("visibility", "visible");
-		// 						xLabels.transition().duration(150).delay(150).style("opacity", 1);
-		// 						yLabels.transition().duration(150).delay(150).style("opacity", 1);
-		//
-		// 						d3.selectAll(".temporaryLabel").transition().duration(150).style("opacity", 0);
-		// 						d3.selectAll(".temporaryLabel").transition().delay(150).remove();
-		//
-		// 						if(runHighlighted) {
-		// 							d3.select(".colHighlight").transition().duration(300)
-		// 								.style("stroke-opacity", 0.5);
-		// 								// .attr("x", beginningSpacing + (plotSpacing/2) + runHighlighted.x * (plotSpacing + plotDim));
-		//
-		// 							d3.select(".rowHighlight").transition().duration(300)
-		// 								.style("stroke-opacity", 0.5);
-		// 								// .attr("y", beginningSpacing + (plotSpacing/2) + runHighlighted.y * (plotSpacing + plotDim));
-		//
-		//
-		// 						}
-		// 					}
-		// 				});
-		// 		}
-		// 	}
-		//
-		// 	// plot each run variable onto graph at each location
-		// 	for(var i = 0; i < runSummaryData.length; i++) {
-		// 		// for each run
-		//
-		// 		// 6 values in same order as varNames
-		// 		// "Total Fingers", "Avg Fingers", "Avg Finger Conc.", "Avg Point Conc.", "Avg Finger Density", "Merge Factor"
-		// 		var graphOffsets = new Array(6);
-		// 		var statValues = new Array(6);
-		//
-		// 		graphOffsets[0] = scales[0](runSummaryData[i].totalClusters);
-		// 		graphOffsets[1] = scales[1](runSummaryData[i].avgClusters);
-		// 		graphOffsets[2] = scales[2](runSummaryData[i].avgFingerConc);
-		// 		graphOffsets[3] = scales[3](runSummaryData[i].avgFingerPointConc);
-		// 		graphOffsets[4] = scales[4](runSummaryData[i].avgFingerDensity);
-		// 		graphOffsets[5] = scales[5](runSummaryData[i].mergeFactor);
-		//
-		// 		statValues[0] = runSummaryData[i].totalClusters;
-		// 		statValues[1] = runSummaryData[i].avgClusters;
-		// 		statValues[2] = runSummaryData[i].avgFingerConc;
-		// 		statValues[3] = runSummaryData[i].avgFingerPointConc;
-		// 		statValues[4] = runSummaryData[i].avgFingerDensity;
-		// 		statValues[5] = runSummaryData[i].mergeFactor;
-		//
-		// 		for(var j = 0; j < numVars; j++) {
-		// 			// for each of numVars variables (horizontal)
-		// 			for(var k = 0; k < numVars; k++) {
-		// 				// for each of numVars variables (vertical)
-		// 				plots.append("circle")
-		// 					.datum({
-		// 						run: ('00' + (i+1)).substr(-2),
-		// 						col: j,
-		// 						columnVal: statValues[j],
-		// 						row: k,
-		// 						rowVal: statValues[k],
-		// 						summary: runSummaryData[i]
-		// 					})
-		// 					.attr("class", "runCircle")
-		// 					.attr("id", ("run" + ('00' + (i+1)).substr(-2) + "Circle"))
-		// 					.attr("r", circleRadius)
-		// 					.attr("cx", beginningSpacing + plotSpacing + (j*(plotSpacing + plotDim)) + graphOffsets[j])
-		// 					.attr("cy", beginningSpacing + ((k+1)*(plotSpacing + plotDim)) - graphOffsets[k])
-		// 					.style("fill", "#" + colorSplit[0])
-		// 					.style("stroke", "white")
-		// 					.style("stroke-width", ('00' + (i+1)).substr(-2) === runPick ? 1.5 : 0.5)
-		// 					.on("click", function(d){
-		// 						if(d3.event.button === 0) { // left click
-		// 							if(runHighlighted && (d.summary.run === runHighlighted.num) && (d.run != runPick)) {
-		// 								// load the run here
-		// 								runPick = d.run;
-		// 								var dropdown = document.getElementById("runDropdown");
-		// 								dropdown.value = runPick;
-		// 								folderPath = "clean.44/" + "run" + runPick + "/";
-		// 								readFileNumCSV(filePick);
-		// 								loadFingerGraph();
-		//
-		// 								console.log("Loading: run" + d.run);
-		// 							}
-		//
-		// 							runHighlighted = {num: d.summary.run, x: d.col, y: d.row};
-		//
-		// 							runGroupHighlighted.push(runHighlighted);
-		//
-		// 							// set all back to normal color
-		// 							d3.selectAll(".runCircle")
-		// 								.style("fill", "#" + colorSplit[0])
-		// 								.style("stroke", "white")
-		// 								.style("stroke-width", 0.5);
-		//
-		//
-		// 							// set all in run group to be highlighted in secondary color
-		// 							for(var i = 0; i < runGroupHighlighted.length; i++) {
-		// 								d3.selectAll("#run" + ('00' + runGroupHighlighted[i].num).substr(-2) + "Circle")
-		// 									.style("fill", "#" + colorSplit[Math.round(colorSplit.length/2)]);
-		// 							}
-		//
-		// 							// highlight new run
-		// 							var id = d.run;
-		// 							d3.selectAll("#run" + id + "Circle").style("fill", "#" + colorSplit[colorSplit.length-1]);
-		//
-		// 							// thicker stroke on current run
-		// 							d3.selectAll("#run" + runPick + "Circle").style("stroke-width", 1.5);
-		//
-		// 							d3.select(this).style("fill", "white").style("stroke", "#" + colorSplit[colorSplit.length-1]).style("stroke-width", 2);
-		//
-		// 							// horizontal highlight
-		// 							d3.select(".rowHighlight")
-		// 								.attr("y", beginningSpacing + (plotSpacing/2) + d.row * (plotSpacing + plotDim))
-		// 								.attr("x", beginningSpacing + (plotSpacing/2));
-		//
-		// 							// vertical highlight
-		// 							d3.select(".colHighlight")
-		// 								.attr("y", beginningSpacing + (plotSpacing/2))
-		// 								.attr("x", beginningSpacing + (plotSpacing/2) + d.col * (plotSpacing + plotDim));
-		//
-		// 							console.log(d);
-		// 						}
-		// 					})
-		// 					.on("contextmenu", function(d) {
-		// 						d3.event.preventDefault();
-		// 						// no run is highlighted
-		// 						runHighlighted = null;
-		// 						runGroupHighlighted = [];
-		//
-		// 						// recolor normally
-		// 						d3.selectAll(".runCircle")
-		// 							.style("fill", "#" + colorSplit[0])
-		// 							.style("stroke", "white")
-		// 							.style("stroke-width", 0.5);
-		//
-		// 						// thicker stroke on current run
-		// 						d3.selectAll("#run" + runPick + "Circle").style("stroke-width", 1.5);
-		//
-		// 						// horizontal
-		// 						d3.select(".rowHighlight")
-		// 							.style("stroke-opacity", 0);
-		//
-		// 						// vertical
-		// 						d3.select(".colHighlight")
-		// 							.style("stroke-opacity", 0);
-		//
-		// 					})
-		// 					.on('mousemove', function(d) {
-		// 						sel = d3.select(this);
-		// 						sel.moveToFront();
-		// 						var matrix = this.getScreenCTM()
-		//         			.translate(+ this.getAttribute("cx"), + this.getAttribute("cy"));
-		// 						tooltip.classed("hidden", false)
-		// 							.html("Run: " + d.run + "<br>" +
-		// 								varNames[d.col] + ": " + (d.columnVal).toFixed(2) + "<br>" +
-		// 								varNames[d.row] + ": " + (d.rowVal).toFixed(2))
-		// 							.style("left", (window.pageXOffset + matrix.e + 15) + "px")
-		// 			        .style("top", (window.pageYOffset + matrix.f - 80) + "px");
-		// 					})
-		// 					.on('mouseout', function() {
-		// 						tooltip.classed("hidden", true);
-		// 					});
-		// 			}
-		// 		}
-		//
-		// 	}
-		//
-		// } // END if(myDiv)
+		var myDiv = d3.select("#pairplots");
+
+		if(myDiv) {
+			var mySVG = myDiv.append("svg")
+				.attr("width", "100%")
+				.attr("height", "100%");
+
+			var plots = mySVG.append("g");
+			var xLabels = mySVG.append("g");
+			var yLabels = mySVG.append("g");
+
+			var numVars = 6;
+			var varNames = ["Total Fingers", "Avg Fingers", "Avg Finger Conc.", "Avg Point Conc.", "Avg Finger Dens.", "Merge Factor"];
+			var varDescriptions = [
+				"Total number of unique fingers over the entire run.",
+				"Number of fingers in each timestep, averaged over the entire run.",
+				"Average concentration of fingers in each timestep, averaged over the entire run.",
+				"Average concentraion of points in viscous fingers in each timestep, averaged over the entire run.",
+				"Average finger density (finger concentration / finger volume) in each timestep, averaged over the entire run.",
+				"Number of merges (not including fingers which disappear) in each timestep, averaged over the entire run.",
+			];
+
+			var width = 804;
+			var height = 804;
+
+			var plotSpacing = 8;
+			var beginningSpacing = 30;
+			var plotDim = ((width-beginningSpacing)-((numVars+1) * plotSpacing))/numVars;
+
+			var isZoomed = false;
+			var runHighlighted = null;
+			var runGroupHighlighted = [];
+
+			/* === CREATE SCALES === */
+
+			var scales = new Array(numVars);
+
+			var min, max;
+			var circleRadius = 5;
+			var circleStrokeWidth = 0.5;
+			// get ranges of values for each variable
+
+			// ======================================
+			// total number of fingers
+			min = d3.min(runSummaryData, function(el) {
+				return el.totalClusters;
+			});
+			max = d3.max(runSummaryData, function(el) {
+				return el.totalClusters;
+			});
+
+			scales[0] = d3.scale.linear()
+				.domain([min, max])
+				.range([circleRadius + circleStrokeWidth, plotDim-(circleRadius + circleStrokeWidth)]);
+
+			// ======================================
+			// average number of fingers per timestep
+			min = d3.min(runSummaryData, function(el) {
+				return el.avgClusters;
+			});
+			max = d3.max(runSummaryData, function(el) {
+				return el.avgClusters;
+			});
+
+			scales[1] = d3.scale.linear()
+				.domain([min, max])
+				.range([circleRadius + circleStrokeWidth, plotDim-(circleRadius + circleStrokeWidth)]);
+
+			// =========================================
+			// average finger concentration per timestep
+			min = d3.min(runSummaryData, function(el) {
+				return el.avgFingerConc;
+			});
+			max = d3.max(runSummaryData, function(el) {
+				return el.avgFingerConc;
+			});
+
+			scales[2] = d3.scale.linear()
+				.domain([min, max])
+				.range([circleRadius + circleStrokeWidth, plotDim-(circleRadius + circleStrokeWidth)]);
+
+			// =========================================
+			// average finger point concentration per timestep
+			min = d3.min(runSummaryData, function(el) {
+				return el.avgFingerPointConc;
+			});
+			max = d3.max(runSummaryData, function(el) {
+				return el.avgFingerPointConc;
+			});
+
+			scales[3] = d3.scale.linear()
+				.domain([min, max])
+				.range([circleRadius + circleStrokeWidth, plotDim-(circleRadius + circleStrokeWidth)]);
+
+			// =========================================
+			// average finger density per timestep
+			min = d3.min(runSummaryData, function(el) {
+				return el.avgFingerDensity;
+			});
+			max = d3.max(runSummaryData, function(el) {
+				return el.avgFingerDensity;
+			});
+
+			scales[4] = d3.scale.linear()
+				.domain([min, max])
+				.range([circleRadius + circleStrokeWidth, plotDim-(circleRadius + circleStrokeWidth)]);
+
+			// =========================================
+			// average finger density per timestep
+			min = d3.min(runSummaryData, function(el) {
+				return el.mergeFactor;
+			});
+			max = d3.max(runSummaryData, function(el) {
+				return el.mergeFactor;
+			});
+
+			scales[5] = d3.scale.linear()
+				.domain([min, max])
+				.range([circleRadius + circleStrokeWidth, plotDim-(circleRadius + circleStrokeWidth)]);
+
+			/* === SCALES CREATED === */
+
+			/* === calculate correlations ===
+					a lot of calculation... */
+
+			var sumVar = new Array(numVars);
+			// sumVar[0] - totalClusters
+			sumVar[0] = d3.sum(runSummaryData, function(el) {
+				return el.totalClusters;
+			});
+
+			// sumVar[1] - avgClusters
+			sumVar[1] = d3.sum(runSummaryData, function(el) {
+				return el.avgClusters;
+			});
+
+			// sumVar[2] - avgFingerConc
+			sumVar[2] = d3.sum(runSummaryData, function(el) {
+				return el.avgFingerConc;
+			});
+
+			// sumVar[3] - avgFingerPointConc
+			sumVar[3] = d3.sum(runSummaryData, function(el) {
+				return el.avgFingerPointConc;
+			});
+
+			// sumVar[4] - avgFingerDensity
+			sumVar[4] = d3.sum(runSummaryData, function(el) {
+				return el.avgFingerDensity;
+			});
+
+			// sumVar[5] - mergeFactor
+			sumVar[5] = d3.sum(runSummaryData, function(el) {
+				return el.mergeFactor;
+			});
+
+
+			var sumPairs = new Array(numVars);
+			for(var i = 0; i < numVars; i++) {
+				sumPairs[i] = new Array(numVars);
+			}
+
+			// all totalClusters * ______
+			sumPairs[0][0] = d3.sum(runSummaryData, function(el) {
+				return el.totalClusters * el.totalClusters;
+			});
+
+			sumPairs[0][1] = d3.sum(runSummaryData, function(el) {
+				return el.totalClusters * el.avgClusters;
+			});
+
+			sumPairs[0][2] = d3.sum(runSummaryData, function(el) {
+				return el.totalClusters * el.avgFingerConc;
+			});
+
+			sumPairs[0][3] = d3.sum(runSummaryData, function(el) {
+				return el.totalClusters * el.avgFingerPointConc;
+			});
+
+			sumPairs[0][4] = d3.sum(runSummaryData, function(el) {
+				return el.totalClusters * el.avgFingerDensity;
+			});
+
+			sumPairs[0][5] = d3.sum(runSummaryData, function(el) {
+				return el.totalClusters * el.mergeFactor;
+			});
+
+			// all avgClusters * ______
+			sumPairs[1][0] = sumPairs[0][1];
+
+			sumPairs[1][1] = d3.sum(runSummaryData, function(el) {
+				return el.avgClusters * el.avgClusters;
+			});
+
+			sumPairs[1][2] = d3.sum(runSummaryData, function(el) {
+				return el.avgClusters * el.avgFingerConc;
+			});
+
+			sumPairs[1][3] = d3.sum(runSummaryData, function(el) {
+				return el.avgClusters * el.avgFingerPointConc;
+			});
+
+			sumPairs[1][4] = d3.sum(runSummaryData, function(el) {
+				return el.avgClusters * el.avgFingerDensity;
+			});
+
+			sumPairs[1][5] = d3.sum(runSummaryData, function(el) {
+				return el.avgClusters * el.mergeFactor;
+			});
+
+			// all avgFingerConc * ______
+			sumPairs[2][0] = sumPairs[0][2];
+			sumPairs[2][1] = sumPairs[1][2];
+
+			sumPairs[2][2] = d3.sum(runSummaryData, function(el) {
+				return el.avgFingerConc * el.avgFingerConc;
+			});
+
+			sumPairs[2][3] = d3.sum(runSummaryData, function(el) {
+				return el.avgFingerConc * el.avgFingerPointConc;
+			});
+
+			sumPairs[2][4] = d3.sum(runSummaryData, function(el) {
+				return el.avgFingerConc * el.avgFingerDensity;
+			});
+
+			sumPairs[2][5] = d3.sum(runSummaryData, function(el) {
+				return el.avgFingerConc * el.mergeFactor;
+			});
+
+			// all avgFingerPointConc * ______
+			sumPairs[3][0] = sumPairs[0][3];
+			sumPairs[3][1] = sumPairs[1][3];
+			sumPairs[3][2] = sumPairs[2][3];
+
+			sumPairs[3][3] = d3.sum(runSummaryData, function(el) {
+				return el.avgFingerPointConc * el.avgFingerPointConc;
+			});
+
+			sumPairs[3][4] = d3.sum(runSummaryData, function(el) {
+				return el.avgFingerPointConc * el.avgFingerDensity;
+			});
+
+			sumPairs[3][5] = d3.sum(runSummaryData, function(el) {
+				return el.avgFingerPointConc * el.mergeFactor;
+			});
+
+			// all avgFingerDensity * ______
+			sumPairs[4][0] = sumPairs[0][4];
+			sumPairs[4][1] = sumPairs[1][4];
+			sumPairs[4][2] = sumPairs[2][4];
+			sumPairs[4][3] = sumPairs[3][4];
+
+			sumPairs[4][4] = d3.sum(runSummaryData, function(el) {
+				return el.avgFingerDensity * el.avgFingerDensity;
+			});
+
+			sumPairs[4][5] = d3.sum(runSummaryData, function(el) {
+				return el.avgFingerDensity * el.mergeFactor;
+			});
+
+			// all mergeFactor * ______
+			sumPairs[5][0] = sumPairs[0][5];
+			sumPairs[5][1] = sumPairs[1][5];
+			sumPairs[5][2] = sumPairs[2][5];
+			sumPairs[5][3] = sumPairs[3][5];
+			sumPairs[5][4] = sumPairs[4][5];
+
+			sumPairs[5][5] = d3.sum(runSummaryData, function(el) {
+				return el.mergeFactor * el.mergeFactor;
+			});
+
+
+			plots.append("rect")
+				.attr("class", "rowHighlight")
+				.attr("y", 0)
+				.attr("x", 0)
+				.attr("width", (plotSpacing + plotDim) * numVars)
+				.attr("height", plotDim + plotSpacing)
+				.style("fill-opacity", 0)
+				.style("stroke", "#" + colorSplit[colorSplit.length-1])
+				.style("stroke-width", 1)
+				.style("stroke-opacity", 0);
+
+			// vertical
+			plots.append("rect")
+				.attr("class", "colHighlight")
+				.attr("y", 0)
+				.attr("x", 0)
+				.attr("width", plotDim + plotSpacing)
+				.attr("height", (plotSpacing + plotDim) * numVars)
+				.style("fill-opacity", 0)
+				.style("stroke", "#" + colorSplit[colorSplit.length-1])
+				.style("stroke-width", 1)
+				.style("stroke-opacity", 0);
+
+			for(var i = 0; i < numVars; i++) {
+				xLabels.append("text")
+					.attr("class", "variableLabel")
+					.text(varNames[i])
+					.style("fill", "#5BBDDE")
+					.style("text-decoration", "underline")
+					.style("text-anchor", "middle")
+					.attr("x", beginningSpacing + plotSpacing + plotDim/2 + i*(plotDim+plotSpacing))
+					.attr("y", beginningSpacing - 5);
+
+				xLabels.append("rect")
+					.datum(i)
+					.attr("x", beginningSpacing + 3*plotSpacing/4 + i*(plotDim+plotSpacing))
+					.attr("y", plotSpacing/4)
+					.attr("width", plotDim + plotSpacing/2)
+					.attr("height", beginningSpacing + plotSpacing/2)
+					.style("fill-opacity", 0)
+					.on('mousemove', function(d) {
+						var matrix = this.getScreenCTM()
+							.translate(+ this.getAttribute("x"), + this.getAttribute("y"));
+						tooltip.classed("hidden", false)
+							.html(varDescriptions[d])
+							.style("left", (window.pageXOffset + matrix.e + (plotDim/2)) + "px")
+							.style("top", (window.pageYOffset + matrix.f - 40) + "px");
+					})
+					.on('mouseout', function() {
+						tooltip.classed("hidden", true);
+					});
+
+				yLabels.append("text")
+					.attr("class", "variableLabel")
+					.text(varNames[i])
+					.style("fill", "#5BBDDE")
+					.style("text-decoration", "underline")
+					// .style("writing-mode", "vertical-rl")
+					.style("text-anchor", "middle")
+					.attr("transform", "rotate(-90)")
+					.attr("x", -(beginningSpacing + plotSpacing + plotDim/2 + i*(plotDim+plotSpacing)))
+					.attr("y", beginningSpacing - 5);
+
+				yLabels.append("rect")
+					.datum(i)
+					.attr("x", plotSpacing/4)
+					.attr("y", beginningSpacing + 3*plotSpacing/4 + i*(plotDim+plotSpacing))
+					.attr("width", beginningSpacing + plotSpacing/2)
+					.attr("height", plotDim + plotSpacing/2)
+					.style("fill-opacity", 0)
+					.on('mousemove', function(d) {
+						var matrix = this.getScreenCTM()
+							.translate(+ this.getAttribute("x"), + this.getAttribute("y"));
+						tooltip.classed("hidden", false)
+							.html(varDescriptions[d])
+							.style("left", (window.pageXOffset + matrix.e + (beginningSpacing/2)) + "px")
+							.style("top", (window.pageYOffset + matrix.f - 30) + "px");
+					})
+					.on('mouseout', function() {
+						tooltip.classed("hidden", true);
+					});
+
+				for(var j = 0; j < numVars; j++) {
+					plots.append("rect")
+						.datum([i, j])
+						.attr("height", plotDim)
+						.attr("width", plotDim)
+						.attr("x", (beginningSpacing + (i*plotDim) + ((i+1)*plotSpacing)))
+						.attr("y", (beginningSpacing + (j*plotDim) + ((j+1)*plotSpacing)))
+						.style("fill", "#050505")
+						.on("mouseup", function(d) {
+							// only zooms if the mouseup is caused by left click
+							if(d3.event.button === 0 && !isZoomed) {
+								isZoomed = true;
+
+								console.log("zoom into plot:", d);
+								var xTranslate, yTranslate, scale;
+
+								// zoom into the selected plot
+								xTranslate = -1 * (beginningSpacing + (d[0] * (plotSpacing + plotDim)));
+								yTranslate = -1 * (beginningSpacing + (d[1] * (plotSpacing + plotDim)));
+								scale = (numVars * (plotSpacing + plotDim)) / (plotDim + plotSpacing);
+
+								plots.transition().duration(300).ease("expOut")
+									.attr("transform", "scale(" + scale + ") translate(" + xTranslate + "," + yTranslate + ")");
+
+								// hide the main axis labels
+								xLabels.transition().duration(150).style("opacity", 0);
+								yLabels.transition().duration(150).style("opacity", 0);
+
+								xLabels.transition().delay(150).style("visibility", "hidden");
+								yLabels.transition().delay(150).style("visibility", "hidden");
+
+
+								// create temporary labels for selected variables
+								// horizontal label
+								mySVG.append("text")
+									.attr("class", "temporaryLabel")
+									.text(varNames[d[0]])
+									.style("fill", "white")
+									.style("text-anchor", "middle")
+									.style("font-size", 26)
+									.attr("x", beginningSpacing + (width-beginningSpacing)/2)
+									.attr("y", height - 13);
+
+								// vertical label
+								mySVG.append("text")
+									.attr("class", "temporaryLabel")
+									.text(varNames[d[1]])
+									.style("fill", "white")
+									// .style("writing-mode", "vertical-rl")
+									.style("text-anchor", "middle")
+									.style("font-size", 26)
+									.attr("transform", "rotate(-90)")
+									.attr("y", beginningSpacing/2 + 13)
+									.attr("x", -(beginningSpacing + (height-beginningSpacing)/2));
+
+								// add scale labels
+								// horizontal scale
+								var xDomain = scales[d[0]].domain();
+
+								mySVG.append("text")
+									.attr("class", "temporaryLabel")
+									.text(xDomain[0].toFixed(2))
+									.style("fill", "white")
+									.style("text-anchor", "begin")
+									.style("font-size", 20)
+									.attr("x", beginningSpacing + 2*plotSpacing)
+									.attr("y", height - 10);
+
+								mySVG.append("text")
+									.attr("class", "temporaryLabel")
+									.text(xDomain[1].toFixed(2))
+									.style("fill", "white")
+									.style("text-anchor", "end")
+									.style("font-size", 20)
+									.attr("x", width - 2*plotSpacing)
+									.attr("y", height - 10);
+
+								// vertical scale
+
+								var yDomain = scales[d[1]].domain();
+
+								mySVG.append("text")
+									.attr("class", "temporaryLabel")
+									.text(yDomain[1].toFixed(2))
+									.style("fill", "white")
+									// .style("writing-mode", "vertical-rl")
+									.style("text-anchor", "end")
+									.style("font-size", 20)
+									.attr("transform", "rotate(-90)")
+									.attr("y", beginningSpacing/2 + 10)
+									.attr("x", -(beginningSpacing + 2*plotSpacing));
+
+								mySVG.append("text")
+									.attr("class", "temporaryLabel")
+									.text(yDomain[0].toFixed(2))
+									.style("fill", "white")
+									// .style("writing-mode", "vertical-rl")
+									.style("text-anchor", "begin")
+									.style("font-size", 20)
+									.attr("transform", "rotate(-90)")
+									.attr("y", beginningSpacing/2 + 10)
+									.attr("x", -(width - 2*plotSpacing - 10));
+
+								// calculate correlation and create correlation label
+								var s00, s11, s01;
+								s00 = sumPairs[d[0]][d[0]] - (Math.pow(sumVar[d[0]], 2)/numRuns);
+								s11 = sumPairs[d[1]][d[1]] - (Math.pow(sumVar[d[1]], 2)/numRuns);
+								s01 = sumPairs[d[0]][d[1]] - ((sumVar[d[0]] * sumVar[d[1]])/numRuns);
+
+								var correlation;
+
+								correlation = s01 / Math.sqrt(s00 * s11);
+
+								mySVG.append("text")
+									.attr("class", "temporaryLabel")
+									.text("Variable Correlation: " + correlation.toFixed(2))
+									.style("fill", "white")
+									.style("text-anchor", "middle")
+									.style("font-size", 20)
+									.attr("x", width/2)
+									.attr("y", beginningSpacing);
+
+								d3.selectAll(".temporaryLabel").style("opacity", 0);
+
+								d3.selectAll(".temporaryLabel").transition().duration(150).delay(150)
+									.style("opacity", 1);
+
+								// hide the highlighting rectangles
+								d3.select(".colHighlight").transition().duration(300)
+									.style("stroke-opacity", 0);
+
+								d3.select(".rowHighlight").transition().duration(300)
+									.style("stroke-opacity", 0);
+							}
+						})
+						.on("contextmenu", function(d) { // "right click"
+							d3.event.preventDefault();
+							if(isZoomed) {
+								isZoomed = false;
+
+								console.log("zoom out of plot: ", d);
+								// zoom out of plots
+								plots.transition().duration(300).ease("expIn")
+									.attr("transform", "scale(1) translate(0,0)");
+								// set labels to be visible again, remove temporary labels
+
+								xLabels.style("visibility", "visible");
+								yLabels.style("visibility", "visible");
+								xLabels.transition().duration(150).delay(150).style("opacity", 1);
+								yLabels.transition().duration(150).delay(150).style("opacity", 1);
+
+								d3.selectAll(".temporaryLabel").transition().duration(150).style("opacity", 0);
+								d3.selectAll(".temporaryLabel").transition().delay(150).remove();
+
+								if(runHighlighted) {
+									d3.select(".colHighlight").transition().duration(300)
+										.style("stroke-opacity", 0.5);
+										// .attr("x", beginningSpacing + (plotSpacing/2) + runHighlighted.x * (plotSpacing + plotDim));
+
+									d3.select(".rowHighlight").transition().duration(300)
+										.style("stroke-opacity", 0.5);
+										// .attr("y", beginningSpacing + (plotSpacing/2) + runHighlighted.y * (plotSpacing + plotDim));
+
+
+								}
+							}
+						});
+				}
+			}
+
+			// plot each run variable onto graph at each location
+			for(var i = 0; i < runSummaryData.length; i++) {
+				// for each run
+
+				// 6 values in same order as varNames
+				// "Total Fingers", "Avg Fingers", "Avg Finger Conc.", "Avg Point Conc.", "Avg Finger Density", "Merge Factor"
+				var graphOffsets = new Array(6);
+				var statValues = new Array(6);
+
+				graphOffsets[0] = scales[0](runSummaryData[i].totalClusters);
+				graphOffsets[1] = scales[1](runSummaryData[i].avgClusters);
+				graphOffsets[2] = scales[2](runSummaryData[i].avgFingerConc);
+				graphOffsets[3] = scales[3](runSummaryData[i].avgFingerPointConc);
+				graphOffsets[4] = scales[4](runSummaryData[i].avgFingerDensity);
+				graphOffsets[5] = scales[5](runSummaryData[i].mergeFactor);
+
+				statValues[0] = runSummaryData[i].totalClusters;
+				statValues[1] = runSummaryData[i].avgClusters;
+				statValues[2] = runSummaryData[i].avgFingerConc;
+				statValues[3] = runSummaryData[i].avgFingerPointConc;
+				statValues[4] = runSummaryData[i].avgFingerDensity;
+				statValues[5] = runSummaryData[i].mergeFactor;
+
+				for(var j = 0; j < numVars; j++) {
+					// for each of numVars variables (horizontal)
+					for(var k = 0; k < numVars; k++) {
+						// for each of numVars variables (vertical)
+						plots.append("circle")
+							.datum({
+								run: ('00' + (i+1)).substr(-2),
+								col: j,
+								columnVal: statValues[j],
+								row: k,
+								rowVal: statValues[k],
+								summary: runSummaryData[i]
+							})
+							.attr("class", "runCircle")
+							.attr("id", ("run" + ('00' + (i+1)).substr(-2) + "Circle"))
+							.attr("r", circleRadius)
+							.attr("cx", beginningSpacing + plotSpacing + (j*(plotSpacing + plotDim)) + graphOffsets[j])
+							.attr("cy", beginningSpacing + ((k+1)*(plotSpacing + plotDim)) - graphOffsets[k])
+							.style("fill", "#" + colorSplit[0])
+							.style("stroke", "white")
+							.style("stroke-width", ('00' + (i+1)).substr(-2) === runPick ? 1.5 : 0.5)
+							.on("click", function(d){
+								if(d3.event.button === 0) { // left click
+									if(runHighlighted && (d.summary.run === runHighlighted.num) && (d.run != runPick)) {
+										// load the run here
+										runPick = d.run;
+										var dropdown = document.getElementById("runDropdown");
+										dropdown.value = runPick;
+										folderPath = "clean.44/" + "run" + runPick + "/";
+										readFileNumCSV(filePick);
+										loadFingerGraph();
+
+										console.log("Loading: run" + d.run);
+									}
+
+									runHighlighted = {num: d.summary.run, x: d.col, y: d.row};
+
+									runGroupHighlighted.push(runHighlighted);
+
+									// set all back to normal color
+									d3.selectAll(".runCircle")
+										.style("fill", "#" + colorSplit[0])
+										.style("stroke", "white")
+										.style("stroke-width", 0.5);
+
+
+									// set all in run group to be highlighted in secondary color
+									for(var i = 0; i < runGroupHighlighted.length; i++) {
+										d3.selectAll("#run" + ('00' + runGroupHighlighted[i].num).substr(-2) + "Circle")
+											.style("fill", "#" + colorSplit[Math.round(colorSplit.length/2)]);
+									}
+
+									// highlight new run
+									var id = d.run;
+									d3.selectAll("#run" + id + "Circle").style("fill", "#" + colorSplit[colorSplit.length-1]);
+
+									// thicker stroke on current run
+									d3.selectAll("#run" + runPick + "Circle").style("stroke-width", 1.5);
+
+									d3.select(this).style("fill", "white").style("stroke", "#" + colorSplit[colorSplit.length-1]).style("stroke-width", 2);
+
+									// horizontal highlight
+									d3.select(".rowHighlight")
+										.attr("y", beginningSpacing + (plotSpacing/2) + d.row * (plotSpacing + plotDim))
+										.attr("x", beginningSpacing + (plotSpacing/2));
+
+									// vertical highlight
+									d3.select(".colHighlight")
+										.attr("y", beginningSpacing + (plotSpacing/2))
+										.attr("x", beginningSpacing + (plotSpacing/2) + d.col * (plotSpacing + plotDim));
+
+									console.log(d);
+								}
+							})
+							.on("contextmenu", function(d) {
+								d3.event.preventDefault();
+								// no run is highlighted
+								runHighlighted = null;
+								runGroupHighlighted = [];
+
+								// recolor normally
+								d3.selectAll(".runCircle")
+									.style("fill", "#" + colorSplit[0])
+									.style("stroke", "white")
+									.style("stroke-width", 0.5);
+
+								// thicker stroke on current run
+								d3.selectAll("#run" + runPick + "Circle").style("stroke-width", 1.5);
+
+								// horizontal
+								d3.select(".rowHighlight")
+									.style("stroke-opacity", 0);
+
+								// vertical
+								d3.select(".colHighlight")
+									.style("stroke-opacity", 0);
+
+							})
+							.on('mousemove', function(d) {
+								sel = d3.select(this);
+								sel.moveToFront();
+								var matrix = this.getScreenCTM()
+		        			.translate(+ this.getAttribute("cx"), + this.getAttribute("cy"));
+								tooltip.classed("hidden", false)
+									.html("Run: " + d.run + "<br>" +
+										varNames[d.col] + ": " + (d.columnVal).toFixed(2) + "<br>" +
+										varNames[d.row] + ": " + (d.rowVal).toFixed(2))
+									.style("left", (window.pageXOffset + matrix.e + 15) + "px")
+					        .style("top", (window.pageYOffset + matrix.f - 80) + "px");
+							})
+							.on('mouseout', function() {
+								tooltip.classed("hidden", true);
+							});
+					}
+				}
+
+			}
+
+		} // END if(myDiv)
 
 		recolorPairplots = function() {
 			// set all back to normal color
@@ -2201,13 +2217,14 @@ function loadFingerGraph() {
 				.attr("height", "100%");
 
 			var numVars = 6;
-			var varNames = ["Total Fingers", "Avg Fingers", "Avg Finger Conc.", "Avg Finger Point Conc.", "Avg Finger Dens.", "Merge Factor"];
+			var varNames = ["Total Fingers", "Avg Fingers", "Avg Finger Conc.", "Avg Finger Point Conc.", /* "Avg Finger Dens.",*/ "Avg Finger Vel.", "Merge Factor"];
 			var varDescriptions = [
 				"Total number of unique fingers over the entire run.",
 				"Number of fingers in each timestep, averaged over the entire run.",
 				"Average concentration of fingers in each timestep, averaged over the entire run.",
-				"Average concentration of points in viscous fingers in each timestep, averaged over the entire run.", // also used for coloring
-				"Average finger density (finger concentration / finger volume) in each timestep, averaged over the entire run.",
+				"Average concentration of points in viscous fingers in each timestep, averaged over the entire run.",
+				// "Average finger density (finger concentration / finger volume) in each timestep, averaged over the entire run.",
+				"Average velocity magnitude of points in viscous fingers in each timestep, averaged over the entire run",
 				"Number of merges (not including fingers which disappear) in each timestep, averaged over the entire run.",
 			];
 
@@ -2229,7 +2246,7 @@ function loadFingerGraph() {
 
 			var scales = new Array(numVars);
 			var colorScales = new Array(3);
-			var modes = ["totalClusters", "", "mergeFactor"];
+			var modes = ["totalClusters", "avgFingerVelMag", "mergeFactor"];
 
 			var min, max;
 			var circleRadius = 5;
@@ -2340,7 +2357,7 @@ function loadFingerGraph() {
 			// average finger density per timestep
 			min = d3.min(runSummaryData, function(el) {
 				if(el) {
-					return el.avgFingerDensity;
+					return el.avgFingerVelMag;
 				}
 				else {
 					return Number.MAX_VALUE;
@@ -2348,7 +2365,7 @@ function loadFingerGraph() {
 			});
 			max = d3.max(runSummaryData, function(el) {
 				if(el) {
-					return el.avgFingerDensity;
+					return el.avgFingerVelMag;
 				}
 				else {
 					return Number.MIN_VALUE;
@@ -2358,6 +2375,9 @@ function loadFingerGraph() {
 			scales[4] = d3.scale.linear()
 				.domain([min, max])
 				.range([10, plotDim/2 - 5]);
+			colorScales[1] = d3.scale.quantize()
+				.domain([min, max])
+				.range(colorSplit);
 
 			// =========================================
 			// average finger density per timestep
@@ -2567,14 +2587,14 @@ function loadFingerGraph() {
 						coords[1] = rotate(scales[1](d.avgClusters), ((360 * 1/(numVars)) - 90));
 						coords[2] = rotate(scales[2](d.avgFingerConc), ((360 * 2/(numVars)) - 90));
 						coords[3] = rotate(scales[2](d.avgFingerConc), ((360 * 3/(numVars)) - 90));
-						coords[4] = rotate(scales[4](d.avgFingerDensity), ((360 * 4/(numVars)) - 90));
+						coords[4] = rotate(scales[4](d.avgFingerVelMag), ((360 * 4/(numVars)) - 90));
 						coords[5] = rotate(scales[5](d.mergeFactor), ((360 * 5/(numVars)) - 90));
 
 						values[0] = d.totalClusters;
 						values[1] = d.avgClusters;
 						values[2] = d.avgFingerConc;
 						values[3] = d.avgFingerPointConc;
-						values[4] = d.avgFingerDensity;
+						values[4] = d.avgFingerVelMag;
 						values[5] = d.mergeFactor;
 
 						for(var j = 0; j < numVars; j++) {
@@ -2656,6 +2676,7 @@ function loadFingerGraph() {
 		recolorStarplots = function() {
 			// change scale range
 			// scales[3].range(colorSplit);
+			colorScales.map(function(d) { d.range(colorSplit); });
 			d3.selectAll(".plotSlice").style("fill", function(d, i) {
 				return "#" + colorScales[starplotColorMode](runSummaryData[d.runNum][modes[starplotColorMode]]);
 			});
