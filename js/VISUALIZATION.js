@@ -1414,6 +1414,11 @@ function loadFingerGraph() {
 				var timestepAvgFingerVelMagConc = new Array(120).fill(0);
 				var timestepAvgFingerDensity = new Array(120).fill(0);
 
+				console.log(d3.min(thisClusterCenters, function(d) { return d3.min(d, function(e) {return e.vMag; }); }),
+										d3.max(thisClusterCenters, function(d) { return d3.max(d, function(e) {return e.vMag; }); }));
+
+				console.log(d3.min(thisClusterCenters, function(d) { return d3.min(d, function(e) {return e.vMagConc; }); }),
+										d3.max(thisClusterCenters, function(d) { return d3.max(d, function(e) {return e.vMagConc; }); }));
 				// for each timestep
 				for(var i = 0; i <= 120; i++) {
 
@@ -1436,7 +1441,11 @@ function loadFingerGraph() {
 					for(var j = 0; j < thisClusterCenters[i].length; j++) {
 						totalTimestepConc += thisClusterCenters[i][j].concTotal;
 						totalTimestepNumPoints += thisClusterCenters[i][j].size;
+
+						// console.log(thisClusterCenters[i][j].vMag);
 						totalTimestepVelMag += thisClusterCenters[i][j].vMag;
+
+						// console.log(thisClusterCenters[i][j].vMagConc);
 						totalTimestepVelMagConc += thisClusterCenters[i][j].vMagConc;
 
 						totalTimestepDensity += thisClusterCenters[i][j].concTotal/
@@ -1478,7 +1487,13 @@ function loadFingerGraph() {
 					avgFingerPointConc: d3.mean(timestepAvgPointConc),
 					avgFingerDensity: d3.mean(timestepAvgFingerDensity),
 					avgFingerVelMag: d3.mean(timestepAvgFingerVelMag),
-					avgFingerVelMagConc: d3.mean(timestepAvgFingerVelMagConc)
+					extAvgFingerVelMag: d3.extent(timestepAvgFingerVelMag),
+					extFingerVelMag: [d3.min(thisClusterCenters, function(d) { return d3.min(d, function(e) {return e.vMag; }); }),
+											d3.max(thisClusterCenters, function(d) { return d3.max(d, function(e) {return e.vMag; }); })],
+					avgFingerVelMagConc: d3.mean(timestepAvgFingerVelMagConc),
+					extAvgFingerVelMagConc: d3.extent(timestepAvgFingerVelMagConc),
+					extFingerVelMagConc: [d3.min(thisClusterCenters, function(d) { return d3.min(d, function(e) {return e.vMagConc; }); }),
+											d3.max(thisClusterCenters, function(d) { return d3.max(d, function(e) {return e.vMagConc; }); })],
 				};
 
 				console.log(thisRunData);
@@ -2675,8 +2690,7 @@ function loadFingerGraph() {
 
 		recolorStarplots = function() {
 			// change scale range
-			// scales[3].range(colorSplit);
-			colorScales.map(function(d) { d.range(colorSplit); });
+			colorScales[starplotColorMode].range(colorSplit);
 			d3.selectAll(".plotSlice").style("fill", function(d, i) {
 				return "#" + colorScales[starplotColorMode](runSummaryData[d.runNum][modes[starplotColorMode]]);
 			});
