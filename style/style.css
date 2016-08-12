@@ -67,7 +67,7 @@ h1 {
 }
 
 #canvas, #starCanvas {
-  width: 450px;
+  width: 100%;
   height: 25px;
   /*border: solid 3px #e0e0e0;*/
   position: relative;
@@ -251,13 +251,15 @@ p.view3 {
 }
 
 #legendStar {
-  max-width: 450px;
+  width: 100%;
+  max-width: 100%;
   /*display: inline-block;*/
   /*vertical-align: bottom;*/
   /*float: center;*/
   position: absolute;
   bottom: 0;
-  transform: translate(50%);
+  margin: 0;
+  //transform: translate(50%);
 }
 
 #sliderDiv {
