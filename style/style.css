@@ -250,10 +250,11 @@ p.view3 {
   bottom: 0;
 }
 
-#legendSlice {
+#legendStar {
   max-width: 338px;
-  /*display: inline-block;
-  vertical-align: bottom;*/
+  /*display: inline-block;*/
+  /*vertical-align: bottom;*/
+  /*float: center;*/
   position: absolute;
   bottom: 0;
 }
@@ -296,8 +297,8 @@ p.view3 {
 #starplots {
   max-width: 650px;
   width: 650px;
-  height: 804px;
-  max-height: 804px;
+  height: 723px;
+  max-height: 723px;
   position: relative;
   /*text-align: center;*/
   /*margin-top: 10px;*/
