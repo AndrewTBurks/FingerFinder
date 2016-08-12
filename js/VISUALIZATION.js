@@ -579,7 +579,7 @@ function drawParticles(fileNum) {
 			// 	.translate(+ this.getAttribute("cx"), + this.getAttribute("cy"));
 			var position = this.getBoundingClientRect();
 			tooltip.classed("hidden", false)
-				.html("Slice Orientation")
+				.html("Slab Orientation")
 				.style("left", (window.pageXOffset + (position.left+position.right)/2 + 15) + "px")
 				.style("top", (window.pageYOffset + position.top - 15) + "px");
 		})
@@ -616,7 +616,7 @@ function drawParticles(fileNum) {
 			// 	.translate(+ this.getAttribute("cx"), + this.getAttribute("cy"));
 			var position = this.getBoundingClientRect();
 			tooltip.classed("hidden", false)
-				.html("Slice Orientation")
+				.html("Slab Orientation")
 				.style("left", (window.pageXOffset + (position.left+position.right)/2 + 15) + "px")
 				.style("top", (window.pageYOffset + position.top - 15) + "px");
 		})
