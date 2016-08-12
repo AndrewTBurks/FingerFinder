@@ -194,6 +194,7 @@ p.view3 {
   display: inline-block;
   vertical-align: top;
   margin-left: 16px;
+  padding-right: 50px;
   /*position: relative;*/
   /*left: 34px;*/
 }
@@ -207,6 +208,7 @@ p.view3 {
   vertical-align: top;
   position: relative;
   margin-left: 16px;
+  padding-right: 50px;
 }
 
 #runPairplotWrapper {
@@ -230,6 +232,7 @@ p.view3 {
   vertical-align: top;
   position: relative;
   margin-left: 16px;
+  padding-left: 50px;
 }
 
 #menuWrapper {
