@@ -385,7 +385,7 @@ function drawParticles(fileNum) {
 
 		var end = new Date().getTime();
 		var time = end - startTime;
-		console.log('DRAW PARTICLES: Execution time: ' + time + 'ms.');
+		// console.log('DRAW PARTICLES: Execution time: ' + time + 'ms.');
 
 
 		// render again after particles created
@@ -462,7 +462,7 @@ function drawParticles(fileNum) {
 			});
 		});
 
-		console.log(maxVelSlice);
+		// console.log(maxVelSlice);
 
 
 
@@ -626,7 +626,7 @@ function drawParticles(fileNum) {
 
 		var end = new Date().getTime();
 		var time = end - startTime;
-		console.log('REFRESH SLICE: Execution time: ' + time + 'ms.');
+		// console.log('REFRESH SLICE: Execution time: ' + time + 'ms.');
 
 		recolor3DModel();
 	}
@@ -711,7 +711,7 @@ function drawParticles(fileNum) {
 	function highlightViscousFinger() {
 		// desaturate all points
 		if(currSelectedNode.timestep != -1 && currSelectedNode.timestep === filePick && currSelectedNode.run === runPick){
-			console.log("Highlighting");
+			// console.log("Highlighting");
 			for(var p = 0; p < data.length; p++) {
 				particleSystem.geometry.colors[p] = new THREE.Color("#" + color(Number(data[p].concentration)));
 
@@ -900,7 +900,7 @@ function loadFingerGraph() {
 			}
 		}
 
-		console.log("Number of IDs", IDs.length);
+		// console.log("Number of IDs", IDs.length);
 		var numClustersReduced = IDs.length;
 
 		// console.log(reducedArray);
@@ -1321,7 +1321,7 @@ function loadFingerGraph() {
 
 		var end = new Date().getTime();
 		var time = end - startTime;
-		console.log('DRAW FINGER FOREST: Execution time: ' + time + 'ms.');
+		// console.log('DRAW FINGER FOREST: Execution time: ' + time + 'ms.');
 
 		updateFingerGraphFileLine();
 
@@ -1399,7 +1399,7 @@ function loadFingerGraph() {
 
 		d3.json(clusterCentersFile, function(error, json){
 			if(error) {
-				console.log(error)
+				// console.log(f)
 				runSummaryData[runNum-1] = null;
 				d3.select("#runOption" + ("00" + runNum).substr(-2)).attr("disabled", "true");
 			}
@@ -1413,12 +1413,12 @@ function loadFingerGraph() {
 				var timestepAvgFingerVelMag = new Array(120).fill(0);
 				var timestepAvgFingerVelMagConc = new Array(120).fill(0);
 				var timestepAvgFingerDensity = new Array(120).fill(0);
-
-				console.log(d3.min(thisClusterCenters, function(d) { return d3.min(d, function(e) {return e.vMag; }); }),
-										d3.max(thisClusterCenters, function(d) { return d3.max(d, function(e) {return e.vMag; }); }));
-
-				console.log(d3.min(thisClusterCenters, function(d) { return d3.min(d, function(e) {return e.vMagConc; }); }),
-										d3.max(thisClusterCenters, function(d) { return d3.max(d, function(e) {return e.vMagConc; }); }));
+        //
+				// console.log(d3.min(thisClusterCenters, function(d) { return d3.min(d, function(e) {return e.vMag; }); }),
+				// 						d3.max(thisClusterCenters, function(d) { return d3.max(d, function(e) {return e.vMag; }); }));
+        //
+				// console.log(d3.min(thisClusterCenters, function(d) { return d3.min(d, function(e) {return e.vMagConc; }); }),
+				// 						d3.max(thisClusterCenters, function(d) { return d3.max(d, function(e) {return e.vMagConc; }); }));
 				// for each timestep
 				for(var i = 0; i <= 120; i++) {
 
@@ -1496,7 +1496,7 @@ function loadFingerGraph() {
 											d3.max(thisClusterCenters, function(d) { return d3.max(d, function(e) {return e.vMagConc; }); })],
 				};
 
-				console.log(thisRunData);
+				// console.log(thisRunData);
 
 				runSummaryData[runNum-1] = thisRunData;
 			}
@@ -1505,8 +1505,8 @@ function loadFingerGraph() {
 				getRunSummary(runNum+1);
 			}
 			else {
-				console.log("Vel Mag", d3.extent(runSummaryData, function(el) { return el ? el.avgFingerVelMag : null; }));
-				console.log("Vel Mag Conc", d3.extent(runSummaryData, function(el) { return el ? el.avgFingerVelMagConc : null; }));
+				// console.log("Vel Mag", d3.extent(runSummaryData, function(el) { return el ? el.avgFingerVelMag : null; }));
+				// console.log("Vel Mag Conc", d3.extent(runSummaryData, function(el) { return el ? el.avgFingerVelMagConc : null; }));
 
 				// drawPairplots();
 				// createParallelCoordsPlots();
@@ -1891,7 +1891,7 @@ function loadFingerGraph() {
 							if(d3.event.button === 0 && !isZoomed) {
 								isZoomed = true;
 
-								console.log("zoom into plot:", d);
+								// console.log("zoom into plot:", d);
 								var xTranslate, yTranslate, scale;
 
 								// zoom into the selected plot
@@ -2018,7 +2018,7 @@ function loadFingerGraph() {
 							if(isZoomed) {
 								isZoomed = false;
 
-								console.log("zoom out of plot: ", d);
+								// console.log("zoom out of plot: ", d);
 								// zoom out of plots
 								plots.transition().duration(300).ease("expIn")
 									.attr("transform", "scale(1) translate(0,0)");
@@ -2142,7 +2142,7 @@ function loadFingerGraph() {
 										.attr("y", beginningSpacing + (plotSpacing/2))
 										.attr("x", beginningSpacing + (plotSpacing/2) + d.col * (plotSpacing + plotDim));
 
-									console.log(d);
+									// console.log(d);
 								}
 							})
 							.on("contextmenu", function(d) {
@@ -2253,7 +2253,7 @@ function loadFingerGraph() {
 
 			var dimVals = [(width - ((runsPerLine+1)*(plotSpacing)))/runsPerLine, (height - ((numRows+1)*(plotSpacing) + (numRows*beginningSpacing)))/runsPerLine]
 
-			console.log(dimVals);
+			// console.log(dimVals);
 
 			var plotDim = d3.min(dimVals);
 
@@ -2810,7 +2810,7 @@ function loadFingerGraph() {
 			return d.concentration;
 		}));
 		*/
-		console.log(n, "read (CSV).");
+		// console.log(n, "read (CSV).");
 
 		mean = d3.mean(data, function (e) { return e.concentration; });
 		stddev = d3.deviation(data, function (e) { return e.concentration; });
@@ -2835,7 +2835,7 @@ function loadFingerGraph() {
 
 		var end = new Date().getTime();
 		var time = end - startTime;
-		console.log('READ CSV: Execution time: ' + time + 'ms.');
+		// console.log('READ CSV: Execution time: ' + time + 'ms.');
 
 		drawParticles(n);
 		render();
@@ -2850,7 +2850,7 @@ function loadFingerGraph() {
 		 }
 		updateFingerGraphFileLine();
 		highlightViscousFinger();
-		console.log("done");
+		// console.log("done");
 	});
 
 });
@@ -2874,7 +2874,7 @@ function readFileNumJSON(n) {
 
 		}
 
-		console.log(n, "read (JSON).");
+		// console.log(n, "read (JSON).");
 
 		mean = d3.mean(data, function (e) { return e.concentration; });
 		stddev = d3.deviation(data, function (e) { return e.concentration; });
@@ -2895,11 +2895,11 @@ function readFileNumJSON(n) {
 
 		var end = new Date().getTime();
 		var time = end - startTime;
-		console.log('LOAD JSON: Execution time: ' + time + 'ms.');
+		// console.log('LOAD JSON: Execution time: ' + time + 'ms.');
 
 		drawParticles(n);
 		render();
-		console.log("done");
+		// console.log("done");
 
 	});
 
@@ -3005,7 +3005,7 @@ function fingerGraphBrush() {
 		return Number.MIN_VALUE;
 	});
 
-	console.log(maxFingers);
+	// console.log(maxFingers);
 
 	var x = d3.scale.linear()
 	.domain([0, endFile])
@@ -3145,7 +3145,7 @@ function fingerGraphBrush() {
 
 		var begin = Math.round((brush.extent()[0])/5)*5,
 		end = Math.round((brush.extent()[1])/5)*5;
-		console.log(begin);
+		// console.log(begin);
 		brush.extent([begin, end]);
 
 		d3.select(this)
