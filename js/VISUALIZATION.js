@@ -1065,6 +1065,8 @@ function loadFingerGraph() {
 		var rangeActive = new Array(numClusters); // range that each clusterID exists
 		prevIDs = new Array(numClusters);
 
+    var IDAncestors = {};
+
 		// calculate the range that each clusterID exists
 		// initiate to have earliest be end, latest be start
 		for(var i = 0; i < numClusters; i++)
@@ -1107,6 +1109,10 @@ function loadFingerGraph() {
 				if(nextArray[i][j] !== -1) {
 					if(arrGetIndOfVal(prevIDs[nextArray[i][j]].values, j) === -1){
 						prevIDs[nextArray[i][j]].values.push(j);
+
+            // set that cluster is used in previous IDS
+            IDAncestors[j] = true;
+
 						// console.log("Pushing", j, "to", nextArray[i][j]); // debug
 					}
 				}
@@ -1153,10 +1159,50 @@ function loadFingerGraph() {
 			// console.log(prevIDs[i].values); // debug
 
 		}
+
+
+    console.log("TESTING");
+
+    // try to correct the roots used
+    var trackingGraphRoots = [];
+
+    console.log("trackingGraphRoots", trackingGraphRoots);
+
+    for (let cluster of reducedArray[reducedArray.length-1]) {
+      trackingGraphRoots.push(cluster);
+    }
+
+    console.log("trackingGraphRoots ", trackingGraphRoots);
+
+    console.log(numClusters);
+
+    for(var i = 0; i < numClusters; i++)
+    {
+
+      if (rangeActive[i].latest >= start && rangeActive[i].latest < end) {
+        let clusterIndex = fingersOverTime[rangeActive[i].latest].findIndex((d) => d.clusterID === i);
+
+        // if the last index seen of the cluster has nextID -1, consider it as root
+        if (clusterIndex !== -1 && fingersOverTime[rangeActive[i].latest][clusterIndex].nextID === -1 && !IDAncestors[i]) {
+
+
+          // new root
+          console.log("new root: ", fingersOverTime[rangeActive[i].latest][clusterIndex]);
+          trackingGraphRoots.push(fingersOverTime[rangeActive[i].latest][clusterIndex]);
+        }
+
+        console.log("Finger ID", i, "at", clusterIndex);
+      }
+
+      
+    }
+
+    console.log("trackingGraphRoots", trackingGraphRoots);
+
 		// construct map [0, ... , numClusters] -> [(more balanced graph)]
 		var mapArr = [];
-		for(var i = 0; i < reducedArray[reducedArray.length-1].length; i++){
-			mapArr = mapArr.concat(constructGraphMapArr(reducedArray[reducedArray.length-1][i].clusterID, prevIDs));
+		for(var i = 0; i < trackingGraphRoots.length; i++){
+			mapArr = mapArr.concat(constructGraphMapArr(trackingGraphRoots[i].clusterID, prevIDs));
 		}
 
 		var mapArrClean = []; // same as mapArr with no duplicates
@@ -1441,11 +1487,11 @@ function loadFingerGraph() {
 				var timestepAvgFingerVelMagConc = new Array(120).fill(0);
 				var timestepAvgFingerDensity = new Array(120).fill(0);
 
-				console.log(d3.min(thisClusterCenters, function(d) { return d3.min(d, function(e) {return e.vMag; }); }),
-										d3.max(thisClusterCenters, function(d) { return d3.max(d, function(e) {return e.vMag; }); }));
+				// console.log(d3.min(thisClusterCenters, function(d) { return d3.min(d, function(e) {return e.vMag; }); }),
+				// 						d3.max(thisClusterCenters, function(d) { return d3.max(d, function(e) {return e.vMag; }); }));
 
-				console.log(d3.min(thisClusterCenters, function(d) { return d3.min(d, function(e) {return e.vMagConc; }); }),
-										d3.max(thisClusterCenters, function(d) { return d3.max(d, function(e) {return e.vMagConc; }); }));
+				// console.log(d3.min(thisClusterCenters, function(d) { return d3.min(d, function(e) {return e.vMagConc; }); }),
+				// 						d3.max(thisClusterCenters, function(d) { return d3.max(d, function(e) {return e.vMagConc; }); }));
 				// for each timestep
 				for(var i = 0; i <= 120; i++) {
 
@@ -1523,7 +1569,8 @@ function loadFingerGraph() {
 											d3.max(thisClusterCenters, function(d) { return d3.max(d, function(e) {return e.vMagConc; }); })],
 				};
 
-				console.log(thisRunData);
+				// console.log(thisRunData);
+
 
 				runSummaryData[runNum-1] = thisRunData;
 			}
@@ -1532,8 +1579,8 @@ function loadFingerGraph() {
 				getRunSummary(runNum+1);
 			}
 			else {
-				console.log("Vel Mag", d3.extent(runSummaryData, function(el) { return el ? el.avgFingerVelMag : null; }));
-				console.log("Vel Mag Conc", d3.extent(runSummaryData, function(el) { return el ? el.avgFingerVelMagConc : null; }));
+				// console.log("Vel Mag", d3.extent(runSummaryData, function(el) { return el ? el.avgFingerVelMag : null; }));
+				// console.log("Vel Mag Conc", d3.extent(runSummaryData, function(el) { return el ? el.avgFingerVelMagConc : null; }));
 
 				// drawPairplots();
 				// createParallelCoordsPlots();
@@ -2169,7 +2216,7 @@ function loadFingerGraph() {
 										.attr("y", beginningSpacing + (plotSpacing/2))
 										.attr("x", beginningSpacing + (plotSpacing/2) + d.col * (plotSpacing + plotDim));
 
-									console.log(d);
+									// console.log(d);
 								}
 							})
 							.on("contextmenu", function(d) {
@@ -2280,7 +2327,7 @@ function loadFingerGraph() {
 
 			var dimVals = [(width - ((runsPerLine+1)*(plotSpacing)))/runsPerLine, (height - ((numRows+1)*(plotSpacing) + (numRows*beginningSpacing)))/runsPerLine]
 
-			console.log(dimVals);
+			// console.log(dimVals);
 
 			var plotDim = d3.min(dimVals);
 

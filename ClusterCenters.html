@@ -327,6 +327,8 @@ function readFileNumCSV(n) {
   d3.csv(folderPath + ('000' + n).substr(-3) + ".csv")
     .row(function(d) {
 
+      console.log(d);
+
       var el = {
         concentration: Number(d.concentration),
         Points0: Number(d.Points0),
@@ -356,7 +358,7 @@ function readFileNumCSV(n) {
     //     findCenterOfConc(n);
     //   });
 
-    findCenterOfConc(n);
+    // findCenterOfConc(n);
 
     });
 
