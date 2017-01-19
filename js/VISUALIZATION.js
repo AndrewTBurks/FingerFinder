@@ -101,6 +101,7 @@ mouseDragRotate();
 drawSlice();
 createColorLegend();
 // createSliceColorLegend();
+createStarColorLegend();
 mouseWheelZoom();
 sliderMove();
 menuListener();
@@ -212,6 +213,29 @@ function createSliceColorLegend() {
 
 	var canvas = d3.select("#legendSlice").append("canvas")
 	.attr("id", "sliceCanvas")
+	.attr("width", WIDTH_SLICE)
+	.attr("height", 1);
+
+	var context = canvas.node().getContext("2d");
+	var image = context.createImageData(WIDTH_SLICE, 1);
+
+	for (var i=0, j=-1, c; i<WIDTH_SLICE; ++i) {
+		c = colorSplit[Math.floor(i/WIDTH_SLICE * colorSplit.length)];
+		image.data[++j] = +("0x" + c.slice(0, 2));
+		image.data[++j] = +("0x" + c.slice(2, 4));
+		image.data[++j] = +("0x" + c.slice(4, 6));
+		image.data[++j] = 255;
+	}
+
+	context.putImageData(image, 0, 0);
+}
+
+function createStarColorLegend() {
+
+	d3.select("#starCanvas").remove();
+
+	var canvas = d3.select("#legendStar").append("canvas")
+	.attr("id", "starCanvas")
 	.attr("width", WIDTH_SLICE)
 	.attr("height", 1);
 
@@ -579,7 +603,7 @@ function drawParticles(fileNum) {
 			// 	.translate(+ this.getAttribute("cx"), + this.getAttribute("cy"));
 			var position = this.getBoundingClientRect();
 			tooltip.classed("hidden", false)
-				.html("Slice Orientation")
+				.html("Slab Orientation")
 				.style("left", (window.pageXOffset + (position.left+position.right)/2 + 15) + "px")
 				.style("top", (window.pageYOffset + position.top - 15) + "px");
 		})
@@ -616,7 +640,7 @@ function drawParticles(fileNum) {
 			// 	.translate(+ this.getAttribute("cx"), + this.getAttribute("cy"));
 			var position = this.getBoundingClientRect();
 			tooltip.classed("hidden", false)
-				.html("Slice Orientation")
+				.html("Slab Orientation")
 				.style("left", (window.pageXOffset + (position.left+position.right)/2 + 15) + "px")
 				.style("top", (window.pageYOffset + position.top - 15) + "px");
 		})
@@ -653,7 +677,7 @@ function drawParticles(fileNum) {
 		recolorHeatMaps();
 		recolorFingerGraph();
 		createColorLegend();
-		// createSliceColorLegend();
+		createStarColorLegend();
 		// recolorPairplots();
 		recolorSelectedRunLine();
 		// recolorParallelCoordinatePlots();
@@ -770,6 +794,7 @@ function drawParticles(fileNum) {
 	* defined within {@link drawStarplots}
 	*/
 	var recolorStarplots;
+	var changeStarplotScales;
 
 
 	function recolorParallelCoordinatePlots() {
@@ -1186,14 +1211,14 @@ function loadFingerGraph() {
 					.on('mouseup', function(d) {
 
 						if(filePick != d.timestep){
-
+							filePick = d.timestep;
 							readFileNumCSV(d.timestep);
 							// updateFingerGraphFileLine();
-							filePick = d.timestep;
+
 							var dropdown = document.getElementById("timeDropdown");
 							dropdown.value = filePick.toString();
 
-							if(currSelectedNode.timestep != d.timestep || currSelectedNode.ID != d.id) {
+							if(currSelectedNode.timestep != d.timestep || currSelectedNode.ID != d.id || currSelectedNode.run != runPick) {
 								// highlight new node
 								currSelectedNode.timestep = d.timestep;
 								currSelectedNode.ID = d.id;
@@ -1211,10 +1236,11 @@ function loadFingerGraph() {
 
 						}
 						else {
-							if(currSelectedNode.timestep != d.timestep || currSelectedNode.ID != d.id) {
+							if(currSelectedNode.timestep != d.timestep || currSelectedNode.ID != d.id || currSelectedNode.run != runPick) {
 								// highlight new node
 								currSelectedNode.timestep = d.timestep;
 								currSelectedNode.ID = d.id;
+								currSelectedNode.run = runPick;
 								currSelectedNode.includes = d.includes;
 
 								highlightViscousFinger();
@@ -1229,6 +1255,7 @@ function loadFingerGraph() {
 								// put back to normal colors
 								currSelectedNode.timestep = -1;
 								currSelectedNode.ID = -1;
+								currSelectedNode.run = -1;
 								currSelectedNode.includes = [];
 								recolor3DModel();
 
@@ -2244,7 +2271,7 @@ function loadFingerGraph() {
 			];
 
 			var width = 650, // 122 dimension, 5 wide
-					height = 804;
+					height = 723;
 
 			var plotSpacing = 10;
 			var beginningSpacing = 50;
@@ -2262,6 +2289,7 @@ function loadFingerGraph() {
 			var scales = new Array(numVars);
 			var colorScales = new Array(3);
 			var modes = ["totalClusters", "avgFingerVelMag", "mergeFactor"];
+			var modeNames = ["Total Clusters", "Average Finger Speed", "Merge Factor"];
 
 			var min, max;
 			var circleRadius = 5;
@@ -2696,7 +2724,15 @@ function loadFingerGraph() {
 			});
 		};
 
+		changeStarplotScales = function () {
+			// change values on scale range
+			d3.select("#starScaleMin").text(colorScales[starplotColorMode].domain()[0].toFixed(2));
+			d3.select("#starScaleMax").text(colorScales[starplotColorMode].domain()[1].toFixed(2));
+			d3.select("#starScaleTitle").text(modeNames[starplotColorMode]);
+		};
+
 		recolorStarplots();
+		changeStarplotScales();
 	}
 
 	var paralellCoordsPlot;
@@ -3448,7 +3484,9 @@ function menuListener() {
 	});
 	d3.selectAll('select[name="starplotColor"]').on("change", function() {
 		starplotColorMode = Number(this.value);
+		changeStarplotScales();
 		recolorStarplots();
+
 	});
 }
 

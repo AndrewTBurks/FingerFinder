@@ -66,8 +66,8 @@ h1 {
   cursor: help;
 }
 
-#canvas {
-  width: 450px;
+#canvas, #starCanvas {
+  width: 100%;
   height: 25px;
   /*border: solid 3px #e0e0e0;*/
   position: relative;
@@ -250,12 +250,16 @@ p.view3 {
   bottom: 0;
 }
 
-#legendSlice {
-  max-width: 338px;
-  /*display: inline-block;
-  vertical-align: bottom;*/
+#legendStar {
+  width: 100%;
+  max-width: 100%;
+  /*display: inline-block;*/
+  /*vertical-align: bottom;*/
+  /*float: center;*/
   position: absolute;
   bottom: 0;
+  margin: 0;
+  //transform: translate(50%);
 }
 
 #sliderDiv {
@@ -296,8 +300,8 @@ p.view3 {
 #starplots {
   max-width: 650px;
   width: 650px;
-  height: 804px;
-  max-height: 804px;
+  height: 723px;
+  max-height: 723px;
   position: relative;
   /*text-align: center;*/
   /*margin-top: 10px;*/
