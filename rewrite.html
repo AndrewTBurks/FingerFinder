@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>FingerFinder 2.0</title>
+
+  <!-- CSS Libs -->
+  <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Lato:300">
+  <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Lato">
+  <link rel="stylesheet" href="./lib/css/bootstrap.min.css">
+
+  <!-- JS Libs -->
+  <script src="./lib/js/jquery.min.js"></script>
+  <script src="./lib/js/bootstrap.min.js"></script>
+  <script src="./lib/js/d3.v4.min.js"></script>
+  <script src="./lib/js/lodash.js"></script>
+
+  <!-- CSS Src -->
+  <link rel="stylesheet/less" href="./src/css/main.less">
+
+  <!-- less.js to parse stylesheet/less -->
+  <script src="//cdnjs.cloudflare.com/ajax/libs/less.js/2.7.2/less.min.js"></script>
+
+  <!-- JS Src -->
+</head>
+
+<body>
+  <div class="container-fluid">
+    <div class="row" id="titleRow">
+      <div class="col-md-12" id="title">
+        <h1>FingerFinder</h1>
+      </div>
+    </div>
+    <div class="row" id="controlRow">
+      <form class="form-inline">
+        <div class="form-group visControl">
+          <label for="runSelect">Run:</label>
+          <select class="form-control" id="runSelect">
+            <option>1</option>
+            <option>2</option>
+            <option>3</option>
+            <option>4</option>
+          </select>
+        </div>
+        <div class="form-group visControl">
+          <label for="timestepSelect">Timestep:</label>
+          <select class="form-control" id="timestepSelect">
+            <option>1</option>
+            <option>2</option>
+            <option>3</option>
+            <option>4</option>
+          </select>
+        </div>
+        <div class="form-group visControl">
+          <label for="colorSelect">Color Scheme:</label>
+          <select class="form-control" id="colorSelect">
+            <option>1</option>
+            <option>2</option>
+            <option>3</option>
+            <option>4</option>
+          </select>
+        </div>
+      </form>
+    </div>
+    <div class="row h-85" id="visRow">
+      <div class="col-md-5 h-100">
+        <div class="col-md-5 h-100">
+          <div class="h-50 viewWrapper">
+            <div class="h-100 view" id="concentrationHeatmap">
+
+            </div>
+          </div>
+          <div class="h-50 viewWrapper">
+            <div class="h-100 view" id="velocityVectorField">
+
+            </div>
+          </div>
+        </div>
+        <div class="col-md-7 contentPanel">
+          <div class="h-15 viewWrapper">
+            <div class="h-100 view" id="flowControls">
+
+            </div>
+          </div>
+          <div class="h-75 viewWrapper">
+            <div class="h-100 view" id="flowView">
+
+            </div>
+          </div>
+          <div class="h-10 viewWrapper">
+            <div class="h-100 view" id="flowLegend">
+
+            </div>
+          </div>
+
+        </div>
+      </div>
+      <div class="col-md-3 h-100">
+        <div class="h-20 viewWrapper">
+          <div class="h-100 view" id="timeChart">
+
+          </div>
+        </div>
+
+        <div class="h-80 viewWrapper">
+          <div class="h-100 view" id="fingerForest">
+
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4 h-100">
+        <div class="h-90 viewWrapper">
+          <div class="h-100 view" id="kiviatSummary">
+
+          </div>
+        </div>
+        <div class="h-10 viewWrapper">
+          <div class="h-100 view" id="kiviatLegend">
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>

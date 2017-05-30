@@ -1,0 +1,63 @@
+html,
+body,
+.container-fluid {
+  height: 100%;
+}
+
+body {
+  font-family: 'Lato', sans-serif;
+  background-color: #1C2329;
+  color: #e0e0e0;
+
+  .box-sizing(border-box);
+  -webkit-font-smoothing: antialiased;
+}
+
+.contentPanel {
+  height: 100%;
+  padding: 0px;
+}
+
+.viewWrapper {
+  background-color: #337940;
+
+  padding: 8px;
+}
+
+.view {
+  background-color: #687a7e;
+}
+
+#title {
+  text-align: center;
+}
+
+#controlRow {
+  text-align: center;
+}
+
+#visRow {
+  text-align: center;
+  padding: 25px 0;
+}
+
+.visControl {
+  margin: 0 20px;
+}
+
+// functions
+.box-sizing(@param) {
+  -webkit-box-sizing: @param;
+     -moz-box-sizing: @param;
+          box-sizing: @param;
+}
+
+.heightGen(0);
+
+.heightGen(@height) when (@height <= 100){
+  .h-@{height} {
+    height: (@height * 100% / 100);
+  }
+
+  .heightGen(@height + 5);
+}
