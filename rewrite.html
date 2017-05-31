@@ -17,6 +17,7 @@
   <script src="./lib/js/bootstrap.min.js"></script>
   <script src="./lib/js/d3.v4.min.js"></script>
   <script src="./lib/js/lodash.js"></script>
+  <script src="./lib/js/three.min.js"></script>
 
   <!-- CSS Src -->
   <link rel="stylesheet/less" href="./src/css/main.less">
@@ -25,7 +26,23 @@
   <script src="//cdnjs.cloudflare.com/ajax/libs/less.js/2.7.2/less.min.js"></script>
 
   <!-- JS Src -->
+  <!-- Models -->
+  <script src="./src/js/model/simulationDataModel.js"></script>
+  <script src="./src/js/model/runSummaryModel.js"></script>
+
+  <!-- Views -->
+  <script src="./src/js/view/slabViews.js"></script>
+  <script src="./src/js/view/flowView.js"></script>
+  <script src="./src/js/view/timeChartView.js"></script>
+  <script src="./src/js/view/fingerForestView.js"></script>
+  <script src="./src/js/view/kiviatView.js"></script>
+
+  <!-- Controllers -->
+
+
+  <!-- Main Script -->
   <script src="./src/js/main.js"></script>
+
 </head>
 
 <body>
@@ -46,28 +63,16 @@
         <div class="form-group visControl">
           <label for="runSelect">Run:</label>
           <select class="form-control" id="runSelect">
-            <option>1</option>
-            <option>2</option>
-            <option>3</option>
-            <option>4</option>
           </select>
         </div>
         <div class="form-group visControl">
           <label for="timestepSelect">Timestep:</label>
           <select class="form-control" id="timestepSelect">
-            <option>1</option>
-            <option>2</option>
-            <option>3</option>
-            <option>4</option>
           </select>
         </div>
         <div class="form-group visControl">
           <label for="colorSelect">Color Scheme:</label>
           <select class="form-control" id="colorSelect">
-            <option>1</option>
-            <option>2</option>
-            <option>3</option>
-            <option>4</option>
           </select>
         </div>
       </form>
@@ -75,12 +80,12 @@
     <div class="row h-95" id="visRow">
       <div class="col-md-5 h-100">
         <div class="col-md-5 h-100">
-          <div class="h-5 viewWrapper">
-            <h5 class="sectionTitle">
+          <div class="h-15 viewWrapper">
+            <h5 class="sectionTitle alignBottom">
               2D Slab Views
             </h5>
           </div>
-          <div class="h-95">
+          <div class="h-75">
             <div class="h-50 viewWrapper">
               <div class="h-100 view" id="concentrationHeatmap">
                 <h5 class="sectionTitle">
@@ -124,6 +129,17 @@
       <div class="col-md-3 h-100">
         <div class="h-20 viewWrapper">
           <div class="h-100 view" id="timeChart">
+            <h5 class="sectionTitle">
+              <span class="alignLeft fadedText">
+                # Fingers
+                <span class="currentRunText">
+                  (Current Run)
+                </span>
+              </span>
+              <span class="alignRight">
+                Graph Range (Timesteps)
+              </span>
+            </h5>
 
           </div>
         </div>

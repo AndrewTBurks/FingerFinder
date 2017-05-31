@@ -9,10 +9,9 @@ html {
 body {
   font-family: 'Lato', sans-serif;
   background-color: #1C2329;
-  color: #e0e0e0;
+  color: #E0E0E0;
   .box-sizing(border-box);
   -webkit-font-smoothing: antialiased;
-
   overflow-x: hidden;
 }
 
@@ -23,19 +22,20 @@ body {
 
 .viewWrapper {
   padding: 5px;
+  position: relative;
 }
 
 .view {
-  border: 1px solid #e0e0e0;
+  border: 1px solid #E0E0E0;
 }
 
 #title {
+  font-size: 3vmin;
+  font-weight: 300;
   margin-top: 10px;
   position: absolute;
   width: 100%;
   text-align: center;
-  // display: inline-block;
-  // float: none;
   pointer-events: none;
 }
 
@@ -57,6 +57,10 @@ body {
 
 #controlRow {
   text-align: center;
+
+  label {
+    font-weight: 300;
+  }
 }
 
 #visRow {
@@ -69,11 +73,29 @@ body {
 }
 
 .sectionTitle {
-  color: #e0e0e0;
-  margin: 0 0 5px;
+  font-size: 1.4vmin;
+  color: #E0E0E0;
+  margin: 0 0 5px 0;
+
+  &.alignBottom {
+    left: 50%;
+    transform: translateX(-50%);
+    position: absolute;
+    bottom: 0;
+  }
+
+  span.alignLeft {
+    display: inline-block;
+    float: left;
+  }
+
+  span.alignRight {
+    display: inline-block;
+    float: right;
+  }
 
   .glyphicon-info-sign {
-    color: #69c3e0;
+    color: #69C3E0;
     margin: 0 0 0 5px;
   }
 }
@@ -81,24 +103,32 @@ body {
 
 #concentrationHeatmap,
 #velocityVectorField {
-  @import "slabViews.less";
+  @import 'slabViews.less';
 }
 
-#flowControls {}
+#flowControls {
+}
 
-#flowView {}
+#flowView {
+}
 
-#timeChart {}
+#timeChart {
+  @import 'timeChart.less';
+}
 
-#fingerForest {}
+#fingerForest {
+  @import 'fingerForest.less';
+}
 
-#kiviatSummary {}
+#kiviatSummary {
+  @import 'kiviatSummary.less';
+}
 // functions
 
 .box-sizing(@param) {
   -webkit-box-sizing: @param;
-  -moz-box-sizing: @param;
-  box-sizing: @param;
+     -moz-box-sizing: @param;
+          box-sizing: @param;
 }
 // generates the h-* classes h-0 to h-100 by 5 for % height
 .heightGen(0);
