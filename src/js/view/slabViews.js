@@ -48,7 +48,28 @@ let SlabViews = function(concDiv, vecDiv) {
 
   }
 
+  function resize() {
+    let elemNode = self.concDiv.node();
+    let title = self.concDiv.select(".sectionTitle");
+
+    let width = elemNode.clientWidth;
+    let titleHeight = title.node().clientHeight;
+    let titleMargin = parseInt(title.style("margin-bottom")) + parseInt(title.style("margin-top"));
+    let height = elemNode.clientHeight - titleHeight - titleMargin;
+
+    let dimension = d3.min([width, height]);
+
+    self.concSVG
+      .attr("width", dimension)
+      .attr("height", dimension);
+
+    self.vecSVG
+      .attr("width", dimension)
+      .attr("height", dimension);
+  }
+
   return {
-    updateViewsWithNewSlice: updateSlice
+    updateViewsWithNewSlice: updateSlice,
+    resize
   };
 };

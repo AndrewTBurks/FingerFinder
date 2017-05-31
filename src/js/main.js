@@ -7,6 +7,10 @@ less.pageLoadFinished.then(function() {
   App.init();
 });
 
+window.onresize = function (){
+  App.resize()
+};
+
 (function() {
   // set up objects to hang MVC off of
   App.models = {};
@@ -17,6 +21,7 @@ less.pageLoadFinished.then(function() {
   App.state = {};
   App.state.currentTimestep = 1;
   App.state.currentRun = 1;
+  App.state.colorScheme = "Viridis";
 
   // set up constants
   App.NUM_TIMESTEPS = 120; // 1 to 120 (exclude 0 as it has no data)
@@ -37,11 +42,21 @@ less.pageLoadFinished.then(function() {
     App.views.kiviatSummary = new KiviatView("#kiviatSummary");
 
     // initialize Controllers
-
+    App.controllers.upperDropdowns = new UpperDropdownController();
+    App.controllers.upperDropdowns.attachRunDropdown("#runSelect");
+    App.controllers.upperDropdowns.attachTimeDropdown("#timestepSelect");
+    App.controllers.upperDropdowns.attachColorDropdown("#colorSelect");
 
     // load data then initialize views with data
     loadAllData();
   };
+
+  App.resize = function() {
+    for (let view of Object.keys(App.views)) {
+      // console.log("Resizing " + view);
+      App.views[view].resize();
+    }
+  }
 
   function loadAllData() {
     App.models.simulationData.getData(App.state.currentRun, App.state.currentTimestep)

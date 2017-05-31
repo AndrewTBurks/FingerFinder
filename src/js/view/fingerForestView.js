@@ -33,7 +33,21 @@ let FingerForestView = function(div) {
       .attr("viewBox", [0, 0, width, height].join(" "));
   }
 
-  return {
+  function resize() {
+    let elemNode = self.div.node();
+    let title = self.div.select(".sectionTitle");
 
+    let width = elemNode.clientWidth;
+    let titleHeight = title.node().clientHeight;
+    let titleMargin = parseInt(title.style("margin-bottom")) + parseInt(title.style("margin-top"));
+    let height = elemNode.clientHeight - titleHeight - titleMargin;
+
+    self.SVG
+      .attr("width", width)
+      .attr("height", height);
+  }
+
+  return {
+    resize
   };
 };

@@ -42,7 +42,20 @@ let FlowView = function(div) {
     console.log(dataPoints);
   }
 
+  function resize() {
+    let elemNode = self.div.node();
+    let title = self.div.select(".sectionTitle");
+
+    let width = elemNode.clientWidth;
+    let titleHeight = title.node().clientHeight;
+    let titleMargin = parseInt(title.style("margin-bottom")) + parseInt(title.style("margin-top"));
+    let height = elemNode.clientHeight - titleHeight - titleMargin;
+
+    self.renderer.setSize(width, height);
+  }
+
   return {
-    updateViewWithNewData: updateData
+    updateViewWithNewData: updateData,
+    resize
   };
 };
