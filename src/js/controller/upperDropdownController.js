@@ -32,7 +32,9 @@ let UpperDropdownController = function() {
     console.log("Color Scheme changed to: " + dropdown.node().value);
 
     App.state.colorScheme = dropdown.node().value;
-    App.state.currentTimestep = 1;
+
+    App.views.flowLegend.setColors(App.colormaps[App.state.colorScheme]);
+    App.views.kiviatLegend.setColors(App.colormaps[App.state.colorScheme]);
   }
 
   // run dropdown

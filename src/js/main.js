@@ -41,6 +41,14 @@ window.onresize = function (){
     App.views.fingerForest = new FingerForestView("#fingerForest");
     App.views.kiviatSummary = new KiviatView("#kiviatSummary");
 
+    // create legends
+    let currentColormap = App.colormaps[App.state.colorScheme];
+    console.log(currentColormap);
+    App.views.flowLegend = new ColorLegend("#flowLegend");
+    App.views.flowLegend.setColors(currentColormap);
+    App.views.kiviatLegend = new ColorLegend("#kiviatLegend");
+    App.views.kiviatLegend.setColors(currentColormap);
+
     // initialize Controllers
     App.controllers.upperDropdowns = new UpperDropdownController();
     App.controllers.upperDropdowns.attachRunDropdown("#runSelect");

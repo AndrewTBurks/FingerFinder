@@ -26,6 +26,10 @@
   <script src="//cdnjs.cloudflare.com/ajax/libs/less.js/2.7.2/less.min.js"></script>
 
   <!-- JS Src -->
+
+  <!-- Utils -->
+  <script src="./src/js/util/colorMaps.js"></script>
+
   <!-- Models -->
   <script src="./src/js/model/simulationDataModel.js"></script>
   <script src="./src/js/model/runSummaryModel.js"></script>
@@ -36,6 +40,7 @@
   <script src="./src/js/view/timeChartView.js"></script>
   <script src="./src/js/view/fingerForestView.js"></script>
   <script src="./src/js/view/kiviatView.js"></script>
+  <script src="./src/js/view/colorLegend.js"></script>
 
   <!-- Controllers -->
   <script src="./src/js/controller/upperDropdownController.js"></script>
@@ -121,6 +126,15 @@
           </div>
           <div class="h-10 viewWrapper">
             <div class="h-100 view" id="flowLegend">
+              <h5 class="sectionTitle">
+                <span class="alignLeft" id="flowLegendMinValue">
+                  0
+                </span>
+                Concentration Range
+                <span class="alignRight" id="flowLegendMinValue">
+                  100
+                </span>
+              </h5>
 
             </div>
           </div>
@@ -165,6 +179,17 @@
         </div>
         <div class="h-10 viewWrapper">
           <div class="h-100 view" id="kiviatLegend">
+            <h5 class="sectionTitle">
+              <span class="alignLeft" id="legendMinValue">
+                0
+              </span>
+              <span id="legendTitle">
+                Total Clusters
+              </span>
+              <span class="alignRight" id="legendMinValue">
+                100
+              </span>
+            </h5>
           </div>
         </div>
       </div>
