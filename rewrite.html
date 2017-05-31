@@ -25,17 +25,29 @@
   <script src="//cdnjs.cloudflare.com/ajax/libs/less.js/2.7.2/less.min.js"></script>
 
   <!-- JS Src -->
+  <script src="./src/js/main.js"></script>
 </head>
 
 <body>
-  <div class="container-fluid">
-    <div class="row" id="titleRow">
+  <nav class="navbar navbar-inverse">
+    <div class="container-fluid" id="navbar">
+      <h2 id="title">FingerFinder</h2>
+      <ul class="nav navbar-nav navbar-right">
+        <button class="btn navbar-btn btn-info">
+          <span class="glyphicon glyphicon-info-sign"></span>
+          About
+        </button>
+      </ul>
+    </div>
+  </nav>
+  <div class="container-fluid h-90">
+    <!-- <div class="row" id="titleRow">
       <div class="col-md-12" id="title">
         <h1>FingerFinder</h1>
       </div>
-    </div>
+    </div> -->
     <div class="row" id="controlRow">
-      <form class="form-inline">
+      <form class="form-inline" id="controls">
         <div class="form-group visControl">
           <label for="runSelect">Run:</label>
           <select class="form-control" id="runSelect">
@@ -68,14 +80,27 @@
     <div class="row h-85" id="visRow">
       <div class="col-md-5 h-100">
         <div class="col-md-5 h-100">
-          <div class="h-50 viewWrapper">
-            <div class="h-100 view" id="concentrationHeatmap">
-
-            </div>
+          <div class="h-5 viewWrapper">
+            <h5 class="sectionTitle">
+              2D Slab Views
+            </h5>
           </div>
-          <div class="h-50 viewWrapper">
-            <div class="h-100 view" id="velocityVectorField">
-
+          <div class="h-95">
+            <div class="h-50 viewWrapper">
+              <div class="h-100 view" id="concentrationHeatmap">
+                <h5 class="sectionTitle">
+                  Concentration Heatmap
+                  <span class="glyphicon glyphicon-info-sign"></span>
+                </h5>
+              </div>
+            </div>
+            <div class="h-50 viewWrapper">
+              <div class="h-100 view" id="velocityVectorField">
+                <h5 class="sectionTitle">
+                  Velocity Vector Field
+                  <span class="glyphicon glyphicon-info-sign"></span>
+                </h5>
+              </div>
             </div>
           </div>
         </div>
@@ -87,7 +112,10 @@
           </div>
           <div class="h-75 viewWrapper">
             <div class="h-100 view" id="flowView">
-
+              <h5 class="sectionTitle">
+                3D Flow View
+                <span class="glyphicon glyphicon-info-sign"></span>
+              </h5>
             </div>
           </div>
           <div class="h-10 viewWrapper">
@@ -107,19 +135,24 @@
 
         <div class="h-80 viewWrapper">
           <div class="h-100 view" id="fingerForest">
-
+            <h5 class="sectionTitle">
+              Finger Forest
+              <span class="glyphicon glyphicon-info-sign"></span>
+            </h5>
           </div>
         </div>
       </div>
       <div class="col-md-4 h-100">
         <div class="h-90 viewWrapper">
           <div class="h-100 view" id="kiviatSummary">
-
+            <h5 class="sectionTitle">
+              Run Summary Kiviat Diagrams
+              <span class="glyphicon glyphicon-info-sign"></span>
+            </h5>
           </div>
         </div>
         <div class="h-10 viewWrapper">
           <div class="h-100 view" id="kiviatLegend">
-
           </div>
         </div>
       </div>

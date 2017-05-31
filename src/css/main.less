@@ -1,6 +1,8 @@
-html,
+// styling for the overall document
+
+.container-fluid,
 body,
-.container-fluid {
+html {
   height: 100%;
 }
 
@@ -8,28 +10,47 @@ body {
   font-family: 'Lato', sans-serif;
   background-color: #1C2329;
   color: #e0e0e0;
-
   .box-sizing(border-box);
   -webkit-font-smoothing: antialiased;
 }
 
 .contentPanel {
   height: 100%;
-  padding: 0px;
+  padding: 0;
 }
 
 .viewWrapper {
-  background-color: #337940;
-
-  padding: 8px;
+  padding: 5px;
 }
 
 .view {
-  background-color: #687a7e;
+  border: 1px solid #e0e0e0;
 }
 
 #title {
+  margin-top: 10px;
+  position: absolute;
+  width: 100%;
   text-align: center;
+  // display: inline-block;
+  // float: none;
+  pointer-events: none;
+}
+
+
+#navbar {
+  text-align: center;
+}
+
+.navbar-inverse {
+  background-color: tint(@background, 5%);
+  border-width: 4px;
+  border-color: transparent tint(@background, 10%) tint(@background, 10%) tint(@background, 10%);
+  border-radius: 0 0 20px 20px;
+}
+
+.navbar-btn {
+  margin: 8px 20px 10px 20px;
 }
 
 #controlRow {
@@ -45,19 +66,46 @@ body {
   margin: 0 20px;
 }
 
-// functions
-.box-sizing(@param) {
-  -webkit-box-sizing: @param;
-     -moz-box-sizing: @param;
-          box-sizing: @param;
+.sectionTitle {
+  color: #e0e0e0;
+  margin: 0 0 5px;
+
+  .glyphicon-info-sign {
+    color: #69c3e0;
+    margin: 0 0 0 5px;
+  }
+}
+// import css for each view within that div block
+
+#concentrationHeatmap,
+#velocityVectorField {
+  @import "slabViews.less";
 }
 
+#flowControls {}
+
+#flowView {}
+
+#timeChart {}
+
+#fingerForest {}
+
+#kiviatSummary {}
+// functions
+
+.box-sizing(@param) {
+  -webkit-box-sizing: @param;
+  -moz-box-sizing: @param;
+  box-sizing: @param;
+}
+// generates the h-* classes h-0 to h-100 by 5 for % height
 .heightGen(0);
 
-.heightGen(@height) when (@height <= 100){
+.heightGen(@height) when (@height <= 100) {
   .h-@{height} {
     height: (@height * 100% / 100);
   }
-
   .heightGen(@height + 5);
 }
+
+@background: #1C2329;
