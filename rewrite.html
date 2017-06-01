@@ -118,10 +118,18 @@
           </div>
           <div class="h-75 viewWrapper">
             <div class="h-100 view" id="flowView">
-              <h5 class="sectionTitle">
-                3D Flow View
-                <span class="glyphicon glyphicon-info-sign"></span>
-              </h5>
+              <div class="sectionTitle">
+                <h5>
+                  3D Flow View
+                  <span class="glyphicon glyphicon-info-sign"></span>
+                </h5>
+                <select class="form-control" id="flowColoringSelect">
+                  <option>All Points</option>
+                  <option>Slab (Desat.)</option>
+                  <option>Slab (Highl.)</option>
+                  <option>Fingers Only</option>
+                </select>
+              </div>
             </div>
           </div>
           <div class="h-10 viewWrapper">
@@ -171,10 +179,20 @@
       <div class="col-md-4 h-100">
         <div class="h-90 viewWrapper">
           <div class="h-100 view" id="kiviatSummary">
-            <h5 class="sectionTitle">
-              Run Summary Kiviat Diagrams
-              <span class="glyphicon glyphicon-info-sign"></span>
-            </h5>
+            <div class="sectionTitle">
+              <h5>
+                Run Summary Kiviat Diagrams
+                <span class="glyphicon glyphicon-info-sign"></span>
+              </h5>
+              <span class="alignRight">
+                <select class="form-control titleSelect" id="kiviatColoringSelect">
+                  <option>1</option>
+                  <option>1</option>
+                  <option>1</option>
+                  <option>1</option>
+                </select>
+              </span>
+            </div>
           </div>
         </div>
         <div class="h-10 viewWrapper">

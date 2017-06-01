@@ -43,7 +43,6 @@ window.onresize = function (){
 
     // create legends
     let currentColormap = App.colormaps[App.state.colorScheme];
-    console.log(currentColormap);
     App.views.flowLegend = new ColorLegend("#flowLegend");
     App.views.flowLegend.setColors(currentColormap);
     App.views.kiviatLegend = new ColorLegend("#kiviatLegend");
