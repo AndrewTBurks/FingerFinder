@@ -15,8 +15,11 @@ let FlowView = function(div) {
     pMaterial: new THREE.PointsMaterial({
       size: .2,
       vertexColors: THREE.VertexColors
-      // color: 0x888888
-    })
+    }),
+
+    cameraDistance: 15,
+    cameraAngle: Math.PI/4,
+    cameraHeight: 7
   };
 
   init();
@@ -42,11 +45,7 @@ let FlowView = function(div) {
     self.scene.add(axisHelper);
 
     self.camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
-    self.camera.position.x = 13;
-    self.camera.position.z = 5;
-    self.camera.position.y = 7;
-
-    self.camera.lookAt(new THREE.Vector3(0, 4, 0));
+    updateCameraPosition();
 
     self.renderer = new THREE.WebGLRenderer();
     self.renderer.setSize(width, height);
@@ -54,6 +53,7 @@ let FlowView = function(div) {
     elemNode.appendChild(self.renderer.domElement);
 
     createSlabBox();
+    setupMouseEventHandlers();
 
     render();
   }
@@ -74,7 +74,112 @@ let FlowView = function(div) {
   }
 
   function setupMouseEventHandlers() {
-    
+    let elem = self.renderer.domElement;
+
+    let prevPosition = null;
+    let movementType = null;
+
+    // movement multipliers for the deltas provided by mouse events
+    let panUDCoeff = 0.05;
+    let panLRCoeff = -0.005;
+    let zoomCoeff = 1/250;
+
+    let rotateLRCoeff = 0.005;
+
+    let cameraHeightRange = [0, 14];
+    let cameraDistanceRange = [5, 20];
+
+    elem.oncontextmenu = function(e) {
+      // block context menu on right click
+      return false;
+    }
+
+    elem.onmousedown = function(e) {
+      if (e.button === 0) {
+        movementType = "pan";
+
+        // change cursor
+        elem.style.cursor = "move";
+      } else if (e.button === 2) {
+        e.preventDefault();
+        movementType = "rotate";
+
+        // change cursor
+        elem.style.cursor = "ew-resize";
+      }
+
+      prevPosition = {
+        x: e.clientX,
+        y: e.clientY
+      };
+    };
+
+    elem.onmousemove = function (e) {
+      if (movementType) {
+        let delt = {
+          x: e.clientX - prevPosition.x,
+          y: e.clientY - prevPosition.y
+        };
+
+        if (movementType === "pan") {
+          self.cameraAngle += delt.x * panLRCoeff;
+          self.cameraHeight += delt.y * panUDCoeff;
+
+          // clamp height into bounds
+          if (self.cameraHeight < cameraHeightRange[0]) {
+            self.cameraHeight = cameraHeightRange[0];
+          } else if (self.cameraHeight > cameraHeightRange[1]) {
+            self.cameraHeight = cameraHeightRange[1];
+          }
+
+          updateCameraPosition();
+
+        } else if (movementType === "rotate") {
+          self.particles.rotation.y += delt.x * rotateLRCoeff;
+        }
+
+        render();
+
+        // update prev position
+        prevPosition = {
+          x: e.clientX,
+          y: e.clientY
+        };
+      }
+
+    };
+
+    elem.onmouseup = function(e) {
+      movementType = null;
+      elem.style.cursor = "default";
+
+      // will need to refresh slice
+    };
+
+    elem.onwheel = function(e) {
+      self.cameraDistance += e.deltaY * zoomCoeff;
+
+      // clamp zoom into bounds
+      if (self.cameraDistance < cameraDistanceRange[0]) {
+        self.cameraDistance = cameraDistanceRange[0];
+      } else if (self.cameraDistance > cameraDistanceRange[1]) {
+        self.cameraDistance = cameraDistanceRange[1];
+      }
+
+      updateCameraPosition();
+      render();
+    };
+  }
+
+  function updateCameraPosition() {
+
+    let cameraVector = new THREE.Vector3(0, self.cameraHeight, self.cameraDistance);
+    cameraVector.applyAxisAngle(new THREE.Vector3(0,1,0), self.cameraAngle);
+
+    self.camera.position.set(cameraVector.x, cameraVector.y, cameraVector.z);
+
+    self.camera.lookAt(new THREE.Vector3(0, 7, 0));
+
   }
 
   function updateData(dataPoints) {
@@ -105,18 +210,12 @@ let FlowView = function(div) {
     self.particles.rotation.y = particleRotation;
 
     self.scene.add(self.particles);
+
+    render();
   }
 
   function render() {
-    if (self.particles) {
-      self.particles.rotation.y += 0.01;
-    }
-
     self.renderer.render(self.scene, self.camera);
-
-    setTimeout(function() {
-      render();
-    }, 30)
   }
 
   function setBackgroundColor(color) {
@@ -133,6 +232,8 @@ let FlowView = function(div) {
 
     self.scene.remove(self.particles);
     self.scene.add(self.particles);
+
+    render();
   }
 
   function resize() {

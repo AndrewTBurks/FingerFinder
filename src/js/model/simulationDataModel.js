@@ -24,6 +24,8 @@ let SimulationDataModel = function() {
         resolve(self.currentData);
       }
 
+      document.body.style.cursor = "wait";
+
       // convert run and timestep values into format of files
       let runName = "run" + ("0" + run).substr(-2);
       let timestepName = ("00" + timestep).substr(-3);
@@ -65,6 +67,7 @@ let SimulationDataModel = function() {
         // console.timeEnd('File Load');
 
         self.req = null;
+        document.body.style.cursor = "default";
         resolve(self.currentData);
       });
     });
