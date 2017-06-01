@@ -17,6 +17,8 @@
   <script src="./lib/js/bootstrap.min.js"></script>
   <script src="./lib/js/d3.v4.min.js"></script>
   <script src="./lib/js/lodash.js"></script>
+
+  <script src="./lib/js/TackballControls.js"></script>
   <script src="./lib/js/three.min.js"></script>
 
   <!-- CSS Src -->
@@ -135,11 +137,11 @@
           <div class="h-10 viewWrapper">
             <div class="h-100 view" id="flowLegend">
               <h5 class="sectionTitle">
-                <span class="alignLeft" id="flowLegendMinValue">
+                <span class="alignLeft" id="legendMinValue">
                   0
                 </span>
                 Concentration Range
-                <span class="alignRight" id="flowLegendMinValue">
+                <span class="alignRight" id="legendMaxValue">
                   100
                 </span>
               </h5>
@@ -203,7 +205,7 @@
               <span id="legendTitle">
                 Total Clusters
               </span>
-              <span class="alignRight" id="legendMinValue">
+              <span class="alignRight" id="legendMaxValue">
                 100
               </span>
             </h5>

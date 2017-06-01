@@ -69,7 +69,17 @@ window.onresize = function (){
     App.models.simulationData.getData(App.state.currentRun, App.state.currentTimestep)
       .then(function(data) {
         // use simulation Data
-        // console.log(data);
+        let timestepDataStats = App.models.simulationData.getStats();
+
+        App.views.flowLegend.setExtents([
+          timestepDataStats.mean + (timestepDataStats.stdDev / 8),
+          timestepDataStats.extent[1]
+        ]);
+
+        App.views.flow.updateViewWithNewData(data);
+      })
+      .catch(function(err) {
+        console.log(err);
       })
   }
 })();

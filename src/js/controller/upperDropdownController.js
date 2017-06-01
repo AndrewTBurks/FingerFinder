@@ -29,11 +29,17 @@ let UpperDropdownController = function() {
 
   function colorDropdownOnChange() {
     let dropdown = d3.select(this);
-    console.log("Color Scheme changed to: " + dropdown.node().value);
 
     App.state.colorScheme = dropdown.node().value;
 
+    // change flow legend and dependents
     App.views.flowLegend.setColors(App.colormaps[App.state.colorScheme]);
+    let scale = App.views.flowLegend.getColorOf;
+
+    App.views.flow.setBackgroundColor(App.flowBG[App.state.colorScheme]);
+    App.views.flow.recolor(scale);
+
+
     App.views.kiviatLegend.setColors(App.colormaps[App.state.colorScheme]);
   }
 
@@ -59,7 +65,6 @@ let UpperDropdownController = function() {
 
   function runDropdownOnChange() {
     let dropdown = d3.select(this);
-    console.log("Run changed to: " + dropdown.node().value);
 
     App.state.currentRun = dropdown.node().value;
 
@@ -87,7 +92,6 @@ let UpperDropdownController = function() {
 
   function timeDropdownOnChange() {
     let dropdown = d3.select(this);
-    console.log("Timestep changed to: " + dropdown.node().value);
 
     App.state.currentTimestep = dropdown.node().value;
 
@@ -98,7 +102,14 @@ let UpperDropdownController = function() {
   function timeOrRunChange() {
     App.models.simulationData.getData(App.state.currentRun, App.state.currentTimestep)
       .then(function(data) {
-        console.log("Data Updated");
+        let timestepDataStats = App.models.simulationData.getStats();
+
+        App.views.flowLegend.setExtents([
+          timestepDataStats.mean + (timestepDataStats.stdDev / 8),
+          timestepDataStats.extent[1]
+        ]);
+
+        App.views.flow.updateViewWithNewData(data);
       });
   }
 

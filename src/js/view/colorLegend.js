@@ -11,7 +11,9 @@ let ColorLegend = function(div) {
     legendMaxText: null,
     legendTitle: null,
 
-    width: null
+    width: null,
+
+    colorScale: null
   };
 
   init();
@@ -21,6 +23,9 @@ let ColorLegend = function(div) {
     self.legendMinText = self.div.select("#legendMinValue");
     self.legendMaxText = self.div.select("#legendMaxValue");
     self.legendTitle = self.div.select("#legendTitle");
+
+    self.colorScale = d3.scaleQuantize()
+      .domain([0,100]);
 
     createCanvas();
   }
@@ -83,10 +88,15 @@ let ColorLegend = function(div) {
     }
 
     context.putImageData(image, 0, 0);
+
+    self.colorScale.range(colorRange);
   }
 
   function setExtents(scaleExtents) {
+    self.legendMinText.text(scaleExtents[0].toFixed(2));
+    self.legendMaxText.text(scaleExtents[1].toFixed(2));
 
+    self.colorScale.domain(scaleExtents);
   }
 
   function resize() {
@@ -103,9 +113,15 @@ let ColorLegend = function(div) {
     .style("height", height + "px");
   }
 
+  function getColorOf(value) {
+    return "#" + self.colorScale(value);
+  }
+
   return {
     setTitle,
     setColors,
+    getColorOf,
+
     setExtents,
     resize
   };

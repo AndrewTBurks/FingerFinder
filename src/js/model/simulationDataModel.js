@@ -6,10 +6,18 @@ let SimulationDataModel = function() {
   let self = {
     currentTimestep: null,
     currentRun: null,
-    currentData: null
+    currentData: null,
+
+    mean: null,
+    stdDev: null,
+    extent: null,
+
+    req: null
   };
 
   function loadData(run, timestep) {
+    if (self.req) { self.req.abort(); }
+
     return new Promise(function(resolve, reject) {
       // if this timestep is already loaded, instantly resolve with the currentData
       if (run === self.currentRun && timestep === self.currentTimestep) {
@@ -24,17 +32,18 @@ let SimulationDataModel = function() {
       let filePath = ["/clean.44", runName, timestepName].join("/") + ".csv";
 
 
-      console.time('File Load');
+      // console.time('File Load');
       // load the csv and reformat data
-      d3.csv(filePath, function(err, data) {
+      self.req = d3.csv(filePath, function(err, data) {
 
         if (err) {
           reject(err);
         }
 
         self.currentRun = run;
-        self.currentData = _.map(data, function(el) {
+        self.currentData = _.keyBy(_.map(data, function(el, i) {
           return {
+            id: i,
             conc: parseFloat(el.concentration),
             pos: {
               x: parseFloat(el.Points0),
@@ -47,9 +56,15 @@ let SimulationDataModel = function() {
               z: parseFloat(el.velocity1)
             }
           };
-        });
+        }), 'id');
 
-        console.timeEnd('File Load');
+        self.extent = d3.extent(Object.values(self.currentData), function (e) { return e.conc; });
+        self.mean = d3.mean(Object.values(self.currentData), function (e) { return e.conc; });
+    		self.stdDev = d3.deviation(Object.values(self.currentData), function (e) { return e.conc; });
+
+        // console.timeEnd('File Load');
+
+        self.req = null;
         resolve(self.currentData);
       });
     });
@@ -59,7 +74,16 @@ let SimulationDataModel = function() {
     return loadData(run, timestep);
   }
 
+  function getStats() {
+    return {
+      extent: self.extent,
+      mean: self.mean,
+      stdDev: self.stdDev
+    };
+  }
+
   return {
-    getData
+    getData,
+    getStats
   };
 };
