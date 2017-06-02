@@ -54,6 +54,9 @@ window.onresize = function (){
     App.controllers.upperDropdowns.attachTimeDropdown("#timestepSelect");
     App.controllers.upperDropdowns.attachColorDropdown("#colorSelect");
 
+    App.controllers.flowColorMode = new FlowColorModeController();
+    App.controllers.flowColorMode.attachColorModeDropdown("#flowColoringSelect");
+
     // load data then initialize views with data
     loadAllData();
   };

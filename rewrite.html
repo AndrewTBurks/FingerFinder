@@ -17,8 +17,6 @@
   <script src="./lib/js/bootstrap.min.js"></script>
   <script src="./lib/js/d3.v4.min.js"></script>
   <script src="./lib/js/lodash.js"></script>
-
-  <script src="./lib/js/TackballControls.js"></script>
   <script src="./lib/js/three.min.js"></script>
 
   <!-- CSS Src -->
@@ -46,6 +44,8 @@
 
   <!-- Controllers -->
   <script src="./src/js/controller/upperDropdownController.js"></script>
+  <script src="./src/js/controller/flowColorModeController.js"></script>
+  <script src="./src/js/controller/flowSlabController.js"></script>
 
 
   <!-- Main Script -->
@@ -126,10 +126,10 @@
                   <span class="glyphicon glyphicon-info-sign"></span>
                 </h5>
                 <select class="form-control" id="flowColoringSelect">
-                  <option>All Points</option>
-                  <option>Slab (Desat.)</option>
-                  <option>Slab (Highl.)</option>
-                  <option>Fingers Only</option>
+                  <option value="all">All Points</option>
+                  <option value="desaturate">Slab (Desat.)</option>
+                  <option value="highlight">Slab (Highl.)</option>
+                  <option value="fingers">Fingers Only</option>
                 </select>
               </div>
             </div>

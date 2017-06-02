@@ -5,6 +5,7 @@ var App = App || {};
 let FlowView = function(div) {
   let self = {
     div: null,
+    currentPointData: null,
 
     scene: null,
     camera: null,
@@ -17,9 +18,15 @@ let FlowView = function(div) {
       vertexColors: THREE.VertexColors
     }),
 
+    slabZ: 0,
+    slab: null,
+    slabbedPoints: null,
+
     cameraDistance: 15,
     cameraAngle: Math.PI/4,
-    cameraHeight: 7
+    cameraHeight: 7,
+
+    flowColorMode: "desaturate" // "all", "desaturate", "highlight", "fingers"
   };
 
   init();
@@ -66,11 +73,10 @@ let FlowView = function(div) {
       color: 0x959595,
     });
 
-    var wireframe = new THREE.LineSegments(geo, mat);
+    self.slab = new THREE.LineSegments(geo, mat);
 
-    wireframe.position.y = 5;
-
-    self.scene.add(wireframe);
+    self.slab.position.y = 5;
+    self.scene.add(self.slab);
   }
 
   function setupMouseEventHandlers() {
@@ -150,10 +156,14 @@ let FlowView = function(div) {
     };
 
     elem.onmouseup = function(e) {
-      movementType = null;
       elem.style.cursor = "default";
 
       // will need to refresh slice
+      if (movementType === "rotate") {
+        App.controllers.flowSlab.slabChanged();
+      }
+
+      movementType = null;
     };
 
     elem.onwheel = function(e) {
@@ -214,6 +224,24 @@ let FlowView = function(div) {
     render();
   }
 
+  function updateSlabPosition(z) {
+    self.slabZ = z;
+    self.slab.position.z = z;
+
+    calculateSlabbedPoints();
+  }
+
+  function calculateSlabbedPoints() {
+    let vector = new THREE.Vector3();
+
+    self.slabbedPoints = {};
+
+    console.log("Slab", self.slabbedPoints);
+
+
+    render();
+  }
+
   function render() {
     self.renderer.render(self.scene, self.camera);
   }
@@ -222,18 +250,40 @@ let FlowView = function(div) {
     self.scene.background = new THREE.Color(color);
   }
 
-  function recolor(colorScale) {
+  function setFlowColorMode(value) {
+    self.flowColorMode = value;
+  }
+
+  function changeColorScale(colorScale) {
+
+    recolorPoints(getPointColor);
+    render();
+
+    // wrapper around the if statements to get the color of a point based on mode
+    function getPointColor(point) {
+      let pointColor = new THREE.Color(colorScale(point.conc));
+
+      if (self.flowColorMode === "all") {
+        return pointColor;
+      } else if (self.flowColorMode === "desaturate") {
+        return pointColor.offsetHSL(0, -1, 0);
+      } else if (self.flowColorMode === "highlight") {
+        return pointColor.offsetHSL(0, 0, 0.25);
+      } else if (self.flowColorMode === "fingers") {
+
+      }
+
+      return pointColor;
+    }
+  }
+
+  function recolorPoints(colorFunc) {
     self.particles.geometry.colors = [];
     for (let point of self.currentPointData) {
-      self.particles.geometry.colors.push(new THREE.Color(colorScale(point.conc)));
+      self.particles.geometry.colors.push(colorFunc(point));
     }
 
     self.particles.geometry.colorsNeedUpdate = true;
-
-    self.scene.remove(self.particles);
-    self.scene.add(self.particles);
-
-    render();
   }
 
   function resize() {
@@ -251,7 +301,11 @@ let FlowView = function(div) {
   return {
     updateViewWithNewData: updateData,
     setBackgroundColor,
-    recolor,
+    setFlowColorMode,
+    calculateSlabbedPoints,
+    getSlabbedPoints,
+    updateSlabPosition,
+    changeColorScale,
     resize
   };
 };
