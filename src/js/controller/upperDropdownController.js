@@ -110,6 +110,7 @@ let UpperDropdownController = function() {
         ]);
 
         App.views.flow.updateViewWithNewData(data);
+        App.controllers.flowSlab.slabUpdated();
       });
   }
 

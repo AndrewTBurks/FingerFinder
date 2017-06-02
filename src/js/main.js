@@ -82,6 +82,7 @@ window.onresize = function (){
         ]);
 
         App.views.flow.updateViewWithNewData(data);
+        App.controllers.flowSlab.slabUpdated();
       })
       .catch(function(err) {
         console.log(err);

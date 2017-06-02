@@ -12,7 +12,7 @@ let FlowView = function(div) {
     renderer: null,
 
     particles: null,
-    rotation: null,
+    rotation: 0,
     pMaterial: new THREE.PointsMaterial({
       size: .2,
       vertexColors: THREE.VertexColors
@@ -141,7 +141,10 @@ let FlowView = function(div) {
           updateCameraPosition();
 
         } else if (movementType === "rotate") {
-          self.particles.rotation.y += delt.x * rotateLRCoeff;
+          self.rotation += (delt.x * rotateLRCoeff);
+          self.particles.rotation.y = self.rotation;
+
+          App.controllers.flowSlab.slabUpdated();
         }
 
         render();
@@ -193,14 +196,13 @@ let FlowView = function(div) {
   }
 
   function updateData(dataPoints) {
-    let particleRotation = 0;
-
     if (self.particles) {
-      particleRotation = self.particles.rotation.y;
       self.scene.remove(self.particles);
     }
 
     let stats = App.models.simulationData.getStats();
+
+    self.allPointData = Object.values(dataPoints);
 
     self.currentPointData = _.filter(Object.values(dataPoints), function(p) {
       return p.conc > stats.mean + stats.stdDev / 8;
@@ -217,7 +219,7 @@ let FlowView = function(div) {
       points,
       self.pMaterial);
 
-    self.particles.rotation.y = particleRotation;
+    self.particles.rotation.y = self.rotation;
 
     self.scene.add(self.particles);
 
@@ -232,14 +234,37 @@ let FlowView = function(div) {
   }
 
   function calculateSlabbedPoints() {
-    let vector = new THREE.Vector3();
+    let sinCalc = Math.sin(self.rotation);
+    let cosCalc = Math.cos(self.rotation);
 
     self.slabbedPoints = {};
 
-    console.log("Slab", self.slabbedPoints);
+    for (let point of self.allPointData) {
+      let rotatedXZ = rotatePoint(point.pos);
 
+      if (rotatedXZ.z < self.slabZ + 0.5 && rotatedXZ.z > self.slabZ - 0.5) {
+        self.slabbedPoints[point.id] = {
+          id: point.id,
+          conc: point.conc,
+          pos: point.pos,
+          vel: rotatePoint(point.vel)
+        };
+
+        self.slabbedPoints[point.id].pos.y = point.pos.y;
+        self.slabbedPoints[point.id].vel.y = point.vel.y;
+      }
+    }
 
     render();
+
+    function rotatePoint(p) {
+      let x = p.x, z = p.z;
+
+      return {
+        x: (cosCalc * x) + (sinCalc * z),
+        z: (cosCalc * z) - (sinCalc * x)
+      };
+    }
   }
 
   function getSlabbedPoints() {
@@ -259,7 +284,6 @@ let FlowView = function(div) {
   }
 
   function changeColorScale(colorScale) {
-
     recolorPoints(getPointColor);
     render();
 
@@ -270,9 +294,9 @@ let FlowView = function(div) {
       if (self.flowColorMode === "all") {
         return pointColor;
       } else if (self.flowColorMode === "desaturate") {
-        return pointColor.offsetHSL(0, -1, 0);
+        return (self.slabbedPoints[point.id] ? pointColor : pointColor.offsetHSL(0, -1, 0));
       } else if (self.flowColorMode === "highlight") {
-        return pointColor.offsetHSL(0, 0, 0.25);
+        return (self.slabbedPoints[point.id] ? pointColor.offsetHSL(0, 0, 0.25) : pointColor);
       } else if (self.flowColorMode === "fingers") {
 
       }

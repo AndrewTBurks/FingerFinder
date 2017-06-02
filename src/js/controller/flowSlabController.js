@@ -21,6 +21,7 @@ let FlowSlabController = function(div) {
 
   function slabUpdated() {
     App.views.flow.calculateSlabbedPoints();
+    
     App.views.flow.changeColorScale(App.views.flowLegend.getColorOf);
   }
 
