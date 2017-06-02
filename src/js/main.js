@@ -57,6 +57,8 @@ window.onresize = function (){
     App.controllers.flowColorMode = new FlowColorModeController();
     App.controllers.flowColorMode.attachColorModeDropdown("#flowColoringSelect");
 
+    App.controllers.flowSlab = new FlowSlabController("#flowControls");
+
     // load data then initialize views with data
     loadAllData();
   };

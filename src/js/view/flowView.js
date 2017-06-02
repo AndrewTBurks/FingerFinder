@@ -26,7 +26,7 @@ let FlowView = function(div) {
     cameraAngle: Math.PI/4,
     cameraHeight: 7,
 
-    flowColorMode: "desaturate" // "all", "desaturate", "highlight", "fingers"
+    flowColorMode: "all" // "all", "desaturate", "highlight", "fingers"
   };
 
   init();
@@ -160,7 +160,7 @@ let FlowView = function(div) {
 
       // will need to refresh slice
       if (movementType === "rotate") {
-        App.controllers.flowSlab.slabChanged();
+        App.controllers.flowSlab.slabUpdated();
       }
 
       movementType = null;
@@ -240,6 +240,10 @@ let FlowView = function(div) {
 
 
     render();
+  }
+
+  function getSlabbedPoints() {
+    return self.slabbedPoints;
   }
 
   function render() {
