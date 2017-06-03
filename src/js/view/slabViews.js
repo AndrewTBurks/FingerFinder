@@ -28,8 +28,11 @@ let SlabViews = function(concDiv, vecDiv) {
     self.vecDiv = d3.select(vecDiv);
 
     // 2 arrays of [...., [..., [], ...], ...]
-    self.concAggr =_.map(new Array(50), o => _.map(new Array(50), p => []));
-    self.vecAggr =_.map(new Array(50), o => _.map(new Array(50), p => []));
+    self.concAggr = _.map(new Array(50), o => _.map(new Array(50), p => []));
+    self.vecAggr = _.map(new Array(50), o => _.map(new Array(50), p => []));
+
+    self.concVals = _.map(new Array(50), o => _.map(new Array(50), p => 0));
+    self.vecVals = _.map(new Array(50), o => _.map(new Array(50), p => 0));
 
     setupSVG();
     setupTileGroups();
@@ -66,7 +69,13 @@ let SlabViews = function(concDiv, vecDiv) {
     // aggragate sliced points into 2x2 array
     // then take mean of values in array
 
-    _.forEach(self.concAggr, el => _.map(el, bin => []));
+    for (let x = 0; x < 50; x++) {
+      for(let y = 0; y < 50; y++) {
+        self.concAggr[x][y] = [];
+      }
+    }
+
+    console.log(self.concAggr);
 
     for (let point of Object.values(slicedPoints)) {
       let mapping = getArrayCoordinate(point.pos);
@@ -74,24 +83,34 @@ let SlabViews = function(concDiv, vecDiv) {
       self.concAggr[mapping.x][mapping.y].push(point.conc);
     }
 
+    self.concVals = _.map(new Array(50), (o, x) => {
+      return _.map(new Array(50), (p, y) => {
+        let concVals = self.concAggr[x][y];
+        let concAvg = concVals.length === 0 ? 0 : d3.mean(concVals);
 
-    _.forEach(self.concAggr, (el, i) => _.map(el, (bin, j) => {
-      console.log(bin, i, j);
-      console.log(d3.mean(bin));
+        return concAvg;
+      });
+    });
 
-      return d3.mean(bin);
-    }));
+    // self.vecVals =_.map(new Array(50), (o, x) => {
+    //   return _.map(new Array(50), (p, y) => {
+    //     let concVals = self.concAggr[d.x][d.y];
+    //     let concAvg = concVals.length === 0 ? 0 : d3.mean(concVals);
+    //
+    //     return concAvg;
+    //   });
+    // });
 
     console.log(self.concAggr);
 
     // concentration tiles
     self.concTileGroup.selectAll(".concTile")
-      .style("fill", d => colorScale(self.concAggr[d.x][d.y]));
+      .style("fill", d => colorScale(self.concVals[d.x][d.y]));
 
     self.vecTileGroup.selectAll(".vecTile")
       .each(function(d) {
         let tile = d3.select(this);
-        let color = colorScale(self.concAggr[d.x][d.y]);
+        let color = colorScale(self.concVals[d.x][d.y]);
 
         tile.select("rect")
           .style("fill", color);
@@ -110,8 +129,8 @@ let SlabViews = function(concDiv, vecDiv) {
 
     function getArrayCoordinate(pos) {
       let coord = {
-        x: Math.floor((pos.x + 5) * 50),
-        y: Math.floor((10 - pos.y) * 50)
+        x: Math.floor((pos.x + 5) * 5),
+        y: Math.floor((10 - pos.y) * 5)
       };
 
       if (coord.x > 49) coord.x = 49;
@@ -141,6 +160,7 @@ let SlabViews = function(concDiv, vecDiv) {
     self.concTileGroup.selectAll(".concTile")
       .data(locations).enter()
     .append("rect")
+      .attr("class", "concTile")
       .attr("transform", d => "translate(" + (d.x * self.binWidth) +"," + (d.y * self.binWidth) + ")")
       .attr("width", self.binWidth)
       .attr("height", self.binWidth)

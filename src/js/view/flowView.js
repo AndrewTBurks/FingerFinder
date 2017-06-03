@@ -244,7 +244,7 @@ let FlowView = function(div) {
         self.slabbedPoints[point.id] = {
           id: point.id,
           conc: point.conc,
-          pos: point.pos,
+          pos: rotatedXZ,
           vel: rotatePoint(point.vel)
         };
 
