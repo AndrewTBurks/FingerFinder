@@ -229,8 +229,6 @@ let FlowView = function(div) {
   function updateSlabPosition(z) {
     self.slabZ = z;
     self.slab.position.z = z;
-
-    calculateSlabbedPoints();
   }
 
   function calculateSlabbedPoints() {
