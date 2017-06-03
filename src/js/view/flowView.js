@@ -18,7 +18,7 @@ let FlowView = function(div) {
       vertexColors: THREE.VertexColors
     }),
 
-    slabZ: 0,
+    slabZ: 4.5,
     slab: null,
     slabbedPoints: null,
 
@@ -76,6 +76,7 @@ let FlowView = function(div) {
     self.slab = new THREE.LineSegments(geo, mat);
 
     self.slab.position.y = 5;
+    self.slab.position.z = self.slabZ;
     self.scene.add(self.slab);
   }
 
@@ -182,6 +183,19 @@ let FlowView = function(div) {
       updateCameraPosition();
       render();
     };
+
+    elem.onmouseout = function(e) {
+      if (movementType) {
+        elem.style.cursor = "default";
+
+        // will need to refresh slice
+        if (movementType === "rotate") {
+          App.controllers.flowSlab.slabUpdated();
+        }
+
+        movementType = null;
+      }
+    }
   }
 
   function updateCameraPosition() {
