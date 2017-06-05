@@ -18,12 +18,12 @@ let FlowView = function(div) {
       vertexColors: THREE.VertexColors
     }),
 
-    slabZ: 4.5,
+    slabZ: 0,
     slab: null,
     slabbedPoints: null,
 
     cameraDistance: 15,
-    cameraAngle: Math.PI/4,
+    cameraAngle: 5 * Math.PI/4,
     cameraHeight: 7,
 
     flowColorMode: "all" // "all", "desaturate", "highlight", "fingers"
@@ -70,7 +70,7 @@ let FlowView = function(div) {
     var geo = new THREE.EdgesGeometry(box); // or WireframeGeometry( geometry )
 
     var mat = new THREE.LineBasicMaterial({
-      color: 0x959595,
+      color: 0xbbbbbb,
     });
 
     self.slab = new THREE.LineSegments(geo, mat);
@@ -93,7 +93,7 @@ let FlowView = function(div) {
 
     let rotateLRCoeff = 0.005;
 
-    let cameraHeightRange = [0, 14];
+    let cameraHeightRange = [-2, 12];
     let cameraDistanceRange = [5, 20];
 
     elem.oncontextmenu = function(e) {
@@ -205,7 +205,7 @@ let FlowView = function(div) {
 
     self.camera.position.set(cameraVector.x, cameraVector.y, cameraVector.z);
 
-    self.camera.lookAt(new THREE.Vector3(0, 7, 0));
+    self.camera.lookAt(new THREE.Vector3(0, 5, 0));
 
   }
 
@@ -251,7 +251,8 @@ let FlowView = function(div) {
 
     self.slabbedPoints = {};
 
-    for (let point of self.allPointData) {
+    // for (let point of self.allPointData) {
+    for (let point of self.currentPointData) {
       let rotatedXZ = rotatePoint(point.pos);
 
       if (rotatedXZ.z < self.slabZ + 0.5 && rotatedXZ.z > self.slabZ - 0.5) {
@@ -308,7 +309,7 @@ let FlowView = function(div) {
       } else if (self.flowColorMode === "desaturate") {
         return (self.slabbedPoints[point.id] ? pointColor : pointColor.offsetHSL(0, -1, 0));
       } else if (self.flowColorMode === "highlight") {
-        return (self.slabbedPoints[point.id] ? pointColor.offsetHSL(0, 0, 0.25) : pointColor);
+        return (self.slabbedPoints[point.id] ? pointColor.offsetHSL(0, 0, 0.15) : pointColor);
       } else if (self.flowColorMode === "fingers") {
 
       }

@@ -39,6 +39,9 @@ let UpperDropdownController = function() {
     App.views.flow.setBackgroundColor(App.flowBG[App.state.colorScheme]);
     App.views.flow.changeColorScale(scale);
 
+    App.views.slabs.setBackgroundColor(App.flowBG[App.state.colorScheme]);
+    App.views.slabs.changeColorScale(scale);
+
 
     App.views.kiviatLegend.setColors(App.colormaps[App.state.colorScheme]);
   }

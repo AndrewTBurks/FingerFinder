@@ -51,18 +51,18 @@ let SlabViews = function(concDiv, vecDiv) {
     let dimension = d3.min([width, height]);
 
     self.concSVG = self.concDiv
-    .append("svg")
+      .append("svg")
       .attr("width", dimension)
       .attr("height", dimension)
       .attr("viewBox", [0, 0, dimension, dimension].join(" "));
 
     self.vecSVG = self.vecDiv
-    .append("svg")
+      .append("svg")
       .attr("width", dimension)
       .attr("height", dimension)
       .attr("viewBox", [0, 0, dimension, dimension].join(" "));
 
-    self.binWidth = dimension/self.NUM_BINS;
+    self.binWidth = dimension / self.NUM_BINS;
   }
 
   function updateSlabs(slicedPoints, colorScale) {
@@ -70,61 +70,69 @@ let SlabViews = function(concDiv, vecDiv) {
     // then take mean of values in array
 
     for (let x = 0; x < 50; x++) {
-      for(let y = 0; y < 50; y++) {
+      for (let y = 0; y < 50; y++) {
         self.concAggr[x][y] = [];
+        self.vecAggr[x][y] = [];
       }
     }
-
-    console.log(self.concAggr);
 
     for (let point of Object.values(slicedPoints)) {
       let mapping = getArrayCoordinate(point.pos);
 
       self.concAggr[mapping.x][mapping.y].push(point.conc);
+      self.vecAggr[mapping.x][mapping.y].push(point.vel);
     }
 
     self.concVals = _.map(new Array(50), (o, x) => {
       return _.map(new Array(50), (p, y) => {
         let concVals = self.concAggr[x][y];
-        let concAvg = concVals.length === 0 ? 0 : d3.mean(concVals);
+        let concAvg = concVals.length === 0 ? null : d3.mean(concVals);
 
         return concAvg;
       });
     });
 
-    // self.vecVals =_.map(new Array(50), (o, x) => {
-    //   return _.map(new Array(50), (p, y) => {
-    //     let concVals = self.concAggr[d.x][d.y];
-    //     let concAvg = concVals.length === 0 ? 0 : d3.mean(concVals);
-    //
-    //     return concAvg;
-    //   });
-    // });
+    self.vecVals = _.map(new Array(50), (o, x) => {
+      return _.map(new Array(50), (p, y) => {
+        let vecVals = self.vecAggr[x][y];
 
-    console.log(self.concAggr);
+        let vecAvg = vecVals.length === 0 ? {
+          x: 0,
+          y: 0
+        } : {
+          x: d3.mean(vecVals, v => v.x),
+          y: d3.mean(vecVals, v => v.y)
+        };
+
+        return vecAvg;
+      });
+    });
+
+
 
     // concentration tiles
     self.concTileGroup.selectAll(".concTile")
-      .style("fill", d => colorScale(self.concVals[d.x][d.y]));
+      .style("fill", d => self.concVals[d.x][d.y] == null ? "none" : colorScale(self.concVals[d.x][d.y]));
 
     self.vecTileGroup.selectAll(".vecTile")
       .each(function(d) {
         let tile = d3.select(this);
-        let color = colorScale(self.concVals[d.x][d.y]);
+        let color = self.concVals[d.x][d.y] == null ? "none" : colorScale(self.concVals[d.x][d.y]);
 
         tile.select("rect")
           .style("fill", color);
 
         tile.select("path")
           .style("fill", color)
+          .style("stroke", color)
           .attr("d", createPath);
       });
 
     // d will be a location {x: _, y: _} from a tile
     function createPath(d) {
+      let vec = self.vecVals[d.x][d.y];
 
-
-      return "";
+      return "M 0,0 l " + (vec.x * self.binWidth * 3) + "," + (-vec.y * self.binWidth * 3);
     }
 
     function getArrayCoordinate(pos) {
@@ -149,7 +157,10 @@ let SlabViews = function(concDiv, vecDiv) {
 
     for (let x = 0; x < 50; x++) {
       for (let y = 0; y < 50; y++) {
-        locations.push({x, y});
+        locations.push({
+          x,
+          y
+        });
       }
     }
 
@@ -159,9 +170,9 @@ let SlabViews = function(concDiv, vecDiv) {
     // concentration tiles
     self.concTileGroup.selectAll(".concTile")
       .data(locations).enter()
-    .append("rect")
+      .append("rect")
       .attr("class", "concTile")
-      .attr("transform", d => "translate(" + (d.x * self.binWidth) +"," + (d.y * self.binWidth) + ")")
+      .attr("transform", d => "translate(" + (d.x * self.binWidth) + "," + (d.y * self.binWidth) + ")")
       .attr("width", self.binWidth)
       .attr("height", self.binWidth)
       .style("fill", d => startingColor(d.x + d.y));
@@ -172,9 +183,9 @@ let SlabViews = function(concDiv, vecDiv) {
 
     self.vecTileGroup.selectAll(".vecTile")
       .data(locations).enter()
-    .append("g")
+      .append("g")
       .attr("class", "vecTile")
-      .attr("transform", d => "translate(" + (d.x * self.binWidth) +"," + (d.y * self.binWidth) + ")")
+      .attr("transform", d => "translate(" + (d.x * self.binWidth) + "," + (d.y * self.binWidth) + ")")
       .each(function(d) {
         let tile = d3.select(this);
 
@@ -182,13 +193,39 @@ let SlabViews = function(concDiv, vecDiv) {
           .attr("class", "concValue")
           .attr("width", self.binWidth)
           .attr("height", self.binWidth)
+          .style("opacity", 0.5)
           .style("fill", d => startingColor(d.x + d.y));
 
         tile.append("path")
           .attr("class", "velVec")
+          .attr("transform", "translate(" + (self.binWidth / 2) + "," + (self.binWidth / 2) + ")")
           .attr("d", "")
+          .style("stroke-width", 1.5)
           .style("fill", "black");
       });
+  }
+
+  function changeColorScale(colorScale) {
+    self.concTileGroup.selectAll(".concTile")
+      .style("fill", d => self.concVals[d.x][d.y] == null ? "none" : colorScale(self.concVals[d.x][d.y]));
+
+    self.vecTileGroup.selectAll(".vecTile")
+      .each(function(d) {
+        let tile = d3.select(this);
+        let color = self.concVals[d.x][d.y] == null ? "none" : colorScale(self.concVals[d.x][d.y]);
+
+        tile.select("rect")
+          .style("fill", color);
+
+        tile.select("path")
+          .style("fill", color)
+          .style("stroke", color);
+      });
+  }
+
+  function setBackgroundColor(color) {
+    self.concSVG.style("background", color);
+    self.vecSVG.style("background", color);
   }
 
   function resize() {
@@ -213,6 +250,8 @@ let SlabViews = function(concDiv, vecDiv) {
 
   return {
     updateViewsWithNewSlab: updateSlabs,
+    changeColorScale,
+    setBackgroundColor,
     resize
   };
 };
