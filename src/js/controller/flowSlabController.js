@@ -46,6 +46,11 @@ let FlowSlabController = function(div) {
       .range([0, width])
       .clamp(true);
 
+    var sliderx = d3.scaleLinear()
+      .domain([-4.5, 4.5])
+      .range([x(-4.5), x(4.5)])
+      .clamp(true)
+
     var slider = svg.append("g")
       .attr("class", "slider")
       .attr("transform", "translate(" + margin.left + "," + height / 2 + ")");
@@ -75,24 +80,51 @@ let FlowSlabController = function(div) {
       .data(x.ticks(10))
     .enter().append("text")
       .attr("x", x)
+      .attr("y", 5)
       .attr("text-anchor", "middle")
-      // .style("fill", "white")
       .text(function(d) {
         return d;
       });
 
-    var handle = slider.insert("circle", ".track-overlay")
-      .attr("class", "handle")
-      .attr("r", 9);
+    var handle = slider.insert("g", ".track-overlay")
+      .attr("class", "handle");
+
+    let handleWidth = x(1) - x(0);
+
+    handle
+      .append("rect")
+      .attr("class", "extents")
+      .attr("x", -handleWidth/2)
+      .attr("y", -9)
+      .attr("width", handleWidth)
+      .attr("height", 18);
+
+    handle
+      .append("rect")
+      .attr("class", "center")
+      .attr("x", -2)
+      .attr("y", -11)
+      .attr("width", 4)
+      .attr("height", 22);
+
+    handle
+      .append("text")
+      .attr("class", "sliderPos")
+      .attr("text-anchor", "middle")
+      .attr("y", -18)
+      .text("0.00");
 
     handle.transition() // Gratuitous intro!
       .duration(750)
-      .attr("cx", x(0));
+      .attr("transform", "translate(" + x(0) + ",0)")
 
     function onSlide() {
-      handle.attr("cx", x(x.invert(d3.event.x)));
+      let sliderXcoord = sliderx(x.invert(d3.event.x));
+      let zVal = x.invert(sliderXcoord);
 
-      let zVal = x.invert(d3.event.x);
+      handle.attr("transform", "translate(" + sliderXcoord + ", 0)");
+      handle.select(".sliderPos").text(zVal.toFixed(2));
+
       slabMoved(zVal);
     }
   }
