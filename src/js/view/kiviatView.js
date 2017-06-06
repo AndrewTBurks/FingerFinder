@@ -47,7 +47,26 @@ let KiviatView = function(div) {
       .style("height", height + "px");
   }
 
+  function drawKiviats(summaryData) {
+    console.log("Drawing Kiviats for:", summaryData);
+  }
+
+  function rotate(x) {
+    var radians = (Math.PI / 180) * angle,
+        cos = Math.cos(radians),
+        sin = Math.sin(radians),
+        nx = (cos * (x - cx)) + (sin * (y - cy)) + cx,
+        ny = (cos * (y - cy)) - (sin * (x - cx)) + cy;
+    return [nx, ny];
+}
+
+  function updateKiviatColors(colorScale) {
+
+  }
+
   return {
-    resize
+    resize,
+    drawKiviats,
+    updateKiviatColors
   };
 };

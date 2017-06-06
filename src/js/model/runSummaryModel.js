@@ -5,8 +5,13 @@ var App = App || {};
 let RunSummaryModel = function() {
   let self = {
     runs: null,
+    singleProperties: null,
+    averagedProperties: null,
+
     clusterCenters: null,
-    summaryData: null
+    summaryData: null,
+
+    summaryExtents: null
   };
 
   init();
@@ -14,7 +19,21 @@ let RunSummaryModel = function() {
   function init() {
     self.runs = _.pull(d3.range(1, 21), 13, 15);
 
-    console.log(self.clusterCenters);
+    self.singleProperties = [
+      "totalClusters"
+    ];
+
+    self.averagedProperties = [
+      "numClusters",
+      "mergeFactor",
+      "dissipationFactor",
+      "avgFingerConc",
+      "avgFingerPointConc",
+      "avgFingerVelMag",
+      "avgFingerVelMagConc",
+      "avgFingerConcDensity",
+      "avgFingerPointDensity"
+    ];
   }
 
   function loadAllClusterCenters() {
@@ -26,14 +45,12 @@ let RunSummaryModel = function() {
       self.clusterCenters = {};
 
       let loadQueue = d3.queue();
-      console.log(self.runs);
 
       for (let run of self.runs) {
 
         let runName = "run" + ("0" + run).substr(-2);
 
         let filePath = ["/clean.44", runName].join("/") + "/allClusterCenters.json";
-        console.log(filePath);
 
         loadQueue.defer(d3.json, filePath);
       }
@@ -41,7 +58,6 @@ let RunSummaryModel = function() {
       loadQueue.awaitAll(function(err, allData) {
         if (err) reject(err);
 
-        console.log(allData);
         filesLoaded(allData, resolve)
       });
 
@@ -49,7 +65,7 @@ let RunSummaryModel = function() {
   }
 
   function filesLoaded(runArr, resolve) {
-    for(let runInd of Object.keys(runArr)) {
+    for (let runInd of Object.keys(runArr)) {
       let runName = "run" + ('0' + (self.runs[runInd])).substr(-2);
       self.clusterCenters[runName] = runArr[runInd];
     }
@@ -59,56 +75,48 @@ let RunSummaryModel = function() {
 
   function summarizeClusterData(clusterData) {
     // summarize this data before returning the summarized data
-    if (self.summaryData) {
-      return self.summaryData;
+    if (self.summaryData && self.summaryExtents) {
+      return {
+        runs: self.summaryData,
+        extents: self.summaryExtents
+      };
     }
 
     self.summaryData = {};
+    self.summaryExtents = {};
 
-    for(let runNum of self.runs) {
+    for (let runNum of self.runs) {
       let runName = "run" + ('0' + (runNum)).substr(-2);
-      console.log("Computing Summary of:", runName);
-
       self.summaryData[runName] = computeRunSummary(self.clusterCenters[runName]);
     }
 
-    return self.summaryData;
+    let runArray = Object.values(self.summaryData);
+
+    for (let property of self.singleProperties) {
+      self.summaryExtents[property] = d3.extent(runArray, e => e[property]);
+    }
+
+    for (let property of self.averagedProperties) {
+      self.summaryExtents[property] = {
+        avg: d3.extent(runArray, e => e[property].avg),
+        ext: d3.extent(_.flatten(_.map(runArray, e => e[property].ext)))
+      };
+    }
+
+    return {
+      runs: self.summaryData,
+      extents: self.summaryExtents
+    };
   }
 
   function computeRunSummary(runData) {
-    // console.log(runData);
-
-    // var timestepMergeFactors = new Array(120).fill(0);
-    // var timestepNumClusters = new Array(120).fill(0);
-    // var timestepAvgFingerConc = new Array(120).fill(0);
-    // var timestepAvgPointConc = new Array(120).fill(0);
-    // var timestepAvgFingerVelMag = new Array(120).fill(0);
-    // var timestepAvgFingerVelMagConc = new Array(120).fill(0);
-    // var timestepAvgFingerDensity = new Array(120).fill(0);
-
+    // compute arrays of statistics for each timestep in the run
     let timestepDataStats = _.map(runData, getTimestepStats)
 
-    // {
-    //   run: runNum,
-    //   totalClusters: numClusters,
-    //   avgClusters: d3.mean(timestepNumClusters),
-    //   mergeFactor: d3.mean(timestepMergeFactors),
-    //   avgFingerConc: d3.mean(timestepAvgFingerConc),
-    //   avgFingerPointConc: d3.mean(timestepAvgPointConc),
-    //   avgFingerDensity: d3.mean(timestepAvgFingerDensity),
-    //   avgFingerVelMag: d3.mean(timestepAvgFingerVelMag),
-    //   extAvgFingerVelMag: d3.extent(timestepAvgFingerVelMag),
-    //   extFingerVelMag: [d3.min(thisClusterCenters, function(d) { return d3.min(d, function(e) {return e.vMag; }); }),
-    //               d3.max(thisClusterCenters, function(d) { return d3.max(d, function(e) {return e.vMag; }); })],
-    //   avgFingerVelMagConc: d3.mean(timestepAvgFingerVelMagConc),
-    //   extAvgFingerVelMagConc: d3.extent(timestepAvgFingerVelMagConc),
-    //   extFingerVelMagConc: [d3.min(thisClusterCenters, function(d) { return d3.min(d, function(e) {return e.vMagConc; }); }),
-    //               d3.max(thisClusterCenters, function(d) { return d3.max(d, function(e) {return e.vMagConc; }); })],
-    // }
-
+    // take the mean and extent of each property over the course of the run
     return {
       totalClusters: d3.max(runData, timestep => d3.max(timestep, cluster => cluster.clusterID)),
-      clustersPerTime: timestepDataStats.numClusters,
+      clustersPerTime: _.map(timestepDataStats, t => t.numClusters),
       numClusters: {
         avg: d3.mean(timestepDataStats, t => t.numClusters),
         ext: d3.extent(timestepDataStats, t => t.numClusters)
@@ -116,6 +124,10 @@ let RunSummaryModel = function() {
       mergeFactor: {
         avg: d3.mean(timestepDataStats, t => t.mergeFactor),
         ext: d3.extent(timestepDataStats, t => t.mergeFactor)
+      },
+      dissipationFactor: {
+        avg: d3.mean(timestepDataStats, t => t.dissipationFactor),
+        ext: d3.extent(timestepDataStats, t => t.dissipationFactor)
       },
       avgFingerConc: {
         avg: d3.mean(timestepDataStats, t => t.avgFingerConc),
@@ -148,21 +160,30 @@ let RunSummaryModel = function() {
     if (timestepData.length === 0) {
       return {
         numClusters: timestepData.length,
-        avgFingerConc: 0,
-        avgFingerPointConc: 0,
-        avgFingerVelMag: 0,
-        avgFingerVelMagConc: 0,
-        avgFingerPointDensity: 0,
-        avgFingerConcDensity: 0,
-        mergeFactor: 0
+        avgFingerConc: undefined,
+        avgFingerPointConc: undefined,
+        avgFingerVelMag: undefined,
+        avgFingerVelMagConc: undefined,
+        avgFingerPointDensity: undefined,
+        avgFingerConcDensity: undefined,
+        mergeFactor: undefined
       };
     }
 
-    // explain more later
+    // numClusters: simply the number of clusters in a timestep
+    // avgFingerConc: average total concentration of fingers in the timestep
+    // avgFingerPointConc: average per-point concentration of fingers in the timestep
+    // avgFingerVelMag: average velocity of clusters in the timestep
+    // avgFingerVelMagConc: average velocity of clusters in the timestep, concentration weighted
+    // avgFingerPointDensity: average point density of the fingers in the timestep (number of points per bounding volume)
+    // avgFingerConcDensity: average concentration density of the fingers in the timestep (total concentration per bounding volume)
+    // mergeFactor: number of fingers which change ID from this timestep to the next (without disappearing)
+    // dissipationFactor: number of fingers which dissapear (next ID of -1)
+
     let timestepSummary = {
       numClusters: timestepData.length,
       avgFingerConc: d3.mean(timestepData, cluster => cluster.concTotal),
-      avgFingerPointConc: d3.mean(timestepData, cluster => cluster.concTotal/cluster.size),
+      avgFingerPointConc: d3.mean(timestepData, cluster => cluster.concTotal / cluster.size),
       avgFingerVelMag: d3.mean(timestepData, cluster => getVectorMagnitude({
         x: cluster.vx,
         y: cluster.vy,
@@ -176,10 +197,9 @@ let RunSummaryModel = function() {
       avgFingerPointDensity: d3.mean(timestepData, cluster => cluster.size / getClusterVolume(cluster)),
       avgFingerConcDensity: d3.mean(timestepData, cluster => cluster.concTotal / getClusterVolume(cluster)),
       mergeFactor: _.filter(timestepData, cluster => cluster.nextClusterID !== -1 && cluster.nextClusterID !== cluster.clusterID).length /
-        timestepData.length
+        timestepData.length,
+      dissipationFactor: _.filter(timestepData, cluster => cluster.nextClusterID === -1).length / timestepData.length
     };
-
-    console.log(timestepSummary);
 
     return timestepSummary;
   }
@@ -201,9 +221,20 @@ let RunSummaryModel = function() {
       .then(summarizeClusterData);
   }
 
+  function getSingleProperties() {
+    return self.singleProperties;
+  }
+
+  function getAveragedProperties() {
+    return self.averagedProperties;
+  }
+
   return {
     loadAllClusterCenters,
     getClusterCenters,
-    getClusterSummary
+    getClusterSummary,
+
+    getSingleProperties,
+    getAveragedProperties
   };
 };
