@@ -92,7 +92,9 @@ window.onresize = function (){
         console.log(err);
       });
 
-    App.models.runSummary.loadAllClusterCenters()
+    // App.models.runSummary.getClusterCenters()
+
+    App.models.runSummary.getClusterSummary()
       .then(function(data) {
         // use summary data
         console.log(data);
