@@ -75,7 +75,7 @@ window.onresize = function (){
       .then(function(data) {
         let pointData = data[0];
         let clusterData = data[1];
-        console.log(clusterData);
+        // console.log(clusterData);
 
         // use simulation Data
         let timestepDataStats = App.models.simulationData.getStats();
@@ -90,6 +90,15 @@ window.onresize = function (){
       })
       .catch(function(err) {
         console.log(err);
+      });
+
+    App.models.runSummary.loadAllClusterCenters()
+      .then(function(data) {
+        // use summary data
+        console.log(data);
       })
+      .catch(function(err) {
+        console.log(err);
+      });
   }
 })();

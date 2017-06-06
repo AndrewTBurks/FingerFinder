@@ -106,6 +106,7 @@ let UpperDropdownController = function() {
     App.models.simulationData.getData(App.state.currentRun, App.state.currentTimestep)
       .then(function(data) {
         let pointData = data[0];
+        let clusterData = data[1];
 
         let timestepDataStats = App.models.simulationData.getStats();
 
