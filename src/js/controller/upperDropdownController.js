@@ -105,6 +105,8 @@ let UpperDropdownController = function() {
   function timeOrRunChange() {
     App.models.simulationData.getData(App.state.currentRun, App.state.currentTimestep)
       .then(function(data) {
+        let pointData = data[0];
+
         let timestepDataStats = App.models.simulationData.getStats();
 
         App.views.flowLegend.setExtents([
@@ -112,7 +114,7 @@ let UpperDropdownController = function() {
           timestepDataStats.extent[1]
         ]);
 
-        App.views.flow.updateViewWithNewData(data);
+        App.views.flow.updateViewWithNewData(pointData);
         App.controllers.flowSlab.slabUpdated();
       });
   }

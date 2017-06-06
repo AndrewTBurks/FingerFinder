@@ -114,7 +114,7 @@ let FlowSlabController = function(div) {
       .attr("y", -18)
       .text("0.00");
 
-    handle.transition() // Gratuitous intro!
+    handle.transition() // Gratuitous intro
       .duration(750)
       .attr("transform", "translate(" + x(0) + ",0)")
 

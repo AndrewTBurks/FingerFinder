@@ -6,25 +6,26 @@ let SimulationDataModel = function() {
   let self = {
     currentTimestep: null,
     currentRun: null,
+
     currentData: null,
+    currentClusters: null,
 
     mean: null,
     stdDev: null,
     extent: null,
 
-    req: null
+    timestepReq: null,
+    clusterReq: null
   };
 
   function loadData(run, timestep) {
-    if (self.req) { self.req.abort(); }
+    if (self.timestepReq) { self.timestepReq.abort(); }
 
     return new Promise(function(resolve, reject) {
       // if this timestep is already loaded, instantly resolve with the currentData
       if (run === self.currentRun && timestep === self.currentTimestep) {
         resolve(self.currentData);
       }
-
-      document.body.style.cursor = "wait";
 
       // convert run and timestep values into format of files
       let runName = "run" + ("0" + run).substr(-2);
@@ -36,7 +37,7 @@ let SimulationDataModel = function() {
 
       // console.time('File Load');
       // load the csv and reformat data
-      self.req = d3.csv(filePath, function(err, data) {
+      self.timestepReq = d3.csv(filePath, function(err, data) {
 
         if (err) {
           reject(err);
@@ -66,15 +67,57 @@ let SimulationDataModel = function() {
 
         // console.timeEnd('File Load');
 
-        self.req = null;
-        document.body.style.cursor = "default";
+        self.timestepReq = null;
         resolve(self.currentData);
       });
     });
   }
 
+  function loadClusterData(run) {
+    if (self.clusterReq) { self.clusterReq.abort(); }
+
+    return new Promise(function(resolve, reject) {
+      // if this run is already loaded, instantly resolve with the currentClusters
+      if (run === self.currentRun) {
+        resolve(self.currentClusters);
+      }
+
+      // convert run and timestep values into format of files
+      let runName = "run" + ("0" + run).substr(-2);
+
+      // create filepath from all 3 pieces
+      let filePath = ["/clean.44", runName].join("/") + "/allClusters.json";
+
+      // console.time('File Load');
+      // load the csv and reformat data
+      self.clusterReq = d3.json(filePath, function(err, data) {
+
+        if (err) {
+          reject(err);
+        }
+
+        self.currentRun = run;
+        self.currentClusters = data;
+
+        // console.timeEnd('File Load');
+
+        self.clusterReq = null;
+        resolve(self.currentClusters);
+      });
+    });
+  }
+
   function getData(run, timestep) {
-    return loadData(run, timestep);
+    document.body.style.cursor = "wait";
+
+    return Promise.all([
+      loadData(run, timestep),
+      loadClusterData(run)
+    ])
+    .then(function(data) {
+      document.body.style.cursor = "default";
+      return data;
+    });
   }
 
   function getStats() {

@@ -23,7 +23,7 @@ let FlowView = function(div) {
     slabbedPoints: null,
 
     cameraDistance: 15,
-    cameraAngle: 5 * Math.PI/4,
+    cameraAngle: 7 * Math.PI / 4,
     cameraHeight: 7,
 
     flowColorMode: "all" // "all", "desaturate", "highlight", "fingers"
@@ -48,8 +48,6 @@ let FlowView = function(div) {
     let height = elemNode.clientHeight - titleHeight - titleMargin;
 
     self.scene = new THREE.Scene();
-    var axisHelper = new THREE.AxisHelper(5);
-    self.scene.add(axisHelper);
 
     self.camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
     updateCameraPosition();
@@ -73,10 +71,34 @@ let FlowView = function(div) {
       color: 0xbbbbbb,
     });
 
-    self.slab = new THREE.LineSegments(geo, mat);
+    self.slab = new THREE.Group();
+    let boxObj = new THREE.LineSegments(geo, mat);
 
-    self.slab.position.y = 5;
-    self.slab.position.z = self.slabZ;
+    boxObj.position.y = 5;
+    boxObj.position.z = self.slabZ;
+
+    self.slab.add(boxObj);
+
+    let path = [
+      new THREE.Vector3(-0.35, 0, -0.35),
+      new THREE.Vector3(0, 0, 0),
+      new THREE.Vector3(-0.35, 0, 0.35),
+      new THREE.Vector3(0, 0, 0),
+      new THREE.Vector3(-1.5, 0, 0)
+    ];
+
+    let arrowGeo = new THREE.Geometry();
+    arrowGeo.vertices = path;
+
+    let arrow1 = new THREE.Line(arrowGeo, mat);
+    let arrow2 = new THREE.Line(arrowGeo, mat);
+
+    arrow1.position.x = 4.75;
+    arrow2.position.x = -3.25;
+
+    self.slab.add(arrow1);
+    self.slab.add(arrow2);
+
     self.scene.add(self.slab);
   }
 
@@ -89,7 +111,7 @@ let FlowView = function(div) {
     // movement multipliers for the deltas provided by mouse events
     let panUDCoeff = 0.05;
     let panLRCoeff = -0.005;
-    let zoomCoeff = 1/250;
+    let zoomCoeff = 1 / 250;
 
     let rotateLRCoeff = 0.005;
 
@@ -121,7 +143,7 @@ let FlowView = function(div) {
       };
     };
 
-    elem.onmousemove = function (e) {
+    elem.onmousemove = function(e) {
       if (movementType) {
         let delt = {
           x: e.clientX - prevPosition.x,
@@ -201,7 +223,7 @@ let FlowView = function(div) {
   function updateCameraPosition() {
 
     let cameraVector = new THREE.Vector3(0, self.cameraHeight, self.cameraDistance);
-    cameraVector.applyAxisAngle(new THREE.Vector3(0,1,0), self.cameraAngle);
+    cameraVector.applyAxisAngle(new THREE.Vector3(0, 1, 0), self.cameraAngle);
 
     self.camera.position.set(cameraVector.x, cameraVector.y, cameraVector.z);
 
@@ -251,8 +273,8 @@ let FlowView = function(div) {
 
     self.slabbedPoints = {};
 
-    // for (let point of self.allPointData) {
-    for (let point of self.currentPointData) {
+    for (let point of self.allPointData) { // calculate slab from all points
+      // for (let point of self.currentPointData) { // calculate slab from only visible points
       let rotatedXZ = rotatePoint(point.pos);
 
       if (rotatedXZ.z < self.slabZ + 0.5 && rotatedXZ.z > self.slabZ - 0.5) {
@@ -271,7 +293,8 @@ let FlowView = function(div) {
     render();
 
     function rotatePoint(p) {
-      let x = p.x, z = p.z;
+      let x = p.x,
+        z = p.z;
 
       return {
         x: (cosCalc * x) + (sinCalc * z),

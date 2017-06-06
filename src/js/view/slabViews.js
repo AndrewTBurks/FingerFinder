@@ -193,7 +193,7 @@ let SlabViews = function(concDiv, vecDiv) {
           .attr("class", "concValue")
           .attr("width", self.binWidth)
           .attr("height", self.binWidth)
-          .style("opacity", 0.5)
+          .style("opacity", 0.25)
           .style("fill", d => startingColor(d.x + d.y));
 
         tile.append("path")

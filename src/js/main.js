@@ -73,6 +73,10 @@ window.onresize = function (){
   function loadAllData() {
     App.models.simulationData.getData(App.state.currentRun, App.state.currentTimestep)
       .then(function(data) {
+        let pointData = data[0];
+        let clusterData = data[1];
+        console.log(clusterData);
+
         // use simulation Data
         let timestepDataStats = App.models.simulationData.getStats();
 
@@ -81,7 +85,7 @@ window.onresize = function (){
           timestepDataStats.extent[1]
         ]);
 
-        App.views.flow.updateViewWithNewData(data);
+        App.views.flow.updateViewWithNewData(pointData);
         App.controllers.flowSlab.slabUpdated();
       })
       .catch(function(err) {
