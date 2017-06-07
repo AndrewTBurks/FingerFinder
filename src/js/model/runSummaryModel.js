@@ -19,11 +19,12 @@ let RunSummaryModel = function() {
   function init() {
     self.runs = _.pull(d3.range(1, 21), 13, 15);
 
-    self.singleProperties = [
+    // set the single and averages properties as global variables
+    App.singleProperties = [
       "totalClusters"
     ];
 
-    self.averagedProperties = [
+    App.averagedProperties = [
       "numClusters",
       "mergeFactor",
       "dissipationFactor",
@@ -92,11 +93,11 @@ let RunSummaryModel = function() {
 
     let runArray = Object.values(self.summaryData);
 
-    for (let property of self.singleProperties) {
+    for (let property of App.singleProperties) {
       self.summaryExtents[property] = d3.extent(runArray, e => e[property]);
     }
 
-    for (let property of self.averagedProperties) {
+    for (let property of App.averagedProperties) {
       self.summaryExtents[property] = {
         avg: d3.extent(runArray, e => e[property].avg),
         ext: d3.extent(_.flatten(_.map(runArray, e => e[property].ext)))
