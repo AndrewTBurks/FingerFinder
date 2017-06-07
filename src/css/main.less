@@ -56,8 +56,8 @@ body {
 }
 
 #aboutButton {
-  background-color: #21918c;
-  border-color: #2c728e;
+  background-color: @focus-border;
+  border-color: @button-border;
 }
 
 .form-control:focus {
@@ -119,7 +119,7 @@ body {
   }
 
   .glyphicon-info-sign {
-    color: #69C3E0;
+    color: @info-color;
     margin: 0 0 0 5px;
   }
 
@@ -182,5 +182,7 @@ body {
 }
 
 @background: #1C2329;
+@info-color: tint(@focus-border, 25%);
+@button-border: #2c728e;
 @focus-border: #21918c;
-@focus-boxshadow: fade(#21918c, 60%);
+@focus-boxshadow: fade(@focus-border, 60%);

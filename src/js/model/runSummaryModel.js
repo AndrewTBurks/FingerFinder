@@ -31,8 +31,8 @@ let RunSummaryModel = function() {
       "avgFingerConc",
       "avgFingerPointConc",
       "avgFingerVelMag",
-      "avgFingerVelMagConc",
-      // "avgFingerConcDensity",
+      // "avgFingerVelMagConc",
+      "avgFingerConcDensity",
       // "avgFingerPointDensity"
     ];
   }

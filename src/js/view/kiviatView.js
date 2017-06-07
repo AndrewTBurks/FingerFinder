@@ -26,6 +26,7 @@ let KiviatView = function(div) {
     let elemNode = self.div.node();
     let title = self.div.select(".sectionTitle");
 
+    // calculate width and height boundaries for div
     let width = elemNode.clientWidth;
     let titleHeight = title.node().clientHeight;
     let titleMargin = parseInt(title.style("margin-bottom")) + parseInt(title.style("margin-top"));
@@ -42,6 +43,7 @@ let KiviatView = function(div) {
     let elemNode = self.div.node();
     let title = self.div.select(".sectionTitle");
 
+    // recalculate width and height available to the kiviats
     let width = elemNode.clientWidth;
     let titleHeight = title.node().clientHeight;
     let titleMargin = parseInt(title.style("margin-bottom")) + parseInt(title.style("margin-top"));
@@ -69,6 +71,8 @@ let KiviatView = function(div) {
 
     let svgViewboxDimension = 100;
     let axisRange = [5, (svgViewboxDimension / 2) - 5]
+
+    // create d3 scales for each property of the kiviats
 
     self.scales = {};
     self.propertyToAxisNum = {};
@@ -105,8 +109,7 @@ let KiviatView = function(div) {
 
     let squareSide = calculateSquareSideLength(x, y, n);
 
-    console.log("Drawing Kiviats for:", summaryData);
-
+    // data bind to create svgs of the squareSide dimension
     self.wrapper.selectAll(".kiviatSVG")
       .data(runNums)
       .enter().append("svg")
@@ -117,6 +120,7 @@ let KiviatView = function(div) {
       .each(function(d, i) {
         let runName = "run" + ('0' + d).substr(-2);
 
+        // create text showing what the number of the current run is
         d3.select(this).append("text")
           .attr("class", "runNum")
           .attr("text-anchor", "left")
@@ -125,6 +129,7 @@ let KiviatView = function(div) {
           .style("font-size", "10px")
           .text(d);
 
+        // create the actual kiviat diagram, translated to be centered within the svg
         d3.select(this)
           .append("g")
           .attr("class", "kiviatGroup")
@@ -133,6 +138,7 @@ let KiviatView = function(div) {
       });
   }
 
+  // method to create and append a kiviat to an el (either svg or group)
   function createKiviat(el, runNum, runData) {
     if (!runData) {
       return;
@@ -165,8 +171,8 @@ let KiviatView = function(div) {
       }
 
       el.append("path")
-        .datum(runData)
         .attr("class", "kiviatShape")
+        .datum(runData)
         .attr("d", ("M" + _.map(coords, e => " " + e.x + " " + e.y + " ").join("L") + "Z"))
         .style("fill", App.views.kiviatLegend.getColorOf(runData[self.coloredProperty]));
 
@@ -203,8 +209,8 @@ let KiviatView = function(div) {
       }
 
       el.append("path")
-        .datum(runData)
         .attr("class", "kiviatShape")
+        .datum(runData)
         .attr("fill-rule", "evenodd")
         .attr("d",
           ("M" + _.map(outerCoords, e => " " + e.x + " " + e.y + " ").join("L") + "Z") + " " +
@@ -215,8 +221,6 @@ let KiviatView = function(div) {
   }
 
   function drawAxes(el, count) {
-    // for (let attr of Object.keys)
-
     let axesGroup = el.append("g")
       .attr("class", "axesGroup");
 
@@ -269,13 +273,9 @@ let KiviatView = function(div) {
   }
 
   function changeColorScale(colorScale) {
-    console.log("Changing Kiviat Colors");
-
     self.wrapper.selectAll(".kiviatSVG")
       .selectAll(".kiviatShape")
       .style("fill", d => {
-        console.log(d);
-        console.log(colorScale(d[self.coloredProperty]));
         return colorScale(d[self.coloredProperty]);
       })
   }
@@ -288,13 +288,13 @@ let KiviatView = function(div) {
     self.wrapper.selectAll(".kiviatSVG")
       .each(function(d) {
         let svg = d3.select(this);
-        svg.select(".runNum")
+        svg.selectAll(".runNum")
           .classed("runNumActive ", d == num)
           .style("font-size", d == num ? "14px" : "10px");
 
-        svg.select(".kiviatShape")
-          .classed("kiviatShapeActive", function() {
-            return d == num
+        svg.selectAll(".kiviatShape")
+          .classed("kiviatShapeActive", function(d2) {
+            return d == num;
           });
       });
   }

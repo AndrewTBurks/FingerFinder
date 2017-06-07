@@ -68,6 +68,8 @@ window.onresize = function (){
       // console.log("Resizing " + view);
       App.views[view].resize();
     }
+
+    App.controllers.flowSlab.resize();
   }
 
   function loadAllData() {

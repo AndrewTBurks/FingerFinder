@@ -49,16 +49,9 @@ let UpperDropdownController = function() {
     let newMainColor = "#" + App.colormaps[App.state.colorScheme][Math.floor(App.colormaps[App.state.colorScheme].length / 2)];
     let newStrokeColor = "#" + App.colormaps[App.state.colorScheme][Math.floor(3 * App.colormaps[App.state.colorScheme].length / 8)];
 
-    d3.select(".currentRunText")
-      .style("color", newMainColor);
-
-    d3.select("#aboutButton")
-      .style("background-color", newMainColor)
-      .style("border-color", newStrokeColor);
-
     less.modifyVars({
-      '@focus-border': newMainColor,
-      '@focus-boxshadow': 'fade(' + newMainColor + ', 60%)'
+      '@button-border': newStrokeColor,
+      '@focus-border': newMainColor
     });
   }
 

@@ -148,7 +148,22 @@ let FlowSlabController = function(div) {
     App.views.slabs.updateViewsWithNewSlab(slabData, App.views.flowLegend.getColorOf);
   }
 
+  function resize() {
+    let elemNode = self.div.node();
+    let title = self.div.select(".sectionTitle");
+
+    let width = elemNode.clientWidth;
+    let titleHeight = title.node().clientHeight;
+    let titleMargin = parseInt(title.style("margin-bottom")) + parseInt(title.style("margin-top"));
+    let height = elemNode.clientHeight - titleHeight - titleMargin;
+
+    self.sliderSVG
+      .attr("width", width)
+      .attr("height", height);
+  }
+
   return {
-    slabUpdated
+    slabUpdated,
+    resize
   };
 };
