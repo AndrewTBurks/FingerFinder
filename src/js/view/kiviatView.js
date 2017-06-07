@@ -8,7 +8,7 @@ let KiviatView = function(div) {
     wrapper: null,
 
     scales: null,
-    mode: "avg", // or "ext"
+    mode: "avg", // "avg" or "ext"
     coloredProperty: "totalClusters"
   };
 
@@ -140,18 +140,24 @@ let KiviatView = function(div) {
 
   // method to create and append a kiviat to an el (either svg or group)
   function createKiviat(el, runNum, runData) {
+    // if a run has no data, don't create the plot
     if (!runData) {
       return;
     }
 
+    // get the number of axes
     let numKiviatProperties = App.singleProperties.length + App.averagedProperties.length;
 
+    // draw the plot axes
     drawAxes(el, Object.keys(self.scales).length);
 
 
+    // if the mode is average (one value for each property)
     if (self.mode === "avg") {
       // coordinates of path
       let coords = [];
+
+      // get coords of properties with single values
       for (let property of App.singleProperties) {
         let coord = rotate(
           self.scales[property](runData[property]),
@@ -161,6 +167,7 @@ let KiviatView = function(div) {
         coords.push(coord);
       }
 
+      // get coords of properties which have both average and extent
       for (let property of App.averagedProperties) {
         let coord = rotate(
           self.scales[property].avg(runData[property].avg),
@@ -170,19 +177,21 @@ let KiviatView = function(div) {
         coords.push(coord);
       }
 
+      // create a path by joining these coordinates together
       el.append("path")
         .attr("class", "kiviatShape")
         .datum(runData)
         .attr("d", ("M" + _.map(coords, e => " " + e.x + " " + e.y + " ").join("L") + "Z"))
         .style("fill", App.views.kiviatLegend.getColorOf(runData[self.coloredProperty]));
 
-    } else if (self.mode === "ext") {
+    } else if (self.mode === "ext") { // value range for each property
       // outer coordinates (i.e. maximum extent)
       let outerCoords = [];
 
       // inner coordinates (i.e. minimum extent)
       let innerCoords = [];
 
+      // get coords of properties with single values
       for (let property of App.singleProperties) {
         let coord = rotate(
           self.scales[property](runData[property]),
@@ -193,6 +202,7 @@ let KiviatView = function(div) {
         innerCoords.push(coord);
       }
 
+      // get coords of properties which have both average and extent
       for (let property of App.averagedProperties) {
         let outerPoint = rotate(
           self.scales[property].ext(runData[property].ext[1]),
@@ -208,6 +218,8 @@ let KiviatView = function(div) {
         innerCoords.push(innerPoint);
       }
 
+      // create the path by joining the coords of outer into one path, then inner into another
+      // by using fill-rule evenodd, the inside will be cut out
       el.append("path")
         .attr("class", "kiviatShape")
         .datum(runData)
@@ -221,9 +233,11 @@ let KiviatView = function(div) {
   }
 
   function drawAxes(el, count) {
+    // make a group for all of the axes
     let axesGroup = el.append("g")
       .attr("class", "axesGroup");
 
+    // draw lines for axes
     axesGroup.selectAll(".kiviatAxis")
       .data(d3.range(count))
       .enter().append("line")
@@ -251,6 +265,8 @@ let KiviatView = function(div) {
     };
   }
 
+  // algorithm to calculate square side length for n squares within an
+  // x by y rectangle
   function calculateSquareSideLength(x, y, n) {
     let sx, sy;
 
@@ -272,6 +288,7 @@ let KiviatView = function(div) {
     return Math.max(sx, sy);
   }
 
+  // update the colors of the kiviat diagrams
   function changeColorScale(colorScale) {
     self.wrapper.selectAll(".kiviatSVG")
       .selectAll(".kiviatShape")
@@ -280,10 +297,12 @@ let KiviatView = function(div) {
       })
   }
 
+  // TODO: change the kiviats on mode change? maybe not include this
   function changeMode(newMode) {
     self.mode = newMode;
   }
 
+  // change the selected run (update class of run number and kiviat shape)
   function changeSelectedRun(num) {
     self.wrapper.selectAll(".kiviatSVG")
       .each(function(d) {
