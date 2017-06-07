@@ -97,7 +97,9 @@ window.onresize = function (){
     App.models.runSummary.getClusterSummary()
       .then(function(data) {
         // use summary data
+        App.views.kiviatLegend.setExtents(data.extents.totalClusters);
         App.views.kiviatSummary.drawKiviats(data);
+
       })
       .catch(function(err) {
         console.log(err);

@@ -7,8 +7,9 @@ let KiviatView = function(div) {
     div: null,
     wrapper: null,
 
-    scales: null
-    mode: "avg" // or "ext"
+    scales: null,
+    mode: "avg", // or "ext"
+    coloredProperty: "totalClusters"
   };
 
   init();
@@ -66,11 +67,36 @@ let KiviatView = function(div) {
   function drawKiviats(summaryData) {
     let runNums = d3.range(1, 21);
 
+    let svgViewboxDimension = 100;
+    let axisRange = [5, (svgViewboxDimension / 2) - 5]
+
     self.scales = {};
+    self.propertyToAxisNum = {};
+    let axisNum = 0;
+
+    for (let property of App.singleProperties) {
+      self.scales[property] = d3.scaleLinear()
+        .domain(summaryData.extents[property])
+        .range(axisRange);
+
+      self.propertyToAxisNum[property] = axisNum++;
+    }
+
+    for (let property of App.averagedProperties) {
+      self.scales[property] = {
+        avg: d3.scaleLinear()
+          .domain(summaryData.extents[property].avg)
+          .range(axisRange),
+        ext: d3.scaleLinear()
+          .domain(summaryData.extents[property].ext)
+          .range(axisRange)
+      };
+
+      self.propertyToAxisNum[property] = axisNum++;
+    }
 
     // find square edge max size
     let wrapperPadding = parseInt(self.wrapper.style("padding"));
-    console.log(wrapperPadding);
 
     // calculate x, y of space for svgs and number of runs
     let x = parseInt(self.wrapper.style("width")) - wrapperPadding * 2,
@@ -85,22 +111,129 @@ let KiviatView = function(div) {
       .data(runNums)
       .enter().append("svg")
       .attr("class", "kiviatSVG")
-      .attr("viewBox", [0, 0, 100, 100].join(" "))
+      .attr("viewBox", [0, 0, svgViewboxDimension, svgViewboxDimension].join(" "))
       .attr("width", squareSide)
       .attr("height", squareSide)
       .each(function(d, i) {
         let runName = "run" + ('0' + d).substr(-2);
 
-        d3.select(this).call(createKiviat, d, summaryData.runs[runName]);
+        d3.select(this).append("text")
+          .attr("class", "runNum")
+          .attr("text-anchor", "left")
+          .attr("x", 2)
+          .attr("y", 10)
+          .style("font-size", "10px")
+          .text(d);
+
+        d3.select(this)
+          .append("g")
+          .attr("class", "kiviatGroup")
+          .attr("transform", "translate(50, 50)")
+          .call(createKiviat, d, summaryData.runs[runName]);
       });
   }
 
-  function createKiviat(svg, runNum, runData) {
-    // console.log(runNum, runData);
+  function createKiviat(el, runNum, runData) {
+    if (!runData) {
+      return;
+    }
 
+    drawAxes(el, Object.keys(self.scales).length);
+
+
+    if (self.mode === "avg") {
+      // coordinates of path
+      let coords = [];
+      for (let property of App.singleProperties) {
+        let coord = rotate(
+          self.scales[property](runData[property]),
+          self.propertyToAxisNum[property] * 360 / 10
+        );
+
+        coords.push(coord);
+      }
+
+      for (let property of App.averagedProperties) {
+        let coord = rotate(
+          self.scales[property].avg(runData[property].avg),
+          self.propertyToAxisNum[property] * 360 / 10
+        );
+
+        coords.push(coord);
+      }
+
+      el.append("path")
+        .datum(runData)
+        .attr("class", "kiviatShape")
+        .attr("d", ("M" + _.map(coords, e => " " + e.x + " " + e.y + " ").join("L") + "Z"))
+        .style("fill", App.views.kiviatLegend.getColorOf(runData[self.coloredProperty]));
+
+    } else if (self.mode === "ext") {
+      // outer coordinates (i.e. maximum extent)
+      let outerCoords = [];
+
+      // inner coordinates (i.e. minimum extent)
+      let innerCoords = [];
+
+      for (let property of App.singleProperties) {
+        let coord = rotate(
+          self.scales[property](runData[property]),
+          self.propertyToAxisNum[property] * 360 / 10
+        );
+
+        outerCoords.push(coord);
+        innerCoords.push(coord);
+      }
+
+      for (let property of App.averagedProperties) {
+        let outerPoint = rotate(
+          self.scales[property].ext(runData[property].ext[1]),
+          self.propertyToAxisNum[property] * 360 / 10
+        );
+
+        let innerPoint = rotate(
+          self.scales[property].ext(runData[property].ext[0]),
+          self.propertyToAxisNum[property] * 360 / 10
+        );
+
+        outerCoords.push(outerPoint);
+        innerCoords.push(innerPoint);
+      }
+
+      el.append("path")
+        .datum(runData)
+        .attr("class", "kiviatShape")
+        .attr("fill-rule", "evenodd")
+        .attr("d",
+          ("M" + _.map(outerCoords, e => " " + e.x + " " + e.y + " ").join("L") + "Z") + " " +
+          ("M" + _.map(innerCoords, e => " " + e.x + " " + e.y + " ").join("L") + "Z")
+        )
+        .style("fill", App.views.kiviatLegend.getColorOf(runData[self.coloredProperty]));
+    }
   }
 
-  function rotate(x) {
+  function drawAxes(el, count) {
+    // for (let attr of Object.keys)
+
+    let axesGroup = el.append("g")
+      .attr("class", "axesGroup");
+
+    axesGroup.selectAll(".kiviatAxis")
+      .data(d3.range(count))
+      .enter().append("line")
+      .attr("class", "kiviatAxis")
+      .attr("x0", 0)
+      .attr("y0", 0)
+      .each(function(d) {
+        let axis = d3.select(this);
+
+        let rotatedEnd = rotate(48, d * 360 / count);
+        axis.attr("x1", rotatedEnd.x);
+        axis.attr("y1", rotatedEnd.y);
+      });
+  }
+
+  function rotate(x, angle) {
     var radians = (Math.PI / 180) * angle,
       cos = Math.cos(radians),
       sin = Math.sin(radians),
@@ -133,8 +266,15 @@ let KiviatView = function(div) {
     return Math.max(sx, sy);
   }
 
-  function updateKiviatColors(colorScale) {
+  function changeColorScale(colorScale) {
+    console.log("Changing Kiviat Colors");
 
+    self.wrapper.selectAll(".kiviatSVG")
+      .selectAll(".kiviatShape")
+      .style("fill", d => {
+        console.log(colorScale(d[self.coloredProperty]));
+        return colorScale(d[self.coloredProperty]);
+      })
   }
 
   function changeMode(newMode) {
@@ -144,7 +284,7 @@ let KiviatView = function(div) {
   return {
     resize,
     drawKiviats,
-    updateKiviatColors,
+    changeColorScale,
     changeMode
   };
 };

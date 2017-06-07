@@ -23,6 +23,12 @@
   <link rel="stylesheet/less" href="./src/css/main.less">
 
   <!-- less.js to parse stylesheet/less -->
+  <script>
+    // set up options for less.js
+    less = {
+      env: "production"
+    };
+  </script>
   <script src="//cdnjs.cloudflare.com/ajax/libs/less.js/2.7.2/less.min.js"></script>
 
   <!-- JS Src -->
@@ -58,7 +64,7 @@
     <div class="container-fluid" id="navbar">
       <h2 id="title">FingerFinder</h2>
       <ul class="nav navbar-nav navbar-right">
-        <button class="btn navbar-btn btn-info">
+        <button class="btn navbar-btn btn-info" id="aboutButton">
           <span class="glyphicon glyphicon-info-sign"></span>
           About
         </button>

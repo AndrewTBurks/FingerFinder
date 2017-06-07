@@ -19,7 +19,7 @@ let UpperDropdownController = function() {
 
     self.colorDropdown.selectAll("option")
       .data(colorSchemes)
-    .enter().append("option")
+      .enter().append("option")
       .text(d => d);
 
     // attach listener
@@ -42,8 +42,28 @@ let UpperDropdownController = function() {
     App.views.slabs.setBackgroundColor(App.flowBG[App.state.colorScheme]);
     App.views.slabs.changeColorScale(scale);
 
-
     App.views.kiviatLegend.setColors(App.colormaps[App.state.colorScheme]);
+    let kiviatScale = App.views.kiviatLegend.getColorOf;
+    App.views.kiviatSummary.changeColorScale(kiviatScale);
+
+    let newMainColor = "#" + App.colormaps[App.state.colorScheme][Math.floor(App.colormaps[App.state.colorScheme].length / 2)];
+    let newStrokeColor = "#" + App.colormaps[App.state.colorScheme][Math.floor(3 * App.colormaps[App.state.colorScheme].length / 8)];
+
+    d3.select(".currentRunText")
+      .style("color", newMainColor);
+
+    d3.select("#aboutButton")
+      .style("background-color", newMainColor)
+      .style("border-color", newStrokeColor);
+
+
+    // @focus-border: #21918c;
+    // @focus-boxshadow: #21918c;
+
+    less.modifyVars({
+      '@focus-border': newMainColor,
+      '@focus-boxshadow': 'fade(' + newMainColor + ', 60%)'
+    });
   }
 
   // run dropdown
@@ -55,7 +75,7 @@ let UpperDropdownController = function() {
 
     self.runDropdown.selectAll("option")
       .data(runs)
-    .enter().append("option")
+      .enter().append("option")
       .attr("disabled", function(d) {
         return (d == 13 || d == 15) ? true : null;
       }) // 13 and 15 not included in data...
@@ -84,7 +104,7 @@ let UpperDropdownController = function() {
 
     self.timeDropdown.selectAll("option")
       .data(timesteps)
-    .enter().append("option")
+      .enter().append("option")
       .text(d => d);
 
     // attach listener
