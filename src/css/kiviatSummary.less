@@ -11,17 +11,33 @@
 }
 
 .kiviatAxis {
-  stroke: tint(@background, 15%);
+  stroke: tint(@background, 10%);
+  stroke-width: 2px;
+  stroke-linecap: round;
 }
 
 .runNum {
-  fill: #e0e0e0
+  fill: #e0e0e0;
+  font-weight: lighter;
+  opacity: 0.4;
+}
+
+.runNumActive {
+  fill: @focus-border;
+  font-weight: bolder;
+  opacity: 1;
 }
 
 .kiviatShape {
   // fill: orange;
   fill-opacity: 0.5;
 
-  // stroke: tint(@background, 50%);
-  stroke-opacty: 0.25;
+  stroke: #e0e0e0;
+  stroke-width: 1.25px;
+  stroke-opacity: 0.25;
+}
+
+.kiviatShapeActive {
+  stroke-width: 2px;
+  stroke-opacity: 0.75;
 }

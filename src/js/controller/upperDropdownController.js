@@ -56,10 +56,6 @@ let UpperDropdownController = function() {
       .style("background-color", newMainColor)
       .style("border-color", newStrokeColor);
 
-
-    // @focus-border: #21918c;
-    // @focus-boxshadow: #21918c;
-
     less.modifyVars({
       '@focus-border': newMainColor,
       '@focus-boxshadow': 'fade(' + newMainColor + ', 60%)'
@@ -90,6 +86,7 @@ let UpperDropdownController = function() {
     let dropdown = d3.select(this);
 
     App.state.currentRun = dropdown.node().value;
+    App.views.kiviatSummary.changeSelectedRun(App.state.currentRun);
 
     // retrieve new data and update views
     timeOrRunChange();

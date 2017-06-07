@@ -120,8 +120,8 @@ let KiviatView = function(div) {
         d3.select(this).append("text")
           .attr("class", "runNum")
           .attr("text-anchor", "left")
-          .attr("x", 2)
-          .attr("y", 10)
+          .attr("x", 4)
+          .attr("y", 12)
           .style("font-size", "10px")
           .text(d);
 
@@ -138,6 +138,8 @@ let KiviatView = function(div) {
       return;
     }
 
+    let numKiviatProperties = App.singleProperties.length + App.averagedProperties.length;
+
     drawAxes(el, Object.keys(self.scales).length);
 
 
@@ -147,7 +149,7 @@ let KiviatView = function(div) {
       for (let property of App.singleProperties) {
         let coord = rotate(
           self.scales[property](runData[property]),
-          self.propertyToAxisNum[property] * 360 / 10
+          self.propertyToAxisNum[property] * 360 / numKiviatProperties
         );
 
         coords.push(coord);
@@ -156,7 +158,7 @@ let KiviatView = function(div) {
       for (let property of App.averagedProperties) {
         let coord = rotate(
           self.scales[property].avg(runData[property].avg),
-          self.propertyToAxisNum[property] * 360 / 10
+          self.propertyToAxisNum[property] * 360 / numKiviatProperties
         );
 
         coords.push(coord);
@@ -178,7 +180,7 @@ let KiviatView = function(div) {
       for (let property of App.singleProperties) {
         let coord = rotate(
           self.scales[property](runData[property]),
-          self.propertyToAxisNum[property] * 360 / 10
+          self.propertyToAxisNum[property] * 360 / numKiviatProperties
         );
 
         outerCoords.push(coord);
@@ -188,12 +190,12 @@ let KiviatView = function(div) {
       for (let property of App.averagedProperties) {
         let outerPoint = rotate(
           self.scales[property].ext(runData[property].ext[1]),
-          self.propertyToAxisNum[property] * 360 / 10
+          self.propertyToAxisNum[property] * 360 / numKiviatProperties
         );
 
         let innerPoint = rotate(
           self.scales[property].ext(runData[property].ext[0]),
-          self.propertyToAxisNum[property] * 360 / 10
+          self.propertyToAxisNum[property] * 360 / numKiviatProperties
         );
 
         outerCoords.push(outerPoint);
@@ -227,7 +229,7 @@ let KiviatView = function(div) {
       .each(function(d) {
         let axis = d3.select(this);
 
-        let rotatedEnd = rotate(48, d * 360 / count);
+        let rotatedEnd = rotate(45, d * 360 / count);
         axis.attr("x1", rotatedEnd.x);
         axis.attr("y1", rotatedEnd.y);
       });
@@ -272,6 +274,7 @@ let KiviatView = function(div) {
     self.wrapper.selectAll(".kiviatSVG")
       .selectAll(".kiviatShape")
       .style("fill", d => {
+        console.log(d);
         console.log(colorScale(d[self.coloredProperty]));
         return colorScale(d[self.coloredProperty]);
       })
@@ -281,10 +284,26 @@ let KiviatView = function(div) {
     self.mode = newMode;
   }
 
+  function changeSelectedRun(num) {
+    self.wrapper.selectAll(".kiviatSVG")
+      .each(function(d) {
+        let svg = d3.select(this);
+        svg.select(".runNum")
+          .classed("runNumActive ", d == num)
+          .style("font-size", d == num ? "14px" : "10px");
+
+        svg.select(".kiviatShape")
+          .classed("kiviatShapeActive", function() {
+            return d == num
+          });
+      });
+  }
+
   return {
     resize,
     drawKiviats,
     changeColorScale,
-    changeMode
+    changeMode,
+    changeSelectedRun
   };
 };

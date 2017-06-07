@@ -99,6 +99,7 @@ window.onresize = function (){
         // use summary data
         App.views.kiviatLegend.setExtents(data.extents.totalClusters);
         App.views.kiviatSummary.drawKiviats(data);
+        App.views.kiviatSummary.changeSelectedRun(App.state.currentRun);
 
       })
       .catch(function(err) {
