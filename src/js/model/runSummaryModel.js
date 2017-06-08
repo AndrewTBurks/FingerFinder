@@ -35,6 +35,59 @@ let RunSummaryModel = function() {
       "avgFingerConcDensity",
       // "avgFingerPointDensity"
     ];
+
+    App.summaryPropertyToText = {
+      "totalClusters": {
+        name: "Total Fingers",
+        abbr: "Total Fingers",
+        desc: "The total number of unique fingers in a run."
+      },
+      "numClusters": {
+        name: "Fingers per Timestep",
+        abbr: "Finger/Time",
+        desc: "The number of fingers in each timestep."
+      },
+      "mergeFactor": {
+        name: "Merge Factor",
+        abbr: "Merge Factor",
+        desc: "The percent of fingers that merge into another in each timestep."
+      },
+      "dissipationFactor": {
+        name: "Dissipation Factor",
+        abbr: "Diss. Factor",
+        desc: "The percent of fingers that disappear in each timestep."
+      },
+      "avgFingerConc": {
+        name: "Average Finger Concentration",
+        abbr: "Avg. Finger Conc.",
+        desc: "The average total concentration of fingers in a timestep."
+      },
+      "avgFingerPointConc": {
+        name: "Average Finger Point Concentration",
+        abbr: "Avg. Finger Pt. Conc.",
+        desc: "The average concentration of points in fingers in a timestep."
+      },
+      "avgFingerVelMag": {
+        name: "Average Finger |Velocity|",
+        abbr: "Avg. Finger |Vel.|",
+        desc: "The average magnitude of velocity of fingers in a timestep."
+      },
+      "avgFingerVelMagConc": {
+        name: "Average Finger |Velocity| by Concentration",
+        abbr: "Avg. Finger |Vel.| by Conc.",
+        desc: "The average magnitude of velocity of fingers in a timestep, weighted by total concentration."
+      },
+      "avgFingerConcDensity": {
+        name: "Average Finger Concentration Density",
+        abbr: "Avg. Finger Conc. Dens.",
+        desc: "The average concentration density of fingers, by total concentration over the bounding box volume."
+      },
+      "avgFingerPointDensity": {
+        name: "Average Finger Point Density",
+        abbr: "Avg. Finger Pt. Dens.",
+        desc: "The average point density of fingers, by the # points over the bounding box volume."
+      }
+    };
   }
 
   function loadAllClusterCenters() {

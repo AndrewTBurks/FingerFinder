@@ -16,16 +16,54 @@
   stroke-linecap: round;
 }
 
+.kiviatAxisHelper {
+  stroke: transparent;
+  stroke-width: 12px;
+
+  pointer-events: stroke;
+
+  opacity: 0.5;
+
+  &:hover {
+    stroke: tint(@background, 20%);
+  }
+}
+
 .runNum {
   fill: #e0e0e0;
   font-weight: lighter;
+  font-size: 10px;
   opacity: 0.4;
+
+  pointer-events: stroke;
+  stroke: 5px;
+  stroke-color:transparent;
+
+  &:hover {
+    font-weight: bolder;
+    opacity: 1;
+    font-size: 14px;
+
+    cursor: pointer;
+  }
 }
 
 .runNumActive {
   fill: @focus-border;
+  font-size: 14px;
+
   font-weight: bolder;
   opacity: 1;
+}
+
+.helperCircle {
+  fill: @info-color;
+  stroke: #e0e0e0;
+
+  stroke-width: 1.25px;
+  stroke-opacity: 0.5;
+
+  cursor: help;
 }
 
 .kiviatShape {
@@ -34,9 +72,11 @@
 
   stroke-width: 1.25px;
   stroke-opacity: 0.25;
+
+  pointer-events: none;
 }
 
 .kiviatShapeActive {
-  stroke-width: 2px;
-  stroke-opacity: 0.75;
+  stroke-width: 3px;
+  stroke-opacity: 0.5;
 }

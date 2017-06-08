@@ -58,6 +58,12 @@ body {
 #aboutButton {
   background-color: @focus-border;
   border-color: @button-border;
+
+  &:active,
+  &:focus {
+    outline: 5px auto @button-outline;
+    outline-color: @button-outline;
+  }
 }
 
 .form-control:focus {
@@ -146,8 +152,7 @@ body {
 
 #flowControls {
   @import 'flowControls.less';
-
-  color: #e0e0e0;
+  color: #E0E0E0;
 }
 
 #flowView {
@@ -164,6 +169,14 @@ body {
 #kiviatSummary {
   @import 'kiviatSummary.less';
 }
+
+// d3 tip .less
+@import 'd3-tip.less';
+
+.valueText {
+  color: @info-color;
+}
+
 // functions
 
 .box-sizing(@param) {
@@ -171,6 +184,7 @@ body {
      -moz-box-sizing: @param;
           box-sizing: @param;
 }
+
 // generates the h-* classes h-0 to h-100 by 5 for % height
 .heightGen(0);
 
@@ -182,7 +196,8 @@ body {
 }
 
 @background: #1C2329;
+@button-outline: darken(@button-border, 15%);
 @info-color: tint(@focus-border, 25%);
-@button-border: #2c728e;
-@focus-border: #21918c;
+@button-border: #2C728E;
+@focus-border: #21918C;
 @focus-boxshadow: fade(@focus-border, 60%);

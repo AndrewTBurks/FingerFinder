@@ -37,9 +37,11 @@ let UpperDropdownController = function() {
     let scale = App.views.flowLegend.getColorOf;
 
     App.views.flow.setBackgroundColor(App.flowBG[App.state.colorScheme]);
+    // App.views.flow.setBackgroundColor("#1C2329");
     App.views.flow.changeColorScale(scale);
 
     App.views.slabs.setBackgroundColor(App.flowBG[App.state.colorScheme]);
+    // App.views.slabs.setBackgroundColor("#1C2329");
     App.views.slabs.changeColorScale(scale);
 
     App.views.kiviatLegend.setColors(App.colormaps[App.state.colorScheme]);
@@ -130,9 +132,22 @@ let UpperDropdownController = function() {
       });
   }
 
+  function changeCurrentRun(newRun) {
+    let dropdown = self.runDropdown;
+
+    dropdown.node().value = newRun;
+
+    App.state.currentRun = dropdown.node().value;
+    App.views.kiviatSummary.changeSelectedRun(App.state.currentRun);
+
+    timeOrRunChange();
+  }
+
   return {
     attachColorDropdown,
     attachRunDropdown,
-    attachTimeDropdown
+    attachTimeDropdown,
+
+    changeCurrentRun
   };
 };

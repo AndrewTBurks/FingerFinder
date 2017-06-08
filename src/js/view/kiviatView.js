@@ -9,7 +9,10 @@ let KiviatView = function(div) {
 
     scales: null,
     mode: "avg", // "avg" or "ext"
-    coloredProperty: "totalClusters"
+    coloredProperty: "totalClusters",
+
+    axisTip: null,
+    helpTip: null
   };
 
   init();
@@ -17,6 +20,28 @@ let KiviatView = function(div) {
   function init() {
     self.div = d3.select(div);
     self.scales = {};
+
+    self.axisTip = d3.tip()
+      .attr('class', 'd3-tip')
+      .direction("w")
+      .offset([0, -10])
+      .html(function(d) {
+        return "<strong>" + d.name + ":</strong><br><span class='valueText'>" + d.value.toFixed(2) + "</span>";
+      });
+
+    self.helpTip = d3.tip()
+      .attr('class', 'd3-tip')
+      .direction("e")
+      .offset([0, 10])
+      .html(function(d) {
+        let domain = _.includes(App.singleProperties, d) ?
+          self.scales[d].domain() :
+          self.scales[d][self.mode].domain();
+        let name = App.summaryPropertyToText[d].name;
+        let description = App.summaryPropertyToText[d].desc;
+
+        return "<strong>" + name + ": </strong><br><span class='valueText'>[" + domain[0].toFixed(2) + ", " + domain[1].toFixed(2) + "]</span><br>" + description;
+      });
 
     setupWrapper();
   }
@@ -126,15 +151,22 @@ let KiviatView = function(div) {
           .attr("text-anchor", "left")
           .attr("x", 4)
           .attr("y", 12)
-          .style("font-size", "10px")
-          .text(d);
+          // .style("font-size", "10px")
+          .text(d)
+          .on("click", function() {
+            if (summaryData.runs[runName]) {
+              App.controllers.upperDropdowns.changeCurrentRun(d);
+            }
+          });
 
         // create the actual kiviat diagram, translated to be centered within the svg
         d3.select(this)
           .append("g")
           .attr("class", "kiviatGroup")
           .attr("transform", "translate(50, 50)")
-          .call(createKiviat, d, summaryData.runs[runName]);
+          .call(createKiviat, d, summaryData.runs[runName])
+          .call(self.axisTip)
+          .call(self.helpTip);
       });
   }
 
@@ -149,7 +181,7 @@ let KiviatView = function(div) {
     let numKiviatProperties = App.singleProperties.length + App.averagedProperties.length;
 
     // draw the plot axes
-    drawAxes(el, Object.keys(self.scales).length);
+    drawAxes(el, Object.keys(self.scales).length, runData);
 
 
     // if the mode is average (one value for each property)
@@ -230,9 +262,32 @@ let KiviatView = function(div) {
         )
         .style("fill", App.views.kiviatLegend.getColorOf(runData[self.coloredProperty]));
     }
+
+    // for the first run, draw more tips on the axes
+    if (runNum === 1) {
+      el.selectAll(".helperCircle")
+        .data(Object.keys(self.scales))
+        .enter().append("circle")
+        .attr("class", "helperCircle")
+        .attr("r", 4)
+        .each(function(d, i, nodes) {
+          let circle = d3.select(this);
+
+          let axisNum = self.propertyToAxisNum[d];
+          let angle = axisNum * 360 / nodes.length;
+
+          let position = rotate(45, angle);
+
+          circle
+            .attr("cx", position.x)
+            .attr("cy", position.y)
+        })
+        .on("mouseover", self.helpTip.show)
+        .on("mouseout", self.helpTip.hide);
+    }
   }
 
-  function drawAxes(el, count) {
+  function drawAxes(el, count, runData) {
     // make a group for all of the axes
     let axesGroup = el.append("g")
       .attr("class", "axesGroup");
@@ -246,11 +301,28 @@ let KiviatView = function(div) {
       .attr("y0", 0)
       .each(function(d) {
         let axis = d3.select(this);
-
         let rotatedEnd = rotate(45, d * 360 / count);
         axis.attr("x1", rotatedEnd.x);
         axis.attr("y1", rotatedEnd.y);
-      });
+      })
+      .select(function() {
+        return this.parentNode.appendChild(this.cloneNode(true));
+      })
+      .datum(d => {
+        let prop = Object.keys(self.scales)[d];
+
+        return {
+          name: App.summaryPropertyToText[prop].name,
+          value: _.includes(App.singleProperties, prop) ?
+            runData[prop] : runData[prop][self.mode]
+        };
+      })
+      .attr("class", "kiviatAxisHelper")
+      .on("click", function(d) {
+        console.log(d);
+      })
+      .on("mouseover", self.axisTip.show)
+      .on("mouseout", self.axisTip.hide);
   }
 
   function rotate(x, angle) {
@@ -309,7 +381,7 @@ let KiviatView = function(div) {
         let svg = d3.select(this);
         svg.selectAll(".runNum")
           .classed("runNumActive ", d == num)
-          .style("font-size", d == num ? "14px" : "10px");
+          // .style("font-size", d == num ? "14px" : "10px");
 
         svg.selectAll(".kiviatShape")
           .classed("kiviatShapeActive", function(d2) {
