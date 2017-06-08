@@ -54,7 +54,7 @@ let KiviatView = function(div) {
       .style("height", height + "px");
 
     // resize the SVGs inside
-    let wrapperPadding = parseInt(self.wrapper.style("padding"));
+    let wrapperPadding = parseInt(self.wrapper.style("padding-top"));
     let squareSide = calculateSquareSideLength(
       width - wrapperPadding * 2,
       height - wrapperPadding * 2,
@@ -100,11 +100,11 @@ let KiviatView = function(div) {
     }
 
     // find square edge max size
-    let wrapperPadding = parseInt(self.wrapper.style("padding"));
+    let wrapperPadding = parseInt(self.wrapper.style("padding-top"));
 
     // calculate x, y of space for svgs and number of runs
-    let x = parseInt(self.wrapper.style("width")) - wrapperPadding * 2,
-      y = parseInt(self.wrapper.style("height")) - wrapperPadding * 2,
+    let x = parseInt(self.wrapper.style("width"), 10) - wrapperPadding * 2,
+      y = parseInt(self.wrapper.style("height"), 10) - wrapperPadding * 2,
       n = 20;
 
     let squareSide = calculateSquareSideLength(x, y, n);
