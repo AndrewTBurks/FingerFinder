@@ -6,6 +6,8 @@ let FlowView = function(div) {
   let self = {
     div: null,
     currentPointData: null,
+    timestepFingers: null,
+    timestepFingerPoints: null,
 
     scene: null,
     camera: null,
@@ -38,6 +40,7 @@ let FlowView = function(div) {
   }
 
   function setupRenderer() {
+    // get size for canvas based on avaliable size inside div
     let elemNode = self.div.node();
     let title = self.div.select(".sectionTitle");
 
@@ -47,8 +50,10 @@ let FlowView = function(div) {
 
     let height = elemNode.clientHeight - titleHeight - titleMargin;
 
+    // set up scene
     self.scene = new THREE.Scene();
 
+    // create camera then update based on local vars for dist, angle, and height of camera
     self.camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
     updateCameraPosition();
 
@@ -57,6 +62,7 @@ let FlowView = function(div) {
 
     elemNode.appendChild(self.renderer.domElement);
 
+    // create the box that shows the slab area
     createSlabBox();
     setupMouseEventHandlers();
 
@@ -231,12 +237,20 @@ let FlowView = function(div) {
 
   }
 
-  function updateData(dataPoints) {
+  function updateData(dataPoints, fingers) {
     if (self.particles) {
       self.scene.remove(self.particles);
     }
 
     let stats = App.models.simulationData.getStats();
+
+
+    // create dictionary of points in viscous fingers
+    self.timestepFingers = fingers[App.state.currentTimestep];
+    self.timestepFingerPoints = {};
+    _.forEach(_.flatten(self.timestepFingers), i => {
+      self.timestepFingerPoints[i] = true;
+    });
 
     self.allPointData = Object.values(dataPoints);
 
@@ -334,7 +348,9 @@ let FlowView = function(div) {
       } else if (self.flowColorMode === "highlight") {
         return (self.slabbedPoints[point.id] ? pointColor.offsetHSL(0, 0, 0.15) : pointColor);
       } else if (self.flowColorMode === "fingers") {
-
+        // check for id in dictionary, if it doesn't exist, desturate
+        return (self.timestepFingerPoints[point.id] ?
+          pointColor : pointColor.offsetHSL(0, -1, 0));
       }
 
       return pointColor;

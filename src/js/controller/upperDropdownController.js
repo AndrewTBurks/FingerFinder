@@ -127,7 +127,7 @@ let UpperDropdownController = function() {
           timestepDataStats.extent[1]
         ]);
 
-        App.views.flow.updateViewWithNewData(pointData);
+        App.views.flow.updateViewWithNewData(pointData, clusterData);
         App.controllers.flowSlab.slabUpdated();
       });
   }
