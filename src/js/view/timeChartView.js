@@ -47,7 +47,17 @@ let TimeChartView = function(div) {
       .attr("height", height);
   }
 
+  function drawFingerGraph(fingerData) {
+    
+  }
+
+  function updateSelectedRun(selectedRun) {
+
+  }
+
   return {
-    resize
+    resize,
+    drawFingerGraph,
+    updateSelectedRun
   };
 };
