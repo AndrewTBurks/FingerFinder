@@ -81,6 +81,7 @@ let UpperDropdownController = function() {
     let dropdown = d3.select(this);
 
     App.state.currentRun = dropdown.node().value;
+    App.views.timeChart.updateSelectedRun(App.state.currentRun);
     App.views.kiviatSummary.changeSelectedRun(App.state.currentRun);
 
     // retrieve new data and update views
@@ -138,6 +139,7 @@ let UpperDropdownController = function() {
     dropdown.node().value = newRun;
 
     App.state.currentRun = dropdown.node().value;
+    App.views.timeChart.updateSelectedRun(App.state.currentRun);
     App.views.kiviatSummary.changeSelectedRun(App.state.currentRun);
 
     timeOrRunChange();

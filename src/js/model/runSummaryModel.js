@@ -270,9 +270,8 @@ let RunSummaryModel = function() {
     return loadAllClusterCenters();
   }
 
-  function getClusterSummary() {
-    return loadAllClusterCenters()
-      .then(summarizeClusterData);
+  function getClusterSummary(data) {
+    return summarizeClusterData(data);
   }
 
   function getSingleProperties() {

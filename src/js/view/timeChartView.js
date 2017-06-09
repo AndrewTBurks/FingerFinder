@@ -4,7 +4,16 @@ var App = App || {};
 
 let TimeChartView = function(div) {
   let self = {
+    div: null,
+    SVG: null,
+    width: null,
+    height: null,
 
+    timeScale: null,
+    fingerScale: null,
+
+    runPaths: null,
+    currentSelection: [10, 30]
   };
 
   init();
@@ -16,21 +25,19 @@ let TimeChartView = function(div) {
   }
 
   function setupSVG() {
-    // these will remain squares and will not fill space completely
     let elemNode = self.div.node();
     let title = self.div.select(".sectionTitle");
 
-    let width = elemNode.clientWidth;
+    self.width = elemNode.clientWidth;
     let titleHeight = title.node().clientHeight;
     let titleMargin = parseInt(title.style("margin-bottom")) + parseInt(title.style("margin-top"));
-    let height = elemNode.clientHeight - titleHeight - titleMargin;
-    // let height = elemNode.clientHeight - 20;
+    self.height = elemNode.clientHeight - titleHeight - titleMargin;
 
     self.SVG = self.div
-    .append("svg")
-      .attr("width", width)
-      .attr("height", height)
-      .attr("viewBox", [0, 0, width, height].join(" "));
+      .append("svg")
+      .attr("width", self.width)
+      .attr("height", self.height)
+      .attr("viewBox", [0, 0, self.width, self.height].join(" "));
   }
 
   function resize() {
@@ -47,17 +54,111 @@ let TimeChartView = function(div) {
       .attr("height", height);
   }
 
-  function drawFingerGraph(fingerData) {
-    
+  function drawTimeChart(fingerData) {
+    let margin = {
+      top: 5,
+      bottom: 20,
+      left: 20,
+      right: 15
+    };
+
+    self.SVG.selectAll("*").remove();
+
+    let maxFingers = d3.max(Object.values(fingerData), r => d3.max(r, t => t.length));
+    let timeLength = Object.values(fingerData)[0].length - 1;
+
+    self.timeScale = d3.scaleLinear()
+      .domain([0, timeLength])
+      .range([margin.left, self.width - margin.right]);
+
+    self.fingerScale = d3.scaleLinear()
+      .domain([0, maxFingers])
+      .range([self.height - margin.bottom, margin.top]);
+
+    console.log(self.timeScale.domain())
+    console.log(self.fingerScale.domain())
+
+    let xAxis = d3.axisBottom(self.timeScale)
+      .ticks(13);
+    let yAxis = d3.axisLeft(self.fingerScale)
+      .tickValues([0, 11, 22, 33]);
+
+
+    self.SVG.append("g")
+      // .attr("class", "axis axis--x")
+      .attr("transform", "translate(" + 0 + ", " + (self.height - margin.bottom) + ")")
+      .call(xAxis);
+
+    self.SVG.append("g")
+      // .attr("class", "axis axis--y")
+      .attr("transform", "translate(" + margin.left + ", " + 0 + ")")
+      .call(yAxis);
+
+    // draw lines for data
+    let line = d3.line()
+      .x((d, i) => self.timeScale(i))
+      .y(d => self.fingerScale(d.length));
+
+    self.runPaths = self.SVG.append("g")
+      .attr("class", "runPathsGroup");
+
+    self.runPaths.selectAll(".runPath")
+      .data(Object.keys(fingerData))
+      .enter().append("path")
+      .attr("class", "runPath")
+      .attr("d", function(d) {
+        return line(fingerData[d]);
+      })
+      .classed("currentRunPath", d => parseInt(d.substr(-2)) == App.state.currentRun);
+
+    self.runPaths.selectAll(".currentRunPath").raise();
+
+    // create brush
+    let brush = d3.brushX()
+      .handleSize(4)
+      .on("end", brushEnd)
+      .extent([
+        [margin.left, margin.top],
+        [self.width - margin.right, self.height - margin.bottom]
+      ]);
+
+    let brushG = self.SVG.append("g")
+      .attr("class", "brush")
+      .on("click", function() {console.log("click"); d3.event.preventDefault();})
+      .call(brush);
+
+    brushG.selectAll(".selection")
+      .style("fill-opacity", 0.1);
+
+    brushG.call(brush.move, [self.timeScale(self.currentSelection[0]), self.timeScale(self.currentSelection[1])])
+
+    function brushEnd() {
+      if (!d3.event.sourceEvent) return; // Only transition after input.
+
+      let brushDomain = [0, 120];
+      if (!d3.event.selection) {
+        brushDomain = self.currentSelection;
+      } else {
+        let selection = d3.event.selection;
+        brushDomain = self.currentSelection = [Math.round(self.timeScale.invert(selection[0]) / 5) * 5, Math.round(self.timeScale.invert(selection[1]) / 5) * 5];
+      }
+
+      let newBrushPos = [self.timeScale(brushDomain[0]), self.timeScale(brushDomain[1])];
+
+      d3.select(this).transition().call(d3.event.target.move, newBrushPos);
+    }
   }
 
   function updateSelectedRun(selectedRun) {
+    self.runPaths.selectAll(".runPath")
+      .classed("currentRunPath", d => parseInt(d.substr(-2)) == App.state.currentRun);
 
+    self.runPaths.selectAll(".currentRunPath").raise();
   }
 
   return {
     resize,
-    drawFingerGraph,
+    drawTimeChart,
     updateSelectedRun
   };
 };

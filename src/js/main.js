@@ -95,14 +95,18 @@ window.onresize = function (){
       });
 
     // App.models.runSummary.getClusterCenters()
+    App.models.runSummary.getClusterCenters()
+      .then(function(clusterData) {
+        App.views.timeChart.drawTimeChart(clusterData);
 
-    App.models.runSummary.getClusterSummary()
-      .then(function(data) {
+        return clusterData;
+      })
+      .then(App.models.runSummary.getClusterSummary)
+      .then(function(summaryData) {
         // use summary data
-        App.views.kiviatLegend.setExtents(data.extents.totalClusters);
-        App.views.kiviatSummary.drawKiviats(data);
+        App.views.kiviatLegend.setExtents(summaryData.extents.totalClusters);
+        App.views.kiviatSummary.drawKiviats(summaryData);
         App.views.kiviatSummary.changeSelectedRun(App.state.currentRun);
-
       })
       .catch(function(err) {
         console.log(err);
