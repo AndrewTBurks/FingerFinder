@@ -26,7 +26,7 @@
   <script>
     // set up options for less.js
     less = {
-      env: "production"
+      // env: "production"
     };
   </script>
   <!-- less.js to parse stylesheet/less -->
@@ -53,6 +53,7 @@
   <script src="./src/js/controller/upperDropdownController.js"></script>
   <script src="./src/js/controller/flowColorModeController.js"></script>
   <script src="./src/js/controller/flowSlabController.js"></script>
+  <script src="./src/js/controller/timeWindowController.js"></script>
 
 
   <!-- Main Script -->
@@ -225,6 +226,19 @@
       </div>
     </div>
   </div>
+
+  <filter id="dropshadow" height="130%">
+    <feGaussianBlur in="SourceAlpha" stdDeviation="3" />
+    <!-- stdDeviation is how much to blur -->
+    <feOffset dx="2" dy="2" result="offsetblur" />
+    <!-- how much to offset -->
+    <feMerge>
+      <feMergeNode/>
+      <!-- this contains the offset blurred image -->
+      <feMergeNode in="SourceGraphic" />
+      <!-- this contains the element that the filter is applied to -->
+    </feMerge>
+  </filter>
 </body>
 
 </html>

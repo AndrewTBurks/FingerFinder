@@ -36,13 +36,16 @@ let UpperDropdownController = function() {
     App.views.flowLegend.setColors(App.colormaps[App.state.colorScheme]);
     let scale = App.views.flowLegend.getColorOf;
 
-    App.views.flow.setBackgroundColor(App.flowBG[App.state.colorScheme]);
-    // App.views.flow.setBackgroundColor("#1C2329");
+    // App.views.flow.setBackgroundColor(App.flowBG[App.state.colorScheme]);
+    App.views.flow.setBackgroundColor("#1C2329");
     App.views.flow.changeColorScale(scale);
 
-    App.views.slabs.setBackgroundColor(App.flowBG[App.state.colorScheme]);
-    // App.views.slabs.setBackgroundColor("#1C2329");
+    // App.views.slabs.setBackgroundColor(App.flowBG[App.state.colorScheme]);
+    App.views.slabs.setBackgroundColor("#1C2329");
     App.views.slabs.changeColorScale(scale);
+
+    // update color scale of finger forest
+    App.views.fingerForest.updateColorScale(scale);
 
     App.views.kiviatLegend.setColors(App.colormaps[App.state.colorScheme]);
     let kiviatScale = App.views.kiviatLegend.getColorOf;
@@ -82,6 +85,7 @@ let UpperDropdownController = function() {
 
     App.state.currentRun = dropdown.node().value;
     App.views.timeChart.updateSelectedRun(App.state.currentRun);
+    App.views.fingerForest.updateSelectedRun(App.state.currentRun);
     App.views.kiviatSummary.changeSelectedRun(App.state.currentRun);
 
     // retrieve new data and update views
@@ -111,6 +115,7 @@ let UpperDropdownController = function() {
 
     App.state.currentTimestep = dropdown.node().value;
 
+    App.views.fingerForest.updateSelectedTimestep(App.state.currentTimestep);
     // retrieve new data and update views
     timeOrRunChange();
   }

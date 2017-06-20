@@ -13,7 +13,10 @@ let TimeChartView = function(div) {
     fingerScale: null,
 
     runPaths: null,
-    currentSelection: [10, 30]
+    currentSelection: [10, 30],
+
+    brush: null,
+    brushG: null
   };
 
   init();
@@ -75,9 +78,6 @@ let TimeChartView = function(div) {
       .domain([0, maxFingers])
       .range([self.height - margin.bottom, margin.top]);
 
-    console.log(self.timeScale.domain())
-    console.log(self.fingerScale.domain())
-
     let xAxis = d3.axisBottom(self.timeScale)
       .ticks(13);
     let yAxis = d3.axisLeft(self.fingerScale)
@@ -114,7 +114,7 @@ let TimeChartView = function(div) {
     self.runPaths.selectAll(".currentRunPath").raise();
 
     // create brush
-    let brush = d3.brushX()
+    let brush = self.brush = d3.brushX()
       .handleSize(4)
       .on("end", brushEnd)
       .extent([
@@ -122,7 +122,7 @@ let TimeChartView = function(div) {
         [self.width - margin.right, self.height - margin.bottom]
       ]);
 
-    let brushG = self.SVG.append("g")
+    let brushG = self.brushG = self.SVG.append("g")
       .attr("class", "brush")
       .on("click", function() {console.log("click"); d3.event.preventDefault();})
       .call(brush);
@@ -140,13 +140,31 @@ let TimeChartView = function(div) {
         brushDomain = self.currentSelection;
       } else {
         let selection = d3.event.selection;
-        brushDomain = self.currentSelection = [Math.round(self.timeScale.invert(selection[0]) / 5) * 5, Math.round(self.timeScale.invert(selection[1]) / 5) * 5];
+        let startTime = Math.round(self.timeScale.invert(selection[0]) / 5) * 5;
+        let endTime = Math.round(self.timeScale.invert(selection[1]) / 5) * 5;
+
+        if (startTime === endTime) {
+          endTime += 5;
+        }
+
+        brushDomain = self.currentSelection = [
+          startTime,
+          endTime
+        ];
       }
 
       let newBrushPos = [self.timeScale(brushDomain[0]), self.timeScale(brushDomain[1])];
 
       d3.select(this).transition().call(d3.event.target.move, newBrushPos);
+
+      App.controllers.timeWindow.timeWindowBrushUpdated(brushDomain);
     }
+  }
+
+  function updateBrushTimeWindow(newWindow) {
+    self.currentSelection = newWindow;
+
+    self.brushG.call(self.brush.move, [self.timeScale(self.currentSelection[0]), self.timeScale(self.currentSelection[1])]);
   }
 
   function updateSelectedRun(selectedRun) {
@@ -159,6 +177,7 @@ let TimeChartView = function(div) {
   return {
     resize,
     drawTimeChart,
+    updateBrushTimeWindow,
     updateSelectedRun
   };
 };

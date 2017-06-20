@@ -52,6 +52,7 @@ let FlowView = function(div) {
 
     // set up scene
     self.scene = new THREE.Scene();
+    self.scene.background = new THREE.Color("#1C2329");
 
     // create camera then update based on local vars for dist, angle, and height of camera
     self.camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
@@ -59,6 +60,7 @@ let FlowView = function(div) {
 
     self.renderer = new THREE.WebGLRenderer();
     self.renderer.setSize(width, height);
+
 
     elemNode.appendChild(self.renderer.domElement);
 

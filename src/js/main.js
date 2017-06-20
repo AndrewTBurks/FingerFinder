@@ -59,6 +59,8 @@ window.onresize = function (){
 
     App.controllers.flowSlab = new FlowSlabController("#flowControls");
 
+    App.controllers.timeWindow = new TimeWindowController();
+
     // load data then initialize views with data
     loadAllData();
   };
@@ -89,6 +91,8 @@ window.onresize = function (){
 
         App.views.flow.updateViewWithNewData(pointData, clusterData);
         App.controllers.flowSlab.slabUpdated();
+
+        App.views.fingerForest.updateColorScale();
       })
       .catch(function(err) {
         console.log(err);
@@ -98,12 +102,17 @@ window.onresize = function (){
     App.models.runSummary.getClusterCenters()
       .then(function(clusterData) {
         App.views.timeChart.drawTimeChart(clusterData);
+        App.views.fingerForest.importClusterData(clusterData);
+
+        // initialize the time window to be 30-50
+        App.controllers.timeWindow.setTimeWindow([30, 50]);
 
         return clusterData;
       })
       .then(App.models.runSummary.getClusterSummary)
       .then(function(summaryData) {
         // use summary data
+        // TODO: allow for kiviat coloring changes
         App.views.kiviatLegend.setExtents(summaryData.extents.totalClusters);
         App.views.kiviatSummary.drawKiviats(summaryData);
         App.views.kiviatSummary.changeSelectedRun(App.state.currentRun);

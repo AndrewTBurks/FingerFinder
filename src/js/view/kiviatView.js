@@ -318,9 +318,6 @@ let KiviatView = function(div) {
         };
       })
       .attr("class", "kiviatAxisHelper")
-      .on("click", function(d) {
-        console.log(d);
-      })
       .on("mouseover", self.axisTip.show)
       .on("mouseout", self.axisTip.hide);
   }
