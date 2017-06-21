@@ -357,6 +357,10 @@ let KiviatView = function(div) {
     return Math.max(sx, sy);
   }
 
+  function setColoredProperty(propertyName) {
+    self.coloredProperty = propertyName;
+  }
+
   // update the colors of the kiviat diagrams
   function changeColorScale(colorScale) {
     self.wrapper.selectAll(".kiviatSVG")
@@ -390,6 +394,7 @@ let KiviatView = function(div) {
   return {
     resize,
     drawKiviats,
+    setColoredProperty,
     changeColorScale,
     changeMode,
     changeSelectedRun

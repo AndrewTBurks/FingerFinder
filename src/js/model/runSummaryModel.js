@@ -64,27 +64,27 @@ let RunSummaryModel = function() {
       },
       "avgFingerPointConc": {
         name: "Average Finger Point Concentration",
-        abbr: "Avg. Finger Pt. Conc.",
+        abbr: "μ Finger Pt. Conc.",
         desc: "The average concentration of points in fingers in a timestep."
       },
       "avgFingerVelMag": {
         name: "Average Finger |Velocity|",
-        abbr: "Avg. Finger |Vel.|",
+        abbr: "μ Finger |Vel.|",
         desc: "The average magnitude of velocity of fingers in a timestep."
       },
       "avgFingerVelMagConc": {
         name: "Average Finger |Velocity| by Concentration",
-        abbr: "Avg. Finger |Vel.| by Conc.",
+        abbr: "μ Finger |Vel.| by Conc.",
         desc: "The average magnitude of velocity of fingers in a timestep, weighted by total concentration."
       },
       "avgFingerConcDensity": {
         name: "Average Finger Concentration Density",
-        abbr: "Avg. Finger Conc. Dens.",
+        abbr: "μ Finger Conc. Dens.",
         desc: "The average concentration density of fingers, by total concentration over the bounding box volume."
       },
       "avgFingerPointDensity": {
         name: "Average Finger Point Density",
-        abbr: "Avg. Finger Pt. Dens.",
+        abbr: "μ Finger Pt. Dens.",
         desc: "The average point density of fingers, by the # points over the bounding box volume."
       }
     };

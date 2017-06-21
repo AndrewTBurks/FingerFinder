@@ -61,6 +61,9 @@ window.onresize = function (){
 
     App.controllers.timeWindow = new TimeWindowController();
 
+    App.controllers.kiviatColorMode = new KiviatColorMode();
+    App.controllers.kiviatColorMode.attachColorModeDropdown("#kiviatColoringSelect");
+
     // load data then initialize views with data
     loadAllData();
   };
@@ -113,6 +116,10 @@ window.onresize = function (){
       .then(function(summaryData) {
         // use summary data
         // TODO: allow for kiviat coloring changes
+        console.log(summaryData);
+
+        App.controllers.kiviatColorMode.saveScaleRanges(summaryData);
+
         App.views.kiviatLegend.setExtents(summaryData.extents.totalClusters);
         App.views.kiviatSummary.drawKiviats(summaryData);
         App.views.kiviatSummary.changeSelectedRun(App.state.currentRun);
