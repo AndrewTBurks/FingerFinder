@@ -7,7 +7,8 @@ let FingerForestView = function(div) {
     div: null,
     SVG: null,
 
-    clusterData: null
+    clusterData: null,
+    selectedFinger: null
   };
 
   init();
@@ -60,7 +61,7 @@ let FingerForestView = function(div) {
       });
     });
 
-    let positionMap = calculateIDtoPositionMap(timeWindow);
+    let positionMap = calculateIDtoPositionMap(timeWindow, uniqData);
 
     let numClusters = Object.keys(positionMap).length;
 
@@ -108,7 +109,22 @@ let FingerForestView = function(div) {
     let axis = d3.axisBottom(x)
       .tickValues(d3.range(timeWindow[0], timeWindow[1] + 1, 2));
 
+    let tip = d3.tip()
+      .attr('class', 'd3-tip')
+      .direction("w")
+      .offset([0, -5])
+      .html(function(d) {
+        let id = "<strong>ID: </strong>" + d.clusterID;
+        let time = "<strong>Timestep: </strong>" + d.timestep;
+        let size = "<strong># Pts.: </strong>" + d.size;
+        let conc = "<strong>Avg. Conc.: </strong>" + (d.concTotal / d.size).toFixed(2);
+
+        return [id, time, size, conc].join("<br>");
+      });
+
     self.SVG.selectAll("*").remove();
+
+    self.SVG.call(tip);
 
     self.timestepHighlight = self.SVG.append("line");
 
@@ -140,6 +156,19 @@ let FingerForestView = function(div) {
           .data(Object.values(uniqData[d]))
           // .data(_.uniqBy(_.orderBy(runClusters[d], 'size', "desc"), 'clusterID'))
           .enter().append("circle")
+          .each(f => {
+            // attach timestep to each
+            f.timestep = d;
+
+            // attach index of clusters (based on timestep clusters array)
+            f.clusterIndex = [];
+
+            _.forEach(runClusters[d], (data, ind) => {
+              if (data.clusterID == f.clusterID) {
+                f.clusterIndex.push(ind);
+              }
+            });
+          })
           .attr("class", "finger")
           .attr("id", (f) => f.clusterID)
           .attr("r", (f) => radiusScale(f.size))
@@ -151,7 +180,10 @@ let FingerForestView = function(div) {
             let yCoord = y(pos);
 
             return "translate(0, " + yCoord + ")";
-          });
+          })
+          .on("mouseover", tip.show)
+          .on("mouseout", tip.hide)
+          .on("click", nodeClicked);
 
       });
 
@@ -165,7 +197,7 @@ let FingerForestView = function(div) {
       .each(function(d) {
         d3.select(this).selectAll(".link")
           .data(runClusters[d].filter(f => f.nextClusterID != -1))
-        .enter().append("path")
+          .enter().append("path")
           .attr("class", "link")
           .each(function(f) {
             let line = d3.select(this);
@@ -183,26 +215,17 @@ let FingerForestView = function(div) {
             line
               .attr("d", path)
               .style("stroke-width", radiusScale(f.size));
-          })
-          // .select(function() {
-          //   return this.parentNode.appendChild(this.cloneNode(true));
-          // })
-          // .attr("class", "linkShadow")
-          // .style("stroke-width", function() {
-          //   return d3.select(this).style("stroke-width") + 2;
-          // });
+          });
       });
 
   }
 
-  function calculateIDtoPositionMap(timeWindow) {
-    let runClusters = self.clusterData[("run" + ("0" + App.state.currentRun).substr(-2))];
-
+  function calculateIDtoPositionMap(timeWindow, data) {
     let fingerTimeRange = {};
 
     // for all timesteps, store all timesteps active of fingers
     for (let i = timeWindow[0]; i <= timeWindow[1]; i++) {
-      for (let finger of runClusters[i]) {
+      for (let finger of Object.values(data[i])) {
         if (!fingerTimeRange[finger.clusterID]) {
           fingerTimeRange[finger.clusterID] = {
             children: [],
@@ -222,7 +245,7 @@ let FingerForestView = function(div) {
     // add connect fingers through children arrays (up before last timestep)
     // also check if a finger is a root
     for (let i = timeWindow[0]; i < timeWindow[1]; i++) {
-      for (let finger of runClusters[i]) {
+      for (let finger of Object.values(data[i])) {
         // check if it is a root
         if (finger.nextClusterID == -1) {
           fingerTimeRange[finger.clusterID].disap = true;
@@ -235,7 +258,7 @@ let FingerForestView = function(div) {
       }
     }
 
-    for (let finger of runClusters[timeWindow[1]]) {
+    for (let finger of Object.values(data[timeWindow[1]])) {
       fingerTimeRange[finger.clusterID].root = true;
     }
 
@@ -301,6 +324,24 @@ let FingerForestView = function(div) {
 
       return fingerTimeRange[id].inOrderChildren;
     }
+  }
+
+  function nodeClicked(d) {
+    let node = d3.select(this);
+
+    if (self.selectedFinger === d) {
+      node.classed("selected", false);
+      self.selectedFinger = null;
+    } else {
+      self.SVG.selectAll(".finger").classed("selected", false);
+      node.classed("selected", true);
+      self.selectedFinger = d;
+    }
+
+    App.views.flow.setSelectedFinger(self.selectedFinger);
+    App.controllers.flowColorMode.setFlowColorMode("fingers");
+    App.controllers.upperDropdowns.changeCurrentTimestep(d.timestep);
+
   }
 
   function updateSelectedRun(run) {

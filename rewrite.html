@@ -66,7 +66,7 @@
     <div class="container-fluid" id="navbar">
       <h2 id="title">FingerFinder</h2>
       <ul class="nav navbar-nav navbar-right">
-        <button class="btn navbar-btn btn-info" id="aboutButton">
+        <button class="btn navbar-btn btn-info" data-toggle="modal" data-target="#aboutModal" id="aboutButton">
           <span class="glyphicon glyphicon-info-sign"></span>
           About
         </button>
@@ -227,18 +227,36 @@
     </div>
   </div>
 
-  <filter id="dropshadow" height="130%">
-    <feGaussianBlur in="SourceAlpha" stdDeviation="3" />
-    <!-- stdDeviation is how much to blur -->
-    <feOffset dx="2" dy="2" result="offsetblur" />
-    <!-- how much to offset -->
-    <feMerge>
-      <feMergeNode/>
-      <!-- this contains the offset blurred image -->
-      <feMergeNode in="SourceGraphic" />
-      <!-- this contains the element that the filter is applied to -->
-    </feMerge>
-  </filter>
+  <!-- Modal -->
+  <div id="aboutModal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+
+      <!-- Modal content-->
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title">About</h4>
+        </div>
+        <div class="modal-body">
+          <h4>
+            <span class="name">FingerFinder</span> is developed by a group of researchers at the Electronic Visualization Laboratory, University of Illinois at Chicago under the direction of G.Elisabeta Marai.
+          </h4>
+          <h4>
+            Team members include: Andrew Burks, Cassiano Sugiyama and Timothy Luciani
+          </h4>
+          <h4>
+            Please send all feedback and questions to marai@uic.edu
+          </h4>
+        </div>
+        <div class="modal-footer">
+          <button id="closeButton" type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+
 </body>
 
 </html>

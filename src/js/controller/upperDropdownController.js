@@ -150,11 +150,23 @@ let UpperDropdownController = function() {
     timeOrRunChange();
   }
 
+  function changeCurrentTimestep(newTimestep) {
+    let dropdown = self.timeDropdown;
+
+    dropdown.node().value = newTimestep;
+
+    App.state.currentTimestep = dropdown.node().value;
+    App.views.fingerForest.updateSelectedTimestep(App.state.currentTimestep);
+
+    timeOrRunChange();
+  }
+
   return {
     attachColorDropdown,
     attachRunDropdown,
     attachTimeDropdown,
 
-    changeCurrentRun
+    changeCurrentRun,
+    changeCurrentTimestep
   };
 };

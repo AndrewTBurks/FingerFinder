@@ -6,6 +6,7 @@ let FlowView = function(div) {
   let self = {
     div: null,
     currentPointData: null,
+    runFingers: null,
     timestepFingers: null,
     timestepFingerPoints: null,
 
@@ -23,6 +24,7 @@ let FlowView = function(div) {
     slabZ: 0,
     slab: null,
     slabbedPoints: null,
+    selectedFinger: null,
 
     cameraDistance: 15,
     cameraAngle: 7 * Math.PI / 4,
@@ -246,15 +248,23 @@ let FlowView = function(div) {
 
     let stats = App.models.simulationData.getStats();
 
+    self.allPointData = Object.values(dataPoints);
+    self.runFingers = fingers;
+
+    if (self.selectedFinger) {
+      self.timestepFingers = _.filter(self.runFingers[App.state.currentTimestep], (f, i) => {
+        return _.includes(self.selectedFinger.clusterIndex, i);
+      });
+
+    } else {
+      self.timestepFingers = self.runFingers[App.state.currentTimestep];
+    }
 
     // create dictionary of points in viscous fingers
-    self.timestepFingers = fingers[App.state.currentTimestep];
     self.timestepFingerPoints = {};
     _.forEach(_.flatten(self.timestepFingers), i => {
       self.timestepFingerPoints[i] = true;
     });
-
-    self.allPointData = Object.values(dataPoints);
 
     self.currentPointData = _.filter(Object.values(dataPoints), function(p) {
       return p.conc > stats.mean + stats.stdDev / 8;
@@ -368,6 +378,10 @@ let FlowView = function(div) {
     self.particles.geometry.colorsNeedUpdate = true;
   }
 
+  function setSelectedFinger(finger) {
+    self.selectedFinger = finger;
+  }
+
   function resize() {
     let elemNode = self.div.node();
     let title = self.div.select(".sectionTitle");
@@ -384,9 +398,12 @@ let FlowView = function(div) {
     updateViewWithNewData: updateData,
     setBackgroundColor,
     setFlowColorMode,
+    setSelectedFinger,
+
     calculateSlabbedPoints,
     getSlabbedPoints,
     updateSlabPosition,
+
     changeColorScale,
     resize
   };

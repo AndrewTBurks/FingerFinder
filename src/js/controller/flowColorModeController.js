@@ -19,7 +19,16 @@ let FlowColorModeController = function() {
     App.views.flow.changeColorScale(App.views.flowLegend.getColorOf);
   }
 
+  function setFlowColorMode(mode) {
+    self.select.node().value = mode;
+
+
+    App.views.flow.setFlowColorMode(mode);
+    App.views.flow.changeColorScale(App.views.flowLegend.getColorOf);
+  }
+
   return {
-    attachColorModeDropdown
+    attachColorModeDropdown,
+    setFlowColorMode
   };
 };

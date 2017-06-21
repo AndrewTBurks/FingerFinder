@@ -8,11 +8,28 @@ html {
 
 body {
   font-family: 'Lato', sans-serif;
-  background-color: #1C2329;
+  background-color: @background;
   color: #E0E0E0;
   .box-sizing(border-box);
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
+}
+
+.modal-content {
+  background-color: tint(@background, 5%);
+  border-width: 1px;
+  border-color: tint(@background, 15%);
+
+  .box-shadow(0 0 25px @focus-border);
+
+  .name {
+    color: @focus-border;
+    font-weight: bolder;
+  }
+
+  .close {
+    color: #e0e0e0
+  }
 }
 
 .contentPanel {
@@ -55,9 +72,10 @@ body {
   margin: 8px 20px 10px 20px;
 }
 
-#aboutButton {
+#aboutButton, #closeButton {
   background-color: @focus-border;
   border-color: @button-border;
+  color: #e0e0e0;
 
   &:active,
   &:focus {
@@ -81,7 +99,7 @@ body {
   select {
     background-color: tint(@background, 5%);
     border-color: tint(@background, 15%);
-    color: #e0e0e0;
+    color: #E0E0E0;
     font-size: 18px;
     padding: 4px 8px;
   }
@@ -136,7 +154,7 @@ body {
     width: auto;
     background-color: tint(@background, 5%);
     border-color: tint(@background, 15%);
-    color: #e0e0e0;
+    color: #E0E0E0;
     padding: 0px 3px;
     font-size: 12px;
     height: 20px;
@@ -183,6 +201,12 @@ body {
   -webkit-box-sizing: @param;
      -moz-box-sizing: @param;
           box-sizing: @param;
+}
+
+.box-shadow(@param) {
+  -webkit-box-shadow: @param;
+     -moz-box-shadow: @param;
+          box-shadow: @param;
 }
 
 // generates the h-* classes h-0 to h-100 by 5 for % height
