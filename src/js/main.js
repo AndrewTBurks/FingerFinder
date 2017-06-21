@@ -115,8 +115,6 @@ window.onresize = function (){
       .then(App.models.runSummary.getClusterSummary)
       .then(function(summaryData) {
         // use summary data
-        // TODO: allow for kiviat coloring changes
-        console.log(summaryData);
 
         App.controllers.kiviatColorMode.saveScaleRanges(summaryData);
 

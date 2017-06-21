@@ -366,7 +366,9 @@ let KiviatView = function(div) {
     self.wrapper.selectAll(".kiviatSVG")
       .selectAll(".kiviatShape")
       .style("fill", d => {
-        return colorScale(d[self.coloredProperty]);
+        let isAvg = _.includes(App.averagedProperties, self.coloredProperty);
+        let data = isAvg ? d[self.coloredProperty].avg : d[self.coloredProperty];
+        return colorScale(data);
       })
   }
 

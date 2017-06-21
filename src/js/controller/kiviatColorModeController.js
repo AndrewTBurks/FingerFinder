@@ -33,6 +33,7 @@ let KiviatColorMode = function() {
 
 
     App.views.kiviatLegend.setExtents(self.scaleRanges[mode]);
+    App.views.kiviatLegend.setTitle(App.summaryPropertyToText[mode].name);
     let kiviatScale = App.views.kiviatLegend.getColorOf;
 
     App.views.kiviatSummary.setColoredProperty(mode);

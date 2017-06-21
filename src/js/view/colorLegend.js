@@ -65,7 +65,7 @@ let ColorLegend = function(div) {
   }
 
   function setTitle(title) {
-
+    self.legendTitle.text(title);
   }
 
   function setColors(colorRange) {
