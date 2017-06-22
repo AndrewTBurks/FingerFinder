@@ -1,146 +1,263 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
+
 <head>
-	<meta charset="utf-8">
-	<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Lato:300">
-	<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Lato">
-	<link rel="stylesheet" type="text/css" href="style/style.css">
-	<link rel="stylesheet" type="text/css" href="style/d3.parcoords.css">
-	<title>FingerFinder</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>FingerFinder 2.0</title>
+
+  <!-- CSS Libs -->
+  <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Lato:300">
+  <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Lato">
+  <link rel="stylesheet" href="./lib/css/bootstrap.min.css">
+
+  <!-- JS Libs -->
+  <script src="./lib/js/jquery.min.js"></script>
+  <script src="./lib/js/bootstrap.min.js"></script>
+  <script src="./lib/js/d3.v4.min.js"></script>
+  <script src="./lib/js/lodash.js"></script>
+  <script src="./lib/js/three.min.js"></script>
+  <script src="./lib/js/d3-tip.js"></script>
+
+  <!-- CSS Src -->
+  <link rel="stylesheet/less" href="./src/css/main.less">
+
+  <script>
+    // set up options for less.js
+    less = {
+      // env: "production"
+    };
+  </script>
+  <!-- less.js to parse stylesheet/less -->
+  <script src="./lib/js/less.min.js"></script>
+
+  <!-- JS Src -->
+
+  <!-- Utils -->
+  <script src="./src/js/util/colorMaps.js"></script>
+
+  <!-- Models -->
+  <script src="./src/js/model/simulationDataModel.js"></script>
+  <script src="./src/js/model/runSummaryModel.js"></script>
+
+  <!-- Views -->
+  <script src="./src/js/view/slabViews.js"></script>
+  <script src="./src/js/view/flowView.js"></script>
+  <script src="./src/js/view/timeChartView.js"></script>
+  <script src="./src/js/view/fingerForestView.js"></script>
+  <script src="./src/js/view/kiviatView.js"></script>
+  <script src="./src/js/view/colorLegend.js"></script>
+
+  <!-- Controllers -->
+  <script src="./src/js/controller/upperDropdownController.js"></script>
+  <script src="./src/js/controller/flowColorModeController.js"></script>
+  <script src="./src/js/controller/kiviatColorModeController.js"></script>
+  <script src="./src/js/controller/flowSlabController.js"></script>
+  <script src="./src/js/controller/timeWindowController.js"></script>
+
+
+  <!-- Main Script -->
+  <script src="./src/js/main.js"></script>
+
 </head>
+
 <body>
-	<defs>
-		<marker id="arrow" markerWidth="13" markerHeight="13" refX="2" refY="6"
-		orient="auto">
-		<path d="M2,2 L2,11 L10,6 L2,2" style="fill: #000000;" />
-	</marker>
-</defs>
-<h1>FingerFinder</h1>
-<p class="subtitle">Scientific Visualization Contest 2016</p>
-<div class="container">
-	<div id="menuWrapper">
-		<p>Run&nbsp</p>
-		<select name="run" id="runDropdown" style="width:60px;overflow:hidden;">
-		</select>
-		<p style="padding-left:1.5em;">Timestep&nbsp</p>
-		<select name="time" id="timeDropdown" style="width:115px;">
-		</select>
-		<p style="padding-left:1.5em;">Color Scheme&nbsp</p>
-		<select name="colorScheme" style="width:90px;">
-			<option value="0">Magma</option>
-			<option value="1">Inferno</option>
-			<option value="2">Plasma</option>
-			<option value="3" selected>Viridis</option>
-		</select>
+  <nav class="navbar navbar-inverse">
+    <div class="container-fluid" id="navbar">
+      <h2 id="title">FingerFinder</h2>
+      <ul class="nav navbar-nav navbar-right">
+        <button class="btn navbar-btn btn-info" data-toggle="modal" data-target="#aboutModal" id="aboutButton">
+          <span class="glyphicon glyphicon-info-sign"></span>
+          About
+        </button>
+      </ul>
+    </div>
+  </nav>
+  <div class="container-fluid h-90">
+    <div class="row" id="controlRow">
+      <form class="form-inline" id="controls">
+        <div class="form-group visControl">
+          <label for="runSelect">Run:</label>
+          <select class="form-control" id="runSelect">
+          </select>
+        </div>
+        <div class="form-group visControl">
+          <label for="timestepSelect">Timestep:</label>
+          <select class="form-control" id="timestepSelect">
+          </select>
+        </div>
+        <div class="form-group visControl">
+          <label for="colorSelect">Color Scheme:</label>
+          <select class="form-control" id="colorSelect">
+          </select>
+        </div>
+      </form>
+    </div>
+    <div class="row h-95" id="visRow">
+      <div class="col-md-5 h-100">
+        <div class="col-md-5 h-100">
+          <div class="h-15 viewWrapper">
+            <h5 class="sectionTitle alignBottom">
+              2D Slab Views
+            </h5>
+          </div>
+          <div class="h-75">
+            <div class="h-50 viewWrapper">
+              <div class="h-100 view" id="concentrationHeatmap">
+                <h5 class="sectionTitle">
+                  Concentration Heatmap
+                  <span class="glyphicon glyphicon-info-sign"></span>
+                </h5>
+              </div>
+            </div>
+            <div class="h-50 viewWrapper">
+              <div class="h-100 view" id="velocityVectorField">
+                <h5 class="sectionTitle">
+                  Velocity Vector Field
+                  <span class="glyphicon glyphicon-info-sign"></span>
+                </h5>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-7 contentPanel">
+          <div class="h-15 viewWrapper">
+            <div class="h-100 view" id="flowControls">
+              <h5 class="sectionTitle">
+                Slab Position
+                <span class="glyphicon glyphicon-info-sign"></span>
+              </h5>
 
-	</div>
-</div>
-<br>
-<br>
-<div class="container">
-	<div id="wrapper">
-		<div id="sliceWrapper">
-			<p class="view2">2D Slab Concentration Heatmap</p>
-			<div id="slice"></div>
-			<p class="view2" style="margin-top:26px;">2D Slab Velocity Vector Field</p>
-			<div id="slice2"></div>
-			<!-- <div id="legendSlice">
-				<p class="view2" style="margin-top:15px;">Slice Concentration Range</p>
-				<p class="colorLegend1" id="sliceScaleMin"></p>
-				<p class="colorLegend2" id="sliceScaleMax"></p>
-			</div> -->
-		</div>
-		<!-- Cylinder View in middle -->
-		<div id="cylinderWrapper">
-			<div id="sliderDiv">
-				<p class="view2">Slab Position</p>
-			</div>
-			<div id="cylinder">
-				<p class="view2" style="margin-left:113px;">3D Flow View
-					<span id="flowTooltip">&nbsp&#9432</span>
-					<span style=display:inline-block;float:right;>
-						<select name="viewCylinder" style="width:125px;">
-							<option value="0" selected>All points</option>
-							<option value="1">Slab (desat.)</option>
-							<option value="2">Slab (highl.)</option>
-							<option value="3">Fingers only</option>
-						</select>
-					</span>
-				</p>
+            </div>
+          </div>
+          <div class="h-75 viewWrapper">
+            <div class="h-100 view" id="flowView">
+              <div class="sectionTitle">
+                <h5>
+                  3D Flow View
+                  <span class="glyphicon glyphicon-info-sign"></span>
+                </h5>
+                <select class="form-control" id="flowColoringSelect">
+                  <option value="all">All Points</option>
+                  <option value="desaturate">Slab (Desat.)</option>
+                  <option value="highlight">Slab (Highl.)</option>
+                  <option value="fingers">Fingers Only</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="h-10 viewWrapper">
+            <div class="h-100 view" id="flowLegend">
+              <h5 class="sectionTitle">
+                <span class="alignLeft" id="legendMinValue">
+                  0
+                </span>
+                Concentration Range
+                <span class="alignRight" id="legendMaxValue">
+                  100
+                </span>
+              </h5>
 
-			</div>
+            </div>
+          </div>
 
-			<div id="legend">
-				<p class="view2" style="margin-top:15px;">Concentration Range</p>
-				<p class="colorLegend1" id="scaleMin"></p>
-				<p class="colorLegend2" id="scaleMax"></p>
-			</div>
-		</div>
-		<!-- Feature Tracking Graph on right -->
-		<div id="fingerGraphWrapper">
-			<div id="graphBrushWrapper">
-				<p class="view2" style="display:inline-block;float:right;">Graph Range (Timesteps)</p>
-				<p class="view2" style="display:inline-block;float:left;color:#707070;">
-					# Viscous Fingers
-					<span id="numFingersTitle"> (Current Run)</span>
-				</p>
-				<div id="graphBrush"></div>
-			</div>
+        </div>
+      </div>
+      <div class="col-md-3 h-100">
+        <div class="h-20 viewWrapper">
+          <div class="h-100 view" id="timeChart">
+            <h5 class="sectionTitle">
+              <span class="alignLeft fadedText">
+                # Fingers
+                <span class="currentRunText">
+                  (Current Run)
+                </span>
+              </span>
+              <span class="alignRight">
+                Graph Range (Timesteps)
+              </span>
+            </h5>
 
-			<div id="fingerGraph">
-				<p class = "view3" style="display:inline-block;float:left;color:#707070;">
-					time &#x27f6
-				</p>
-				<p class="view2" style="margin-right: 54px;">Finger Forest
-					<span id="forestTooltip">&nbsp&#9432</span>
-				</p>
-			</div>
-		</div>
-		<div id="starplotWrapper">
-			<!-- <p class="view2" style="margin-top:30px;">Run Summary
-				<span id="parallelTooltip">&nbsp&#9432</span>
-			</p> -->
-			<p class="view2" style="margin-left:113px;display:inline-block;">Run Summary Star Plots
-				<span id="starplotTooltip">&nbsp&#9432</span>
-				<span style=display:inline-block;float:right;margin-left:50px>
-					<p style="color:white; display:inline;">Color&nbsp</p>
-					<select name="starplotColor" style="width:140px;">
-						<option value="0" selected>Total Fingers</option>
-						<option value="1">Finger Vel.</option>
-						<option value="2">Merge Factor</option>
-					</select>
-				</span>
-			</p>
-			<div id="starplots">
-			</div>
-			<div id="legendStar">
-				<p class="view2" id="starScaleTitle" style="margin-top:15px;">Concentration Range</p>
-				<p class="colorLegend1" id="starScaleMin"></p>
-				<p class="colorLegend2" id="starScaleMax"></p>
-			</div>
+          </div>
+        </div>
 
-			<!-- <div id="parallelWrapper" class="parcoords">
-			</div> -->
-		</div>
-	</div>
-</div>
+        <div class="h-80 viewWrapper">
+          <div class="h-100 view" id="fingerForest">
+            <h5 class="sectionTitle">
+              Finger Forest
+              <span class="glyphicon glyphicon-info-sign"></span>
+            </h5>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4 h-100">
+        <div class="h-90 viewWrapper">
+          <div class="h-100 view" id="kiviatSummary">
+            <div class="sectionTitle">
+              <h5>
+                Run Summary Kiviat Diagrams
+                <span class="glyphicon glyphicon-info-sign"></span>
+              </h5>
+              <span class="alignRight">
+                <select class="form-control titleSelect" id="kiviatColoringSelect">
+                  <!-- <option>Total Fingers</option>
+                  <option>Finger Vel.</option>
+                  <option>Merge Factor</option> -->
+                </select>
+              </span>
+            </div>
+          </div>
+        </div>
+        <div class="h-10 viewWrapper">
+          <div class="h-100 view" id="kiviatLegend">
+            <h5 class="sectionTitle">
+              <span class="alignLeft" id="legendMinValue">
+                0
+              </span>
+              <span id="legendTitle">
+                Total Clusters
+              </span>
+              <span class="alignRight" id="legendMaxValue">
+                100
+              </span>
+            </h5>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
-<!-- <div class="container">
-	<div id="wrapper2">
-		<p class="view2" style="margin-top:30px;">Run Summary Star Plots
-			<span id="starplotTooltip">&nbsp&#9432</span>
-		</p>
-		<div id="starplotWrapper">
-		</div>
-	</div>
-</div> -->
+  <!-- Modal -->
+  <div id="aboutModal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
 
-<script src="https://d3js.org/d3.v3.min.js"></script>
-<!-- <script src="https://d3js.org/d3-brush.v1.min.js"></script> -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r78/three.min.js"></script>
-<script src="js/THREEx.KeyboardState.js"></script>
-<script src="js/TrackballControls.js"></script>
-<script src="js/d3.parcoords.js"></script>
-<script type="text/javascript" src="https://code.jquery.com/jquery-1.7.1.min.js"></script>
-<script src="js/VISUALIZATION.js"></script>
-<script type="text/javascript" src="js/sizeof.compressed.js"></script></body>
+      <!-- Modal content-->
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title">About</h4>
+        </div>
+        <div class="modal-body">
+          <h4>
+            <span class="name">FingerFinder</span> is developed by a group of researchers at the Electronic Visualization Laboratory, University of Illinois at Chicago under the direction of G.Elisabeta Marai.
+          </h4>
+          <h4>
+            Team members include: Andrew Burks, Cassiano Sugiyama and Timothy Luciani
+          </h4>
+          <h4>
+            Please send all feedback and questions to marai@uic.edu
+          </h4>
+        </div>
+        <div class="modal-footer">
+          <button id="closeButton" type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+
+</body>
+
 </html>
