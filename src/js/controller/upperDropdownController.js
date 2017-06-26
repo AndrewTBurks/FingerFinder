@@ -65,7 +65,7 @@ let UpperDropdownController = function() {
     self.runDropdown = d3.select(id);
 
     // populate Dropdown
-    let runs = d3.range(1, 21);
+    let runs = d3.range(1, 7);
 
     self.runDropdown.selectAll("option")
       .data(runs)

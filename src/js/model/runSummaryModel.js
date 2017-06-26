@@ -17,7 +17,7 @@ let RunSummaryModel = function() {
   init();
 
   function init() {
-    self.runs = _.pull(d3.range(1, 21), 13, 15);
+    self.runs = _.pull(d3.range(1, 7), 13, 15);
 
     // set the single and averages properties as global variables
     App.singleProperties = [
