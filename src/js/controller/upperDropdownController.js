@@ -145,6 +145,7 @@ let UpperDropdownController = function() {
 
     App.state.currentRun = dropdown.node().value;
     App.views.timeChart.updateSelectedRun(App.state.currentRun);
+    App.views.fingerForest.updateSelectedRun(App.state.currentRun);
     App.views.kiviatSummary.changeSelectedRun(App.state.currentRun);
 
     timeOrRunChange();
