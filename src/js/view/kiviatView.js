@@ -83,7 +83,7 @@ let KiviatView = function(div) {
     let squareSide = calculateSquareSideLength(
       width - wrapperPadding * 2,
       height - wrapperPadding * 2,
-      20
+      7
     );
 
     self.wrapper.selectAll(".kiviatSVG")
