@@ -32,7 +32,7 @@ let SimulationDataModel = function() {
       let timestepName = ("00" + timestep).substr(-3);
 
       // create filepath from all 3 pieces
-      let filePath = ["/clean.44", runName, timestepName].join("/") + ".csv";
+      let filePath = ["./clean.44", runName, timestepName].join("/") + ".csv";
 
 
       // console.time('File Load');
@@ -86,7 +86,7 @@ let SimulationDataModel = function() {
       let runName = "run" + ("0" + run).substr(-2);
 
       // create filepath from all 3 pieces
-      let filePath = ["/clean.44", runName].join("/") + "/allClusters.json";
+      let filePath = ["./clean.44", runName].join("/") + "/allClusters.json";
 
       // console.time('File Load');
       // load the csv and reformat data
