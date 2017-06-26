@@ -92,7 +92,7 @@ let KiviatView = function(div) {
   }
 
   function drawKiviats(summaryData) {
-    let runNums = d3.range(1, 21);
+    let runNums = d3.range(1, 7);
 
     let svgViewboxDimension = 100;
     let axisRange = [5, (svgViewboxDimension / 2) - 5]
@@ -130,7 +130,7 @@ let KiviatView = function(div) {
     // calculate x, y of space for svgs and number of runs
     let x = parseInt(self.wrapper.style("width"), 10) - wrapperPadding * 2,
       y = parseInt(self.wrapper.style("height"), 10) - wrapperPadding * 2,
-      n = 20;
+      n = 6;
 
     let squareSide = calculateSquareSideLength(x, y, n);
 
