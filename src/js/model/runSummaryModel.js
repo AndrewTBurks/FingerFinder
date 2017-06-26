@@ -104,7 +104,7 @@ let RunSummaryModel = function() {
 
         let runName = "run" + ("0" + run).substr(-2);
 
-        let filePath = ["/clean.44", runName].join("/") + "/allClusterCenters.json";
+        let filePath = ["./clean.44", runName].join("/") + "/allClusterCenters.json";
 
         loadQueue.defer(d3.json, filePath);
       }
