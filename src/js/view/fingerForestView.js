@@ -46,10 +46,11 @@ let FingerForestView = function(div) {
     self.currentTimeWindow = timeWindow;
     let runClusters = self.clusterData[("run" + ("0" + App.state.currentRun).substr(-2))];
 
+    // aggregate nodes based on clusterID
     let uniqData = _.map(runClusters, t => {
       return _.keyBy(_.uniqBy(_.orderBy(t, 'size', "desc"), 'clusterID'), 'clusterID');
     });
-    // let uniqData = _.keyBy(_.uniqBy(_.orderBy(runClusters[d], 'size', "desc"), 'clusterID'), 'clusterID');
+
     let otherData = _.map(runClusters, (t, i) => {
       return _.difference(t, Object.values(uniqData[i]));
     });
@@ -59,6 +60,39 @@ let FingerForestView = function(div) {
         uniqData[i][f.clusterID].size += f.size;
         uniqData[i][f.clusterID].concTotal += f.concTotal;
       });
+    });
+
+    // aggregate links based on clusterID AND nextClusterID
+    let uniqLinks = _.map(runClusters, t => {
+      return _.keyBy(_.uniqBy(_.orderBy(t, 'size', "desc"), 'clusterID'), 'clusterID');
+    });
+
+    let otherLinks = _.map(runClusters, (t, i) => {
+      return _.difference(t, Object.values(uniqData[i]));
+    });
+
+    let allLinks = {};
+
+    _.forEach(otherLinks, (t, i) => {
+      _.forEach(t, f => {
+        if (f.nextClusterID === uniqLinks[i][f.clusterID].nextClusterID) {
+          uniqLinks[i][f.clusterID].size += f.size;
+          uniqLinks[i][f.clusterID].concTotal += f.concTotal;
+        } else {
+          if (!allLinks[i]) {
+            allLinks[i] = [];
+          }
+          allLinks[i].push(f);
+        }
+      });
+    });
+
+    _.forEach(uniqLinks, (t, i) => {
+      if (!allLinks[i]) {
+        allLinks[i] = [];
+      }
+
+      allLinks[i] = _.concat(Object.values(uniqLinks[i]), allLinks[i]);
     });
 
     let positionMap = calculateIDtoPositionMap(timeWindow, uniqData);
@@ -196,7 +230,7 @@ let FingerForestView = function(div) {
       })
       .each(function(d) {
         d3.select(this).selectAll(".link")
-          .data(runClusters[d].filter(f => f.nextClusterID != -1))
+          .data(allLinks[d].filter(f => f.nextClusterID != -1))
           .enter().append("path")
           .attr("class", "link")
           .each(function(f) {
