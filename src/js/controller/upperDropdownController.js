@@ -151,6 +151,10 @@ let UpperDropdownController = function() {
     timeOrRunChange();
   }
 
+  function changeHoveredRun(newRun) {
+    App.views.timeChart.updateHoveredRun(newRun);
+  }
+
   function changeCurrentTimestep(newTimestep) {
     let dropdown = self.timeDropdown;
 
@@ -167,6 +171,7 @@ let UpperDropdownController = function() {
     attachRunDropdown,
     attachTimeDropdown,
 
+    changeHoveredRun,
     changeCurrentRun,
     changeCurrentTimestep
   };

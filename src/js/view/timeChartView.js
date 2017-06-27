@@ -174,10 +174,18 @@ let TimeChartView = function(div) {
     self.runPaths.selectAll(".currentRunPath").raise();
   }
 
+  function updateHoveredRun(hoveredRun) {
+    self.runPaths.selectAll(".runPath")
+      .classed("hoveredRunPath", d => parseInt(d.substr(-2)) == hoveredRun);
+
+    self.runPaths.selectAll(".hoveredRunPath").raise();
+  }
+
   return {
     resize,
     drawTimeChart,
     updateBrushTimeWindow,
-    updateSelectedRun
+    updateSelectedRun,
+    updateHoveredRun
   };
 };
