@@ -155,15 +155,11 @@ let KiviatView = function(div) {
           .text(d)
           .on("mouseover", function() {
             if (summaryData.runs[runName]) {
-              console.log(runName, "Enter");
-              // App.controllers.upperDropdowns.changeCurrentRun(d);
               App.controllers.upperDropdowns.changeHoveredRun(d);
             }
           })
           .on("mouseout", function() {
             if (summaryData.runs[runName]) {
-              console.log(runName, "Exit");
-              // App.controllers.upperDropdowns.changeCurrentRun(d);
               App.controllers.upperDropdowns.changeHoveredRun(null);
             }
           })
