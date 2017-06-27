@@ -65,7 +65,7 @@ let UpperDropdownController = function() {
     self.runDropdown = d3.select(id);
 
     // populate Dropdown
-    let runs = d3.range(1, 21);
+    let runs = d3.range(1, 7);
 
     self.runDropdown.selectAll("option")
       .data(runs)
@@ -151,6 +151,10 @@ let UpperDropdownController = function() {
     timeOrRunChange();
   }
 
+  function changeHoveredRun(newRun) {
+    App.views.timeChart.updateHoveredRun(newRun);
+  }
+
   function changeCurrentTimestep(newTimestep) {
     let dropdown = self.timeDropdown;
 
@@ -167,6 +171,7 @@ let UpperDropdownController = function() {
     attachRunDropdown,
     attachTimeDropdown,
 
+    changeHoveredRun,
     changeCurrentRun,
     changeCurrentTimestep
   };
