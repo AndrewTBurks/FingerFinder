@@ -311,11 +311,16 @@ let FingerForestView = function(div) {
     // get the full node ordering by expanding roots into children recursively
     let nodes;
     // try catch block to handle error of max call stack size
+    // (should no longer happen with tail recursion)
     try {
-      nodes = _.map(roots, replaceWithChildrenInOrderRecursive);
+
+      // === tail recusive ID ordering creation === //
+      nodes = _.map(roots, replaceWithChildrenInOrderTailRecursive);
+
     } catch (err) {
       alert(err);
 
+      // catch stack call max error and just do default mapping unbalanced
       let map = {};
       for (let index in Object.keys(fingerTimeRange)) {
         map[Object.keys(fingerTimeRange)[index]] = index;
@@ -325,7 +330,8 @@ let FingerForestView = function(div) {
     }
 
     // flatten this as the arrays become nested
-    let ordering = _.flattenDeep(nodes);
+    let ordering = _.flatten(nodes); // flatten one level from initial map
+
     let orderUniq = _.uniq(ordering);
 
     // convert the ordering to a dictionary -- clusterID => index
@@ -337,6 +343,7 @@ let FingerForestView = function(div) {
     return map;
 
 
+    // === replace with tail recursive method === //
     function replaceWithChildrenInOrderRecursive(id) {
       if (fingerTimeRange[id].inOrderChildren) {
         return fingerTimeRange[id].inOrderChildren;
@@ -357,6 +364,43 @@ let FingerForestView = function(div) {
       fingerTimeRange[id].inOrderChildren = _.concat(prependChildren, +id, appendChildren);
 
       return fingerTimeRange[id].inOrderChildren;
+    }
+
+    // tail call optimized version of the recursive tree balancing algorithm
+    function replaceWithChildrenInOrderTailRecursive(id) {
+      if (fingerTimeRange[id].children.length === 0) {
+        return +id;
+      } else {
+        // begin tail recursion
+        return replaceTailRecursiveHelper([id], []);
+      }
+    }
+
+    function replaceTailRecursiveHelper(childrenToDo, expandedNodes) {
+      if (childrenToDo.length === 0) {
+        return expandedNodes;
+      } else {
+        // get first item in childrenToDo
+        let nextID = childrenToDo.shift();
+
+        // if it has no children
+        if (fingerTimeRange[nextID].children.length === 0 || fingerTimeRange[nextID].isExpanded) {
+          // add this node to completed list
+          expandedNodes.push(+nextID);
+
+          return replaceTailRecursiveHelper(childrenToDo, expandedNodes);
+        } else {
+          fingerTimeRange[nextID].isExpanded = true;
+
+          // place children around center node
+          let partition = [
+            _.filter(fingerTimeRange[nextID].children, (o, i) => i % 2 === 0),
+            _.reverse(_.filter(fingerTimeRange[nextID].children, (o, i) => i % 2 !== 0))
+          ];
+
+          return replaceTailRecursiveHelper(_.concat(partition[0], nextID, partition[1], childrenToDo), expandedNodes);
+        }
+      }
     }
   }
 
