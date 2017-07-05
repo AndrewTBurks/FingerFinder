@@ -1,0 +1,25 @@
+{
+  "name": "scivis2016",
+  "version": "1.0.0",
+  "description": "",
+  "main": "ClusterCenters.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AndrewTBurks/SciVis2016.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/AndrewTBurks/SciVis2016/issues"
+  },
+  "homepage": "https://github.com/AndrewTBurks/SciVis2016#readme",
+  "dependencies": {
+    "lodash": "^4.17.4"
+  }
+}
