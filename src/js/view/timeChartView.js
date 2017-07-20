@@ -133,7 +133,7 @@ let TimeChartView = function(div) {
     brushG.call(brush.move, [self.timeScale(self.currentSelection[0]), self.timeScale(self.currentSelection[1])])
 
     function brushEnd() {
-      if (!d3.event.sourceEvent) return; // Only transition after input.
+      if (!d3.event.sourceEvent) return; // Only transition after input
 
       let brushDomain = [0, 120];
       if (!d3.event.selection) {
