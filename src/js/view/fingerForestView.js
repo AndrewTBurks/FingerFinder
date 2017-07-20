@@ -418,8 +418,10 @@ let FingerForestView = function(div) {
 
     App.views.flow.setSelectedFinger(self.selectedFinger);
     App.controllers.flowColorMode.setFlowColorMode("fingers");
-    App.controllers.upperDropdowns.changeCurrentTimestep(d.timestep);
-
+    // FIX THIS -> inefficient
+    if (d.timestep !== App.state.currentTimestep) {
+      App.controllers.upperDropdowns.changeCurrentTimestep(d.timestep);
+    }
   }
 
   function updateSelectedRun(run) {

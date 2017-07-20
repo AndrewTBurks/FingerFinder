@@ -52,12 +52,14 @@ let SlabViews = function(concDiv, vecDiv) {
 
     self.concSVG = self.concDiv
       .append("svg")
+      .attr("class", "concSVG")
       .attr("width", dimension)
       .attr("height", dimension)
       .attr("viewBox", [0, 0, dimension, dimension].join(" "));
 
     self.vecSVG = self.vecDiv
       .append("svg")
+      .attr("class", "vecSVG")
       .attr("width", dimension)
       .attr("height", dimension)
       .attr("viewBox", [0, 0, dimension, dimension].join(" "));
@@ -193,7 +195,7 @@ let SlabViews = function(concDiv, vecDiv) {
           .attr("class", "concValue")
           .attr("width", self.binWidth)
           .attr("height", self.binWidth)
-          .style("opacity", 0.25)
+          .style("opacity", 0.4)
           .style("fill", d => startingColor(d.x + d.y));
 
         tile.append("path")
@@ -224,7 +226,9 @@ let SlabViews = function(concDiv, vecDiv) {
   }
 
   function setBackgroundColor(color) {
-    self.concSVG.style("background", color);
+    // leave background of heatmap transparent, color vector field to provide contrast
+
+    // self.concSVG.style("background", color);
     self.vecSVG.style("background", color);
   }
 

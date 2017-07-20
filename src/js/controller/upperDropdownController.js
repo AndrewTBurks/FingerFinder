@@ -40,8 +40,8 @@ let UpperDropdownController = function() {
     App.views.flow.setBackgroundColor("#1C2329");
     App.views.flow.changeColorScale(scale);
 
-    // App.views.slabs.setBackgroundColor(App.flowBG[App.state.colorScheme]);
-    App.views.slabs.setBackgroundColor("#1C2329");
+    App.views.slabs.setBackgroundColor(App.flowBG[App.state.colorScheme]);
+    // App.views.slabs.setBackgroundColor("#1C2329");
     App.views.slabs.changeColorScale(scale);
 
     // update color scale of finger forest
